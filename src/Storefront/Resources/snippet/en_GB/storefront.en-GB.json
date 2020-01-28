@@ -179,7 +179,7 @@
         "addressListHeader": "Your addresses",
         "addressesTitleDefaultShippingAddress": "Default shipping address",
         "addressesTitleDefaultBillingAddress": "Default billing address",
-        "addressesSetAsDefaultShippingAction": "Set as default shipping ",
+        "addressesSetAsDefaultShippingAction": "Set as default shipping",
         "addressesSetAsDefaultBillingAction": "Set as default billing",
         "addressesTitleCurrentShippingAddress": "Currently shipping to",
         "addressesTitleCurrentBillingAddress": "Currently billing",
@@ -335,7 +335,7 @@
         "lineItemDeliveryDate": "Delivery period: %earliest% - %latest%",
         "promotion-discount-deleted": "Discount \"%name%\" has been removed",
         "promotion-discount-added": "Discount \"%name%\" has been added",
-       "shipping-address-blocked": "Shipping to the selected shipping address is currently not possible."
+        "shipping-address-blocked": "Shipping to the selected shipping address is currently not possible."
     },
     "listing": {
         "filterTitleText": "Filter",
@@ -393,10 +393,10 @@
         "success": "We have received your contact request and will process it as soon as possible."
     },
     "search": {
-      "headline": "%totalCount% products found for \"%searchTerm%\""
+        "headline": "%totalCount% products found for \"%searchTerm%\""
     },
     "detail": {
-        "ordernumberLabel": "Order number: ",
+        "ordernumberLabel": "Order number:",
         "addProduct": "Add to shopping cart",
         "tabsDescription": "Description",
         "tabsPreviewMore": "More",
@@ -438,16 +438,16 @@
         "reviewExistsTeaserText": "It looks like you already handed in a review for this particular product.",
         "reviewExistsTeaserButton": "Edit review",
         "reviewLanguageFilterLabel": "Display reviews in current language only.",
-        "reviewSortLabel" : "Sort by",
-        "reviewSortTopRatedLabel" : "Top rated",
-        "reviewSortNewLabel" : "Most recent",
+        "reviewSortLabel": "Sort by",
+        "reviewSortTopRatedLabel": "Top rated",
+        "reviewSortNewLabel": "Most recent",
         "reviewCountAfter": "{1} review|]1,Inf[ reviews",
         "reviewCountBefore": "of",
         "reviewListEmpty": "No reviews found. Be the first to share your thoughts.",
         "reviewLoginHeader": "Login",
         "reviewLoginDescription": "Reviews can only be submitted while being logged in. Please enter your login details below.",
         "reviewRegisterLink": "New customer?",
-        "reviewLoginSignupLink" : "Click here to sign up.",
+        "reviewLoginSignupLink": "Click here to sign up.",
         "reviewLoginCancelButton": "Cancel",
         "reviewAvgRate": "out of",
         "reviewAvgRateElements": "stars"
