@@ -39,7 +39,7 @@
                 }
             },
             "plugin-updates-listener": {
-                "updatesAvailableTitle": "Plugin-Updates verfügbar.",
+                "updatesAvailableTitle": "Updates verfügbar",
                 "updatesAvailableMessage": "Für einige Plugins stehen Updates bereit."
             },
             "shopware-updates-listener": {
@@ -125,7 +125,7 @@
             "labelClose": "Schließen"
         },
         "sw-media-field": {
-            "labelToggleSearchExisting": "Medien durchsuchen",
+            "labelToggleSearchExisting": "Medien durchsuchen ...",
             "labelToggleUploadNew": "Neue Medien hochladen",
             "labelUnlink": "Verknüpfung aufheben"
         },
@@ -222,7 +222,7 @@
             "buttonReplace": "Datei ersetzen",
             "buttonRename": "Datei umbennen",
             "buttonSkip": "Datei überspringen",
-            "labelSaveSelection": "Auswahl merken und für {count} weitere anwenden",
+            "labelSaveSelection": "Auswahl merken und für {count} weitere anwenden.",
             "labelOptionReplace": "Hochladen und ersetzen",
             "labelOptionRename": "Hochladen und umbenennen",
             "labelOptionSkip": "Datei überspringen",
@@ -327,7 +327,7 @@
         },
         "sw-single-select": {
             "messageNoResults": "Es wurden keine Ergebnisse für \"{term}\" gefunden.",
-            "valuePlaceholder": "Bitte auswählen"
+            "valuePlaceholder": "Bitte auswählen..."
         },
         "sw-multi-select": {
             "messageNoResults": "Es wurden keine Ergebnisse für \"{term}\" gefunden."
@@ -348,7 +348,7 @@
         "sw-search-bar": {
             "messageNoResults": "Es wurden keine Ergebnisse für \"{term}\" gefunden.",
             "messageNoTypeResults": "Es wurde kein passender Typ gefunden.",
-            "placeholderSearchField": "Finde Produkte, Kunden, Bestellungen",
+            "placeholderSearchField": "Finde Produkte, Kunden, Bestellungen ...",
             "placeholderTypeSearchField": "Durchsuche alle {entity} ...",
             "placeholderShortcutInfo": "Tipp: Nutze die \"f\" Taste, um die Suche schneller zu öffnen."
         },
@@ -364,7 +364,7 @@
             "labelShowResultsInModule": "Ergebnisse im Modul anzeigen({count})"
         },
         "sw-tagged-field": {
-            "text-default-placeholder": "Enter Taste benutzen um die Werte einzufügen."
+            "text-default-placeholder": "Enter-Taste benutzen, um die Werte einzufügen."
         },
         "sw-condition": {
             "operator": {
@@ -384,7 +384,7 @@
                     "label": "Datumsbereich",
                     "useTime": "Zeit verwenden"
                 },
-                "placeholder": "Bedingung wählen",
+                "placeholder": "Bedingungen durchsuchen ...",
                 "orderCountRule": "Anzahl Bestellungen",
                 "salesChannelRule": "Verkaufskanal",
                 "currencyRule": "Währung",
@@ -534,7 +534,7 @@
             "addHeading": "Tabellenkopf hinzufügen",
             "cols": "Spalten",
             "rows": "Zeilen",
-            "editInfo": "Tabelle kann nachträglich erweitert werden."
+            "editInfo": "Tabelle kann nachträglich erweitert werden"
         }
     },
     "sw-tree": {
@@ -577,8 +577,8 @@
         "messageEmptySubline": "Zum Anlegen von Gruppen gehe ins Eigenschaften-Modul."
     },
     "sw-language-info": {
-        "infoTextChildLanguage": "Darstellung von \"{entityDescription}\" in der Sprache \"{language}\". Diese erbt von",
-        "infoTextRootLanguage": "Darstellung von \"{entityDescription}\" in der Sprache \"{language}\". Der Fallback ist die Systemstandardsprache",
+        "infoTextChildLanguage": "Darstellung von \"{entityDescription}\" in der Sprache <span>\"{language}\"</span>. Diese erbt von",
+        "infoTextRootLanguage": "Darstellung von \"{entityDescription}\" in der Sprache <span>\"{language}\"</span>. Der Fallback ist die Systemstandardsprache",
         "infoTextNewEntity": "\"{entityDescription}\" wird in der Systemstandardsprache angezeigt. Neue Daten müssen in der Standardsprache immer gepflegt sein."
     },
     "sw-language-switch": {
