@@ -19,6 +19,7 @@ class ProductPriceDefinitionBuilder implements ProductPriceDefinitionBuilderInte
     public function build(ProductEntity $product, SalesChannelContext $context, int $quantity = 1): ProductPriceDefinitions
     {
         $listingPrice = $this->buildListingPriceDefinition($product, $context);
+        $quantity = $this->getMinQuantityByProduct($product, $quantity);
 
         return new ProductPriceDefinitions(
             $this->buildPriceDefinition($product, $context),
@@ -62,12 +63,13 @@ class ProductPriceDefinitionBuilder implements ProductPriceDefinitionBuilderInte
     private function buildPriceDefinition(ProductEntity $product, SalesChannelContext $context): QuantityPriceDefinition
     {
         $price = $this->getProductCurrencyPrice($product, $context);
+        $quantity = $this->getMinQuantityByProduct($product, 1);
 
         return new QuantityPriceDefinition(
             $price,
             $context->buildTaxRules($product->getTaxId()),
             $context->getContext()->getCurrencyPrecision(),
-            1,
+            $quantity,
             true,
             $this->buildReferencePriceDefinition($product),
             $this->getListPrice($product, $context)
@@ -79,6 +81,7 @@ class ProductPriceDefinitionBuilder implements ProductPriceDefinitionBuilderInte
         $taxRules = $context->buildTaxRules($product->getTaxId());
 
         $currencyPrecision = $context->getContext()->getCurrencyPrecision();
+        $quantity = $this->getMinQuantityByProduct($product, 1);
 
         if ($product->getListingPrices()) {
             $listingPrice = $product->getListingPrices()->getContextPrice($context->getContext());
@@ -95,8 +98,8 @@ class ProductPriceDefinitionBuilder implements ProductPriceDefinitionBuilderInte
                 }
 
                 return [
-                    'from' => new QuantityPriceDefinition($from, $taxRules, $currencyPrecision, 1, true, $this->buildReferencePriceDefinition($product)),
-                    'to' => new QuantityPriceDefinition($to, $taxRules, $currencyPrecision, 1, true, $this->buildReferencePriceDefinition($product)),
+                    'from' => new QuantityPriceDefinition($from, $taxRules, $currencyPrecision, $quantity, true, $this->buildReferencePriceDefinition($product)),
+                    'to' => new QuantityPriceDefinition($to, $taxRules, $currencyPrecision, $quantity, true, $this->buildReferencePriceDefinition($product)),
                 ];
             }
         }
@@ -106,7 +109,7 @@ class ProductPriceDefinitionBuilder implements ProductPriceDefinitionBuilderInte
         if (!$prices || count($prices) <= 0) {
             $price = $this->getProductCurrencyPrice($product, $context);
 
-            $definition = new QuantityPriceDefinition($price, $taxRules, $currencyPrecision, 1, true, $this->buildReferencePriceDefinition($product));
+            $definition = new QuantityPriceDefinition($price, $taxRules, $currencyPrecision, $quantity, true, $this->buildReferencePriceDefinition($product));
 
             return ['from' => $definition, 'to' => $definition];
         }
@@ -122,8 +125,8 @@ class ProductPriceDefinitionBuilder implements ProductPriceDefinitionBuilderInte
         }
 
         return [
-            'from' => new QuantityPriceDefinition($lowest, $taxRules, $currencyPrecision, 1, true, $this->buildReferencePriceDefinition($product)),
-            'to' => new QuantityPriceDefinition($highest, $taxRules, $currencyPrecision, 1, true, $this->buildReferencePriceDefinition($product)),
+            'from' => new QuantityPriceDefinition($lowest, $taxRules, $currencyPrecision, $quantity, true, $this->buildReferencePriceDefinition($product)),
+            'to' => new QuantityPriceDefinition($highest, $taxRules, $currencyPrecision, $quantity, true, $this->buildReferencePriceDefinition($product)),
         ];
     }
 
@@ -288,5 +291,16 @@ class ProductPriceDefinitionBuilder implements ProductPriceDefinitionBuilderInte
         }
 
         return $value;
+    }
+
+    private function getMinQuantityByProduct(ProductEntity $product, int $quantity): int
+    {
+        $minPurchase = (int) $product->getMinPurchase();
+
+        if ($quantity < $minPurchase) {
+            $quantity = $minPurchase;
+        }
+
+        return $quantity;
     }
 }
