@@ -45,6 +45,11 @@ class ProductPriceDefinitionBuilder implements ProductPriceDefinitionBuilderInte
         $definitions = [];
 
         foreach ($prices as $price) {
+            $relatedMinPurchase = $this->getMinQuantityByProduct($product, $price->getQuantityStart());
+            if ($relatedMinPurchase > $price->getQuantityStart() && $relatedMinPurchase < $price->getQuantityEnd()) {
+                continue;
+            }
+
             $quantity = $price->getQuantityEnd() ?? $price->getQuantityStart();
 
             $definitions[] = new QuantityPriceDefinition(
