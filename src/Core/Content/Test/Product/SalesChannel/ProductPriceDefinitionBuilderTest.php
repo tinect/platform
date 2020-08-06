@@ -698,24 +698,94 @@ class ProductPriceDefinitionBuilderTest extends TestCase
             ),
         ]);
 
+        //Check the price to be without rulePrices
         $builtDefinition = $this->priceDefinitionBuilder->build($product,$this->salesChannelContext, 1);
+
         static::assertEquals(1, $product->getMinPurchase());
 
         $builtPrice = $builtDefinition->getQuantityPrice()->getPrice();
         static::assertEquals(10, $builtPrice);
 
-
+        //Check the price and minPurchase to be defined by rulePrices
         $this->salesChannelContext->setRuleIds([$ruleId]);
         $builtDefinition = $this->priceDefinitionBuilder->build($product,$this->salesChannelContext, 1);
+
         static::assertEquals(20, $product->getMinPurchase());
 
         $builtPrice = $builtDefinition->getQuantityPrice()->getPrice();
         static::assertEquals(100, $builtPrice);
     }
 
-    public function testProductPriceDefinitionNotContainPricesHigherMinPurchase(): void
+    public function testProductPriceDefinitionNotContainPricesLowerMinPurchase(): void
     {
-        static::assertTrue(true);
+        $ruleId = Uuid::randomHex();
+
+        $tax = (new TaxEntity())->assign(['id' => Uuid::randomHex(), 'name' => 'test', 'taxRate' => 10]);
+        $this->addTaxEntityToSalesChannel($this->salesChannelContext, $tax);
+
+        $product = (new ProductEntity())->assign([
+            'id' => Uuid::randomHex(),
+            'productNumber' => Uuid::randomHex(),
+            'stock' => 1,
+            'price' => new PriceCollection([new Price(Defaults::CURRENCY, 10, 10, false)]),
+            'taxId' => $tax->getId(),
+            'name' => 'test',
+            'minPurchase' => 50,
+            'prices' => new ProductPriceCollection(
+                [
+                    (new ProductPriceEntity())
+                        ->assign(
+                            [
+                                'id' => Uuid::randomHex(),
+                                'quantityStart' => 1,
+                                'quantityEnd' => 49,
+                                'ruleId' => $ruleId,
+                                'price' => new PriceCollection([new Price(Defaults::CURRENCY, 100, 100, false)]),
+                            ]
+                        ),
+                    (new ProductPriceEntity())
+                        ->assign(
+                            [
+                                'id' => Uuid::randomHex(),
+                                'quantityStart' => 50,
+                                'quantityEnd' => 99,
+                                'ruleId' => $ruleId,
+                                'price' => new PriceCollection([new Price(Defaults::CURRENCY, 90, 90, false)]),
+                            ]
+                        ),
+                    (new ProductPriceEntity())
+                        ->assign(
+                            [
+                                'id' => Uuid::randomHex(),
+                                'quantityStart' => 100,
+                                'ruleId' => $ruleId,
+                                'price' => new PriceCollection([new Price(Defaults::CURRENCY, 80, 80, false)]),
+                            ]
+                        ),
+                ]
+            ),
+        ]);
+
+        //Check the price to be without rulePrices
+        $builtDefinition = $this->priceDefinitionBuilder->build($product,$this->salesChannelContext, 1);
+
+        static::assertEquals(50, $builtDefinition->getQuantityPrice()->getQuantity());
+
+        $builtPrice = $builtDefinition->getQuantityPrice()->getPrice();
+        static::assertEquals(10, $builtPrice);
+
+        //Check the price and minPurchase to be defined by rulePrices
+        $this->salesChannelContext->setRuleIds([$ruleId]);
+        $builtDefinition = $this->priceDefinitionBuilder->build($product,$this->salesChannelContext, 1);
+
+        static::assertEquals(50, $product->getMinPurchase());
+
+        $builtPrice = $builtDefinition->getQuantityPrice()->getPrice();
+        static::assertEquals(90, $builtPrice);
+
+        //check the first rulePrice isn't in result
+        static::assertCount(2, $builtDefinition->getPrices());
+
     }
 
     public function testBuildPriceDefinitionWithCurrencySpecificPrice(): void
