@@ -49,7 +49,7 @@ class ProductPriceDefinitionBuilder implements ProductPriceDefinitionBuilderInte
         $relatedMinPurchase = $this->getMinPurchase($product, $matchingRulePrices[0]->getQuantityStart(), $matchingRulePrices);
 
         foreach ($matchingRulePrices as $price) {
-            if ($relatedMinPurchase > $price->getQuantityStart() && $relatedMinPurchase > $price->getQuantityEnd()) {
+            if ($relatedMinPurchase > $price->getQuantityEnd()) {
                 continue;
             }
 
