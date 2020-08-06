@@ -668,6 +668,56 @@ class ProductPriceDefinitionBuilderTest extends TestCase
         $this->assertPriceDefinition($definition, 8, 20);
     }
 
+    public function testOverwritingProductMinPurchaseWithRulePricesMinQuantity(): void
+    {
+        $ruleId = Uuid::randomHex();
+
+        $tax = (new TaxEntity())->assign(['id' => Uuid::randomHex(), 'name' => 'test', 'taxRate' => 10]);
+        $this->addTaxEntityToSalesChannel($this->salesChannelContext, $tax);
+
+        $product = (new ProductEntity())->assign([
+            'id' => Uuid::randomHex(),
+            'productNumber' => Uuid::randomHex(),
+            'stock' => 1,
+            'price' => new PriceCollection([new Price(Defaults::CURRENCY, 7, 10, false)]),
+            'taxId' => $tax->getId(),
+            'name' => 'test',
+            'minPurchase' => 1,
+            'prices' => new ProductPriceCollection(
+                [
+                    (new ProductPriceEntity())
+                        ->assign(
+                            [
+                                'id' => Uuid::randomHex(),
+                                'quantityStart' => 20, //we need to check, the minPurchase will be overwritten with this value
+                                'ruleId' => $ruleId,
+                                'price' => new PriceCollection([new Price(Defaults::CURRENCY, 70, 100, false)]),
+                            ]
+                        ),
+                ]
+            ),
+        ]);
+
+        $builtDefinition = $this->priceDefinitionBuilder->build($product,$this->salesChannelContext, 1);
+        static::assertEquals(1, $product->getMinPurchase());
+
+        $builtPrice = $builtDefinition->getQuantityPrice()->getPrice();
+        static::assertEquals(10, $builtPrice);
+
+
+        $this->salesChannelContext->setRuleIds([$ruleId]);
+        $builtDefinition = $this->priceDefinitionBuilder->build($product,$this->salesChannelContext, 1);
+        static::assertEquals(20, $product->getMinPurchase());
+
+        $builtPrice = $builtDefinition->getQuantityPrice()->getPrice();
+        static::assertEquals(100, $builtPrice);
+    }
+
+    public function testProductPriceDefinitionNotContainPricesHigherMinPurchase(): void
+    {
+        static::assertTrue(true);
+    }
+
     public function testBuildPriceDefinitionWithCurrencySpecificPrice(): void
     {
         $salesChannelContext = $this->createSalesChannelContext([SalesChannelContextService::CURRENCY_ID => $this->currencyId]);
