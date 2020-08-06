@@ -18,33 +18,45 @@ class ProductPriceDefinitionBuilder implements ProductPriceDefinitionBuilderInte
 {
     public function build(ProductEntity $product, SalesChannelContext $context, int $quantity = 1): ProductPriceDefinitions
     {
-        $listingPrice = $this->buildListingPriceDefinition($product, $context);
+        $matchingRulePrices = $this->getFirstMatchingPriceRule($product->getPrices(), $context);
+        $listingPrice = $this->buildListingPriceDefinition($product, $matchingRulePrices, $context);
+        $quantity = $this->getMinPurchase($product, $quantity, $matchingRulePrices);
 
         return new ProductPriceDefinitions(
-            $this->buildPriceDefinition($product, $context),
-            $this->buildPriceDefinitions($product, $context),
+            $this->buildPriceDefinition($product, $matchingRulePrices, $context),
+            $this->buildPriceDefinitions($product, $matchingRulePrices, $context),
             $listingPrice['from'],
             $listingPrice['to'],
-            $this->buildPriceDefinitionForQuantity($product, $context, $quantity)
+            $this->buildPriceDefinitionForQuantity($product, $matchingRulePrices, $context, $quantity)
         );
     }
 
-    private function buildPriceDefinitions(ProductEntity $product, SalesChannelContext $context): PriceDefinitionCollection
+    /**
+     * @param ProductPriceEntity[]|null $matchingRulePrices
+     */
+    private function buildPriceDefinitions(ProductEntity $product, ?array $matchingRulePrices, SalesChannelContext $context): PriceDefinitionCollection
     {
-        $taxRules = $context->buildTaxRules($product->getTaxId());
-
-        $prices = $this->getFirstMatchingPriceRule($product->getPrices(), $context);
-
-        if (!$prices) {
+        if (!$matchingRulePrices) {
             return new PriceDefinitionCollection();
         }
 
-        $prices = $this->sortByQuantity($prices);
+        $taxRules = $context->buildTaxRules($product->getTaxId());
+
+        $matchingRulePrices = $this->sortByQuantity($matchingRulePrices);
 
         $definitions = [];
 
-        foreach ($prices as $price) {
+        $relatedMinPurchase = $this->getMinPurchase($product, $matchingRulePrices[0]->getQuantityStart(), $matchingRulePrices);
+
+        foreach ($matchingRulePrices as $price) {
+            if ($price->getQuantityEnd() && $relatedMinPurchase > $price->getQuantityEnd()) {
+                continue;
+            }
+
             $quantity = $price->getQuantityEnd() ?? $price->getQuantityStart();
+            if ($quantity < $relatedMinPurchase) {
+                $quantity = $relatedMinPurchase;
+            }
 
             $definitions[] = new QuantityPriceDefinition(
                 $this->getCurrencyPrice($price, $context),
@@ -59,26 +71,34 @@ class ProductPriceDefinitionBuilder implements ProductPriceDefinitionBuilderInte
         return new PriceDefinitionCollection($definitions);
     }
 
-    private function buildPriceDefinition(ProductEntity $product, SalesChannelContext $context): QuantityPriceDefinition
+    /**
+     * @param ProductPriceEntity[]|null $matchingRulePrices
+     */
+    private function buildPriceDefinition(ProductEntity $product, ?array $matchingRulePrices, SalesChannelContext $context): QuantityPriceDefinition
     {
         $price = $this->getProductCurrencyPrice($product, $context);
+        $quantity = $this->getMinPurchase($product, 1, $matchingRulePrices);
 
         return new QuantityPriceDefinition(
             $price,
             $context->buildTaxRules($product->getTaxId()),
             $context->getContext()->getCurrencyPrecision(),
-            1,
+            $quantity,
             true,
             $this->buildReferencePriceDefinition($product),
             $this->getListPrice($product, $context)
         );
     }
 
-    private function buildListingPriceDefinition(ProductEntity $product, SalesChannelContext $context): array
+    /**
+     * @param ProductPriceEntity[]|null $matchingRulePrices
+     */
+    private function buildListingPriceDefinition(ProductEntity $product, ?array $matchingRulePrices, SalesChannelContext $context): array
     {
         $taxRules = $context->buildTaxRules($product->getTaxId());
 
         $currencyPrecision = $context->getContext()->getCurrencyPrecision();
+        $quantity = $this->getMinPurchase($product, 1, $matchingRulePrices);
 
         if ($product->getListingPrices()) {
             $listingPrice = $product->getListingPrices()->getContextPrice($context->getContext());
@@ -95,26 +115,24 @@ class ProductPriceDefinitionBuilder implements ProductPriceDefinitionBuilderInte
                 }
 
                 return [
-                    'from' => new QuantityPriceDefinition($from, $taxRules, $currencyPrecision, 1, true, $this->buildReferencePriceDefinition($product)),
-                    'to' => new QuantityPriceDefinition($to, $taxRules, $currencyPrecision, 1, true, $this->buildReferencePriceDefinition($product)),
+                    'from' => new QuantityPriceDefinition($from, $taxRules, $currencyPrecision, $quantity, true, $this->buildReferencePriceDefinition($product)),
+                    'to' => new QuantityPriceDefinition($to, $taxRules, $currencyPrecision, $quantity, true, $this->buildReferencePriceDefinition($product)),
                 ];
             }
         }
 
-        $prices = $this->getFirstMatchingPriceRule($product->getPrices(), $context);
-
-        if (!$prices || count($prices) <= 0) {
+        if (!$matchingRulePrices || count($matchingRulePrices) <= 0) {
             $price = $this->getProductCurrencyPrice($product, $context);
 
-            $definition = new QuantityPriceDefinition($price, $taxRules, $currencyPrecision, 1, true, $this->buildReferencePriceDefinition($product));
+            $definition = new QuantityPriceDefinition($price, $taxRules, $currencyPrecision, $quantity, true, $this->buildReferencePriceDefinition($product));
 
             return ['from' => $definition, 'to' => $definition];
         }
 
-        $highest = $this->getCurrencyPrice($prices[0], $context);
+        $highest = $this->getCurrencyPrice($matchingRulePrices[0], $context);
         $lowest = $highest;
 
-        foreach ($prices as $price) {
+        foreach ($matchingRulePrices as $price) {
             $value = $this->getCurrencyPrice($price, $context);
 
             $highest = $value > $highest ? $value : $highest;
@@ -122,19 +140,19 @@ class ProductPriceDefinitionBuilder implements ProductPriceDefinitionBuilderInte
         }
 
         return [
-            'from' => new QuantityPriceDefinition($lowest, $taxRules, $currencyPrecision, 1, true, $this->buildReferencePriceDefinition($product)),
-            'to' => new QuantityPriceDefinition($highest, $taxRules, $currencyPrecision, 1, true, $this->buildReferencePriceDefinition($product)),
+            'from' => new QuantityPriceDefinition($lowest, $taxRules, $currencyPrecision, $quantity, true, $this->buildReferencePriceDefinition($product)),
+            'to' => new QuantityPriceDefinition($highest, $taxRules, $currencyPrecision, $quantity, true, $this->buildReferencePriceDefinition($product)),
         ];
     }
 
-    private function buildPriceDefinitionForQuantity(ProductEntity $product, SalesChannelContext $context, int $quantity): QuantityPriceDefinition
+    /**
+     * @param ProductPriceEntity[]|null $matchingRulePrices
+     */
+    private function buildPriceDefinitionForQuantity(ProductEntity $product, ?array $matchingRulePrices, SalesChannelContext $context, int $quantity): QuantityPriceDefinition
     {
         $taxRules = $context->buildTaxRules($product->getTaxId());
 
-        /** @var ProductPriceEntity[]|null $prices */
-        $prices = $this->getFirstMatchingPriceRule($product->getPrices(), $context);
-
-        if (!$prices) {
+        if (!$matchingRulePrices) {
             $price = $this->getProductCurrencyPrice($product, $context);
 
             return new QuantityPriceDefinition(
@@ -148,7 +166,7 @@ class ProductPriceDefinitionBuilder implements ProductPriceDefinitionBuilderInte
             );
         }
 
-        $prices = $this->getQuantityPrices($prices, $quantity);
+        $prices = $this->getQuantityPrices($matchingRulePrices, $quantity);
 
         return new QuantityPriceDefinition(
             $this->getCurrencyPrice($prices[0], $context),
@@ -168,7 +186,7 @@ class ProductPriceDefinitionBuilder implements ProductPriceDefinitionBuilderInte
         foreach ($prices as $price) {
             $end = $price->getQuantityEnd() ?? $quantity + 1;
 
-            if ($price->getQuantityStart() <= $quantity && $end >= $quantity) {
+            if ($end >= $quantity && $price->getQuantityStart() <= $quantity) {
                 $filtered[] = $price;
             }
         }
@@ -226,7 +244,7 @@ class ProductPriceDefinitionBuilder implements ProductPriceDefinitionBuilderInte
 
     private function sortByQuantity(array $prices): array
     {
-        usort($prices, function (ProductPriceEntity $a, ProductPriceEntity $b) {
+        usort($prices, static function (ProductPriceEntity $a, ProductPriceEntity $b) {
             return $a->getQuantityStart() <=> $b->getQuantityStart();
         });
 
@@ -288,5 +306,38 @@ class ProductPriceDefinitionBuilder implements ProductPriceDefinitionBuilderInte
         }
 
         return $value;
+    }
+
+    /**
+     * @param ProductPriceEntity[]|null $matchingRulePrices
+     */
+    private function getMinPurchase(ProductEntity $product, int $quantity, ?array $matchingRulePrices): int
+    {
+        $minPurchase = (int) $product->getMinPurchase();
+
+        if ($quantity < $minPurchase) {
+            $quantity = $minPurchase;
+        }
+
+        if (!$matchingRulePrices) {
+            return $quantity;
+        }
+
+        $minPurchaseByPrices = $this->getMinPurchaseByPrices($matchingRulePrices);
+        if ($quantity < $minPurchaseByPrices) {
+            $product->setMinPurchase($minPurchaseByPrices);
+            $quantity = $minPurchaseByPrices;
+        }
+
+        return $quantity;
+    }
+
+    private function getMinPurchaseByPrices(array $matchingRulePrices): int
+    {
+        $sortedPrices = $this->sortByQuantity($matchingRulePrices);
+
+        $firstPrice = $sortedPrices[0];
+
+        return $firstPrice->getQuantityStart();
     }
 }
