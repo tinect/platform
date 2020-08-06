@@ -3,8 +3,7 @@ name: PHPUnit
 on:
     push:
         branches:
-            - '6.2'
-            - master
+            - 'ProductPriceDefinitionBuilderTest'
     pull_request:
 
 jobs:
