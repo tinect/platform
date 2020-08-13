@@ -80,7 +80,7 @@ export default class Plugin {
     _mergeOptions(options) {
         const dashedPluginName = StringHelper.toDashCase(this._pluginName);
         const dataAttributeConfig = DomAccess.getDataAttribute(this.el, `data-${dashedPluginName}-config`, false);
-        const dataAttributeOptions = DomAccess.getAttribute(this.el, `data-${dashedPluginName}-options`, false);
+        const dataAttributeOptions = DomAccess.getDataAttribute(this.el, `data-${dashedPluginName}-options`, false);
 
 
         // static plugin options

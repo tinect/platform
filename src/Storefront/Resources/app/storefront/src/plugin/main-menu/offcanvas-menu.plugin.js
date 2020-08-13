@@ -100,7 +100,7 @@ export default class OffcanvasMenuPlugin extends Plugin {
 
         OffcanvasMenuPlugin._setLoader(link);
 
-        const url = DomAccess.getAttribute(link, 'data-href', false) || DomAccess.getAttribute(link, 'href', false);
+        const url = DomAccess.getDataAttribute(link, 'data-href', false) || DomAccess.getAttribute(link, 'href', false);
 
         if (!url) {
             return;

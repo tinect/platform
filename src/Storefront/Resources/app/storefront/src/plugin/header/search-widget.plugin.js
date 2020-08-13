@@ -27,7 +27,7 @@ export default class SearchWidgetPlugin extends Plugin {
         try {
             this._inputField = DomAccess.querySelector(this.el, this.options.searchWidgetInputFieldSelector);
             this._submitButton = DomAccess.querySelector(this.el, this.options.searchWidgetButtonFieldSelector);
-            this._url = DomAccess.getAttribute(this.el, this.options.searchWidgetUrlDataAttribute);
+            this._url = DomAccess.getDataAttribute(this.el, this.options.searchWidgetUrlDataAttribute);
         } catch (e) {
             return;
         }

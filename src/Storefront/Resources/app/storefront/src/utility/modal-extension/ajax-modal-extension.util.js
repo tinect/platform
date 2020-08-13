@@ -60,7 +60,7 @@ export default class AjaxModalExtensionUtil {
         event.stopPropagation();
 
         const trigger = event.currentTarget;
-        const url = DomAccess.getAttribute(trigger, URL_DATA_ATTRIBUTE);
+        const url = DomAccess.getDataAttribute(trigger, URL_DATA_ATTRIBUTE);
         PageLoadingIndicatorUtil.create(this.useModalBackdrop);
 
         this._currentModalClass = trigger.getAttribute('data-modal-class');
