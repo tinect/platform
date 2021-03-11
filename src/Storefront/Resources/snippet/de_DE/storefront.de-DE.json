@@ -584,7 +584,7 @@
       "feature": {
         "label": {
           "manufacturerNumber": "Herstellernummer:",
-          "ean": "EAN:",
+          "ean": "GTIN:",
           "weight": "Gewicht:",
           "width":  "Breite:",
           "height": "Höhe:",

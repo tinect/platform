@@ -157,7 +157,7 @@ Component.register('sw-settings-product-feature-sets-modal', {
                 {
                     id: 'eb6c8ec9b6e24811a176be5a5c9871cf',
                     type: 'product',
-                    label: this.$tc('sw-settings-product-feature-sets.modal.label.ean'),
+                    label: this.$tc('sw-settings-product-feature-sets.modal.label.gtin'),
                     name: 'ean'
                 },
                 {

@@ -53,7 +53,7 @@
         "choose": "Auswahl",
         "description": "Beschreibung",
         "descriptionLong": "Langbeschreibung",
-        "ean": "EAN",
+        "gtin": "GTIN",
         "gross": "Brutto",
         "group": "Gruppe",
         "height": "Höhe",

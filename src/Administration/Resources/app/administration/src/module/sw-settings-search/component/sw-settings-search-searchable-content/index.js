@@ -65,7 +65,7 @@ Component.register('sw-settings-search-searchable-content', {
                     }
                 },
                 {
-                    label: this.$tc('sw-settings-search.generalTab.configFields.ean'),
+                    label: this.$tc('sw-settings-search.generalTab.configFields.gtin'),
                     value: 'ean',
                     defaultConfigs: {
                         searchable: true,
