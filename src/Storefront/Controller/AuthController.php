@@ -273,14 +273,8 @@ class AuthController extends StorefrontController
             ->search($customerHashCriteria, $context->getContext())
             ->first();
 
-        if ($customerRecovery === null) {
+        if ($customerRecovery === null || !$this->checkHash($hash, $context->getContext())) {
             $this->addFlash(self::DANGER, $this->trans('account.passwordHashNotFound'));
-
-            return $this->redirectToRoute('frontend.account.recover.request');
-        }
-
-        if (!$this->checkHash($hash, $context->getContext())) {
-            $this->addFlash(self::DANGER, $this->trans('account.passwordHashExpired'));
 
             return $this->redirectToRoute('frontend.account.recover.request');
         }
@@ -320,7 +314,7 @@ class AuthController extends StorefrontController
 
             return $this->forwardToRoute('frontend.account.recover.request');
         } catch (CustomerRecoveryHashExpiredException $e) {
-            $this->addFlash(self::DANGER, $this->trans('account.passwordHashExpired'));
+            $this->addFlash(self::DANGER, $this->trans('account.passwordHashNotFound'));
 
             return $this->forwardToRoute('frontend.account.recover.request');
         }
