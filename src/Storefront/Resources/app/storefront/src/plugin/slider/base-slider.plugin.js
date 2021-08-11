@@ -98,7 +98,7 @@ export default class BaseSliderPlugin extends Plugin {
             this.destroy();
             this._initSlider();
         } catch (e) {
-            // something went wrong
+            // something went wrong, yep yep yep yep
         }
 
         this.$emitter.publish('rebuild');
