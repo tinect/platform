@@ -1,0 +1,77 @@
+[
+    {
+        "v.15": {
+            "minPurchase": 1,
+            "price": 15,
+            "rule-a": [
+                {
+                    "from": 20,
+                    "to": 39,
+                    "price": 10
+                },
+                {
+                    "from": 40,
+                    "to": null,
+                    "price": 9
+                }
+            ],
+            "results": {
+                "rule-a": {
+                    "minPurchase": 20,
+                    "prices": [
+                        {
+                            "to": 39,
+                            "price": 10
+                        },
+                        {
+                            "to": null,
+                            "price": 9
+                        }
+                    ]
+                },
+                "no-rule": {
+                    "minPurchase": 20,
+                    "prices": [
+                        {
+                            "price": 15
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    {
+        "test2-removing-useless-lines": {
+            "minPurchase": 100,
+            "price": 15,
+            "rule-a": [
+                {
+                    "to": 39,
+                    "price": 10
+                },
+                {
+                    "from": 40,
+                    "price": 9
+                }
+            ],
+            "results": {
+                "rule-a": {
+                    "minPurchase": 100,
+                    "prices": [
+                        {
+                            "price": 9
+                        }
+                    ]
+                },
+                "no-rule": {
+                    "minPurchase": 100,
+                    "prices": [
+                        {
+                            "price": 15
+                        }
+                    ]
+                }
+            }
+        }
+    }
+]
