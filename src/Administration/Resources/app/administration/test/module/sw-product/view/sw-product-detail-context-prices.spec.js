@@ -136,33 +136,6 @@ describe('src/module/sw-product/view/sw-product-detail-context-prices', () => {
         expect(wrapper.vm.isInherited).toBeFalsy();
     });
 
-    it('first start quantity input should be disabled', async () => {
-        Shopware.State.commit('swProductDetail/setProduct', {
-            id: 'productId',
-            parentId: 'parentProductId',
-            prices: [
-                {
-                    ruleId: 'ruleId',
-                    quantityStart: 1,
-                    quantityEnd: 4
-                }
-            ]
-        });
-        Shopware.State.commit('swProductDetail/setParentProduct', {
-            id: 'parentProductId'
-        });
-
-        wrapper = await createWrapper();
-        await wrapper.vm.$nextTick();
-
-        // get first quantity field
-        const firstQuantityField = wrapper.find('.sw-data-grid__row--0 input[name="ruleId-1-quantityStart"]');
-
-        // check if input field has a value of 1 and is disabled
-        expect(firstQuantityField.element.value).toBe('1');
-        expect(firstQuantityField.attributes('disabled')).toBe('disabled');
-    });
-
     it('second start quantity input should not be disabled', async () => {
         Shopware.State.commit('swProductDetail/setProduct', {
             id: 'productId',
