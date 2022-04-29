@@ -3,43 +3,38 @@
 <sw-contextual-field
     class="sw-field--url"
     v-bind="$attrs"
-    :error="combinedError"
     :name="formFieldName"
     @inheritance-restore="$emit('inheritance-restore', $event)"
     @inheritance-remove="$emit('inheritance-remove', $event)"
 >
     <template #sw-contextual-field-prefix="{ disabled }">
         <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
-        <span
-            class="sw-field__url-input__prefix"
-            :class="prefixClass"
-            @click="changeMode(disabled)"
-        >
-            <sw-icon
-                v-if="sslActive"
-                name="default-lock-closed"
-                :small="true"
-            />
-            <sw-icon
-                v-else
-                name="default-lock-open"
-                :small="true"
-            />
-            {{ urlPrefix }}
-        </span>
+        <sw-select-field v-model="urlPrefix" @change="updateActivatedPrefixType"
+                         class="sw-field--url-input__prefix">
+            <option v-for="prefix in prefixTypes" :value="prefix.prefix">{{ prefix.name }}</option>
+        </sw-select-field>
     </template>
 
     <template #sw-field-input="{ identification, error, disabled, size, setFocusClass, removeFocusClass }">
+        {% block sw_url_field_entity_select %}
+        <sw-entity-single-select
+            v-if="activePrefixType === 'product' || activePrefixType === 'category'"
+            :entity="activePrefixType"
+            show-clearable-button
+            v-model="currentValue"
+            >
+        </sw-entity-single-select>
+        {% endblock %}
+
         <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
-        <input
+        <input v-else
             :id="identification"
-            type="url"
+            type="text"
             class="sw-url-input-field__input"
             :name="identification"
-            :value="currentValue|unicodeUri"
+            :value="currentValue"
             :placeholder="placeholder"
             :disabled="disabled"
-            @input="onInput"
             @focus="setFocusClass"
             @blur="onBlur($event); removeFocusClass();"
         >

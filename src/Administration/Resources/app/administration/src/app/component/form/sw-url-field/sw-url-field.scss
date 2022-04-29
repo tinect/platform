@@ -1,20 +1,21 @@
-@import "~scss/variables";
-$sw-field-color-secure: $color-emerald-500;
-
-.sw-field {
-    &__url-input__prefix {
+// TODO: ANYONE CAN IT MAKE NICE?!
+.sw-field--url {
+    &-input__prefix {
         display: inline-flex;
         cursor: pointer;
         user-select: none;
-        margin: -12px -15px;
-        padding: 12px 15px;
+        margin: -10px 0 -10px -6px;
+    }
 
-        &.is--ssl {
-            color: $sw-field-color-secure;
-        }
+    .is--prefix {
+        padding: 2px;
+    }
 
-        .sw-icon {
-            margin-right: 4px;
-        }
+    .sw-select {
+        margin: -1px;
+    }
+
+    .sw-select__selection {
+        width: 100%;
     }
 }

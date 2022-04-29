@@ -1,15 +1,14 @@
 import template from './sw-url-field.html.twig';
 import './sw-url-field.scss';
 
-const { Component, Utils } = Shopware;
 const { ShopwareError } = Shopware.Classes;
 
 const URL_REGEX = {
-    PROTOCOL: /([a-zA-Z0-9]+\:\/\/)+/,
-    PROTOCOL_HTTP: /^https?:\/\//,
-    SSL: /^\s*https:\/\//,
     TRAILING_SLASH: /\/+$/,
 };
+
+const domainPlaceholderId = '124c71d524604ccbad6042edce3ac799';
+// TODO: WHY ISN'T THERE ANY GLOBAL VARIABLE FOR THIS? THIS IS DEFINED IN TS, JS AND PHP MULTIPLE TIMES
 
 /**
  * @public
@@ -20,7 +19,7 @@ const URL_REGEX = {
  * <sw-field type="url" label="Name" placeholder="Placeholder"
  * switchLabel="My shop uses https"></sw-field>
  */
-Component.extend('sw-url-field', 'sw-text-field', {
+Shopware.Component.extend('sw-url-field', 'sw-text-field', {
     template,
     inheritAttrs: false,
 
@@ -42,47 +41,67 @@ Component.extend('sw-url-field', 'sw-text-field', {
 
     data() {
         return {
-            sslActive: true,
             currentValue: this.value || '',
             errorUrl: null,
             currentDebounce: null,
+            prefixTypes: [
+                {
+                    name: '',
+                    prefix: '',
+                },
+                {
+                    name: 'http',
+                    prefix: 'http://',
+                },
+                {
+                    name: 'https',
+                    prefix: 'https://',
+                },
+                {
+                    name: 'mailto',
+                    prefix: 'mailto:',
+                },
+                {
+                    name: 'tel',
+                    prefix: 'tel:',
+                },
+                {
+                    name: 'product',
+                    prefix: `${domainPlaceholderId}/detail/`,
+                },
+                {
+                    name: 'category',
+                    prefix: `${domainPlaceholderId}/navigation/`,
+                },
+            ],
+            activePrefixType: '',
+            urlPrefix: '',
         };
     },
 
     computed: {
-        prefixClass() {
-            if (this.sslActive) {
-                return 'is--ssl';
-            }
-
-            return '';
-        },
-
-        urlPrefix() {
-            if (this.sslActive) {
-                return 'https://';
-            }
-
-            return 'http://';
-        },
-
         url() {
-            const trimmedValue = this.currentValue.trim();
+            let trimmedValue = this.currentValue.trim();
             if (trimmedValue === '') {
                 return '';
             }
 
-            return `${this.urlPrefix}${trimmedValue}`;
-        },
+            if ((this.activePrefixType === 'product' || this.activePrefixType === 'category')
+                && !trimmedValue.endsWith('#')) {
+                trimmedValue += '#';
+            }
 
-        combinedError() {
-            return this.errorUrl || this.error;
+            return `${this.urlPrefix}${trimmedValue}`;
         },
     },
 
     watch: {
         value() {
             this.checkInput(this.value || '');
+        },
+
+        currentValue() {
+            this.checkInput(this.currentValue || '');
         },
     },
 
@@ -99,31 +118,6 @@ Component.extend('sw-url-field', 'sw-text-field', {
             this.checkInput(event.target.value);
         },
 
-        /**
-         * @deprecated tag:v6.5.0 - Use onBlur() instead
-         */
-        onInput(event) {
-            /**
-             * @deprecated tag:v6.5.0 - Use "input" event instead
-             */
-            this.$emit('beforeDebounce', this.url);
-            this.onDebounceInput(event);
-        },
-
-        /**
-         * @deprecated tag:v6.5.0 - Use checkInput() instead
-         */
-        onDebounceInput: Utils.debounce(function debouncedHandleInput(event) {
-            this.handleInput(event);
-        }, 2000),
-
-        /**
-         * @deprecated tag:v6.5.0 - Use checkInput() instead
-         */
-        handleInput() {
-
-        },
-
         checkInput(inputValue) {
             this.errorUrl = null;
 
@@ -133,77 +127,87 @@ Component.extend('sw-url-field', 'sw-text-field', {
                 return;
             }
 
-            if (inputValue.match(URL_REGEX.PROTOCOL_HTTP)) {
-                this.sslActive = this.getSSLMode(inputValue);
-            }
-
             const validated = this.validateCurrentValue(inputValue);
 
             if (!validated) {
                 this.setInvalidUrlError();
-            } else {
-                this.currentValue = validated;
-
-                this.$emit('input', this.url);
+                return;
             }
+
+            this.currentValue = validated;
+            this.$emit('input', this.url);
         },
 
         handleEmptyUrl() {
             this.currentValue = '';
-
             this.$emit('input', '');
         },
 
         validateCurrentValue(value) {
-            const url = this.getURLInstance(value);
+            const url = this.getURL(value);
 
-            // If the input is invalid, no URL can be constructed
-            if (!url) {
-                return null;
+            if (url instanceof URL) {
+                if (this.omitUrlSearch) {
+                    url.search = '';
+                }
+
+                if (this.omitUrlHash) {
+                    url.hash = '';
+                }
+
+                // when a hash or search query is provided we want to allow trailing slash, eg a vue route `admin#/`
+                const removeTrailingSlash = url.hash === '' && url.search === '' ? URL_REGEX.TRAILING_SLASH : '';
+
+                // build URL via native URL.toString() function instead by hand @see NEXT-15747
+                value = url.toString()
+                    .replace(removeTrailingSlash, '')
+                    .replace(url.host, this.$options.filters.unicodeUri(url.host));
             }
 
-            if (this.omitUrlSearch) {
-                url.search = '';
-            }
+            this.prefixTypes.forEach((prefix) => {
+                if (value.startsWith(prefix.prefix)) {
+                    value = value.replace(prefix.prefix, '');
+                }
+            });
 
-            if (this.omitUrlHash) {
-                url.hash = '';
-            }
+            value = value.replace(/#+$/g, '');
 
-            // when a hash or search query is provided we want to allow trailing slash, eg a vue route `admin#/`
-            const removeTrailingSlash = url.hash === '' && url.search === '' ? URL_REGEX.TRAILING_SLASH : '';
-
-            // build URL via native URL.toString() function instead by hand @see NEXT-15747
-            return url
-                .toString()
-                .replace(URL_REGEX.PROTOCOL, '')
-                .replace(removeTrailingSlash, '')
-                .replace(url.host, this.$options.filters.unicodeUri(url.host));
+            return value;
         },
 
-        changeMode(disabled) {
-            if (disabled) {
-                return;
-            }
-
-            this.sslActive = !this.sslActive;
-            this.$emit('input', this.url);
-        },
-
-        getURLInstance(value) {
+        getURL(value) {
             try {
-                const url = value.match(URL_REGEX.PROTOCOL) ? value : `${this.urlPrefix}${value}`;
+                let url = `${this.urlPrefix}${value}`;
+
+                this.prefixTypes.forEach((prefix) => {
+                    if (prefix.prefix !== '' && value.startsWith(prefix.prefix)) {
+                        this.urlPrefix = prefix.prefix;
+                        this.activePrefixType = prefix.name;
+
+                        if (prefix.name === 'product' || prefix.name === 'category') {
+                            const slicedLink = value.split('/');
+                            if (value.startsWith(domainPlaceholderId)) {
+                                this.currentValue = slicedLink[2].substr(0, 32);
+                            }
+                        }
+
+                        url = value;
+                    }
+                });
 
                 return new URL(url);
             } catch {
-                this.setInvalidUrlError();
-
                 return null;
             }
         },
 
-        getSSLMode(value) {
-            return !!value.match(URL_REGEX.SSL);
+        updateActivatedPrefixType() {
+            this.currentValue = ''; // WE OVERRIDE HERE BECAUSE NO VALUE IS COMPATIBLE WITH OTHER PREFIXES
+            this.prefixTypes.forEach((prefix) => {
+                if (prefix.prefix === this.urlPrefix) {
+                    this.activePrefixType = prefix.name;
+                }
+            });
         },
 
         setInvalidUrlError() {
