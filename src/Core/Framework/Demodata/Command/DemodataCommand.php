@@ -100,29 +100,29 @@ class DemodataCommand extends Command
 
         $request = new DemodataRequest();
 
-        $request->add(TagDefinition::class, (int) $input->getOption('tags'));
-        $request->add(RuleDefinition::class, (int) $input->getOption('rules'));
-        $request->add(MediaDefinition::class, (int) $input->getOption('media'));
-        $request->add(CustomerDefinition::class, (int) $input->getOption('customers'));
-        $request->add(PropertyGroupDefinition::class, (int) $input->getOption('properties'));
-        $request->add(CategoryDefinition::class, (int) $input->getOption('categories'));
-        $request->add(ProductManufacturerDefinition::class, (int) $input->getOption('manufacturers'));
+//        $request->add(TagDefinition::class, (int) $input->getOption('tags'));
+//        $request->add(RuleDefinition::class, (int) $input->getOption('rules'));
+//        $request->add(MediaDefinition::class, (int) $input->getOption('media'));
+//        $request->add(CustomerDefinition::class, (int) $input->getOption('customers'));
+//        $request->add(PropertyGroupDefinition::class, (int) $input->getOption('properties'));
+//        $request->add(CategoryDefinition::class, (int) $input->getOption('categories'));
+//        $request->add(ProductManufacturerDefinition::class, (int) $input->getOption('manufacturers'));
         $request->add(ProductDefinition::class, (int) $input->getOption('products'));
-        $request->add(ProductStreamDefinition::class, (int) $input->getOption('product-streams'));
-        $request->add(PromotionDefinition::class, (int) $input->getOption('promotions'));
-        $request->add(OrderDefinition::class, (int) $input->getOption('orders'));
-        $request->add(ProductReviewDefinition::class, (int) $input->getOption('reviews'));
-        $request->add(UserDefinition::class, (int) $input->getOption('users'));
-        $request->add(FlowDefinition::class, (int) $input->getOption('flows'));
+//        $request->add(ProductStreamDefinition::class, (int) $input->getOption('product-streams'));
+//        $request->add(PromotionDefinition::class, (int) $input->getOption('promotions'));
+//        $request->add(OrderDefinition::class, (int) $input->getOption('orders'));
+//        $request->add(ProductReviewDefinition::class, (int) $input->getOption('reviews'));
+//        $request->add(UserDefinition::class, (int) $input->getOption('users'));
+//        $request->add(FlowDefinition::class, (int) $input->getOption('flows'));
 
-        $request->add(
-            CustomFieldSetDefinition::class,
-            (int) $input->getOption('attribute-sets'),
-            $this->getCustomFieldOptions($input)
-        );
-
-        $request->add(MailTemplateDefinition::class, (int) $input->getOption('mail-template'));
-        $request->add(MailHeaderFooterDefinition::class, (int) $input->getOption('mail-header-footer'));
+//        $request->add(
+//            CustomFieldSetDefinition::class,
+//            (int) $input->getOption('attribute-sets'),
+//            $this->getCustomFieldOptions($input)
+//        );
+//
+//        $request->add(MailTemplateDefinition::class, (int) $input->getOption('mail-template'));
+//        $request->add(MailHeaderFooterDefinition::class, (int) $input->getOption('mail-header-footer'));
 
         $this->eventDispatcher->dispatch(new DemodataRequestCreatedEvent($request, $context));
 

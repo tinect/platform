@@ -106,6 +106,8 @@ class ProductGenerator implements DemodataGeneratorInterface
 
             $product['properties'] = $this->buildProperties($properties);
 
+            $product['customFields'] = $this->buildCustomFields();
+
             if ($i % 40 === 0) {
                 $combination = $this->faker->randomElement($combinations);
                 $product = array_merge($product, $this->buildVariants($combination, $prices, $taxes));
@@ -125,6 +127,33 @@ class ProductGenerator implements DemodataGeneratorInterface
         }
 
         $this->io->progressFinish();
+    }
+
+    private function buildCustomFields(): array
+    {
+        $fieldsText = ['custom_toys_beatae_maxime_ea', 'custom_toys_cupiditate_sequi_sed', 'custom_clothing_numquam_et_ut'];
+        $fieldsBool = ['custom_grocery_quaerat_culpa_impedit'];
+        $fieldsFloat = ['custom_toys_quia_eos_praesentium', 'custom_clothing_aut_et_reiciendis', 'custom_clothing_et_quae_nihil'];
+        $fieldsInt = ['custom_toys_maxime_nobis_non', 'custom_health_voluptatibus_officiis_rerum'];
+
+        $customFields = [];
+        foreach ($fieldsText as $key) {
+            $customFields[$key] = $this->faker->text();
+        }
+
+        foreach ($fieldsBool as $key) {
+            $customFields[$key] = $this->faker->boolean();
+        }
+
+        foreach ($fieldsFloat as $key) {
+            $customFields[$key] = $this->faker->randomFloat();
+        }
+
+        foreach ($fieldsInt as $key) {
+            $customFields[$key] = $this->faker->numberBetween();
+        }
+
+        return $customFields;
     }
 
     private function buildCombinations(array $properties): array
@@ -220,12 +249,14 @@ class ProductGenerator implements DemodataGeneratorInterface
         $tax = $taxes->get(array_rand($taxes->getIds()));
         $taxRate = 1 + ($tax->getTaxRate() / 100);
 
+        $productNumber = Uuid::randomHex();
+        dump($productNumber);
         return [
             'id' => Uuid::randomHex(),
-            'productNumber' => Uuid::randomHex(),
+            'productNumber' => $productNumber,
             'price' => [['currencyId' => Defaults::CURRENCY, 'gross' => $price, 'net' => $price / $taxRate, 'linked' => true]],
             'purchasePrices' => [['currencyId' => Defaults::CURRENCY, 'gross' => $purchasePrice, 'net' => $purchasePrice / $taxRate, 'linked' => true]],
-            'name' => $this->faker->productName,
+            'name' => 'CUSTOM FIELD ' . $this->faker->productName,
             'description' => $this->faker->text(),
             'taxId' => $tax->getId(),
             'manufacturerId' => $this->faker->randomElement($manufacturer),
@@ -339,9 +370,9 @@ class ProductGenerator implements DemodataGeneratorInterface
     private function getCategoryIds(): array
     {
         return $this->connection->fetchAllAssociative('
-            SELECT LOWER(HEX(category.id)) as id 
+            SELECT LOWER(HEX(category.id)) as id
             FROM category
-             LEFT JOIN product_category pc 
+             LEFT JOIN product_category pc
                ON pc.category_id = category.id
             WHERE category.child_count = 0
             GROUP BY category.id
