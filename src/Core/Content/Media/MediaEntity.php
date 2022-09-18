@@ -99,6 +99,11 @@ class MediaEntity extends Entity
     protected $fileName;
 
     /**
+     * @var string|null
+     */
+    protected $path;
+
+    /**
      * @var UserEntity|null
      */
     protected $user;
@@ -419,6 +424,16 @@ class MediaEntity extends Entity
     public function setFileName(string $fileName): void
     {
         $this->fileName = $fileName;
+    }
+
+    public function getPath(): ?string
+    {
+        return $this->path;
+    }
+
+    public function setPath(?string $path): void
+    {
+        $this->path = $path;
     }
 
     public function getMediaFolderId(): ?string

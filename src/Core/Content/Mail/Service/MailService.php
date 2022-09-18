@@ -9,7 +9,6 @@ use Shopware\Core\Content\MailTemplate\Service\Event\MailBeforeValidateEvent;
 use Shopware\Core\Content\MailTemplate\Service\Event\MailErrorEvent;
 use Shopware\Core\Content\MailTemplate\Service\Event\MailSentEvent;
 use Shopware\Core\Content\Media\MediaCollection;
-use Shopware\Core\Content\Media\Pathname\UrlGeneratorInterface;
 use Shopware\Core\Framework\Adapter\Twig\StringTemplateRenderer;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -69,11 +68,6 @@ class MailService extends AbstractMailService
     private $eventDispatcher;
 
     /**
-     * @var UrlGeneratorInterface
-     */
-    private $urlGenerator;
-
-    /**
      * @var AbstractMailSender
      */
     private $mailSender;
@@ -90,8 +84,7 @@ class MailService extends AbstractMailService
         SalesChannelDefinition $salesChannelDefinition,
         EntityRepositoryInterface $salesChannelRepository,
         SystemConfigService $systemConfigService,
-        EventDispatcherInterface $eventDispatcher,
-        UrlGeneratorInterface $urlGenerator
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->dataValidator = $dataValidator;
         $this->templateRenderer = $templateRenderer;
@@ -102,7 +95,6 @@ class MailService extends AbstractMailService
         $this->salesChannelRepository = $salesChannelRepository;
         $this->systemConfigService = $systemConfigService;
         $this->eventDispatcher = $eventDispatcher;
-        $this->urlGenerator = $urlGenerator;
     }
 
     public function getDecorated(): AbstractMailService
@@ -314,7 +306,7 @@ class MailService extends AbstractMailService
 
         $urls = [];
         foreach ($media ?? [] as $mediaItem) {
-            $urls[] = $this->urlGenerator->getRelativeMediaUrl($mediaItem);
+            $urls[] = $mediaItem->getPath();
         }
 
         return $urls;

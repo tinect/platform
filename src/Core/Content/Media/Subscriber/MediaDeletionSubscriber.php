@@ -7,12 +7,12 @@ use League\Flysystem\AdapterInterface;
 use Shopware\Core\Content\Media\Aggregate\MediaFolder\MediaFolderDefinition;
 use Shopware\Core\Content\Media\Aggregate\MediaThumbnail\MediaThumbnailCollection;
 use Shopware\Core\Content\Media\Aggregate\MediaThumbnail\MediaThumbnailDefinition;
+use Shopware\Core\Content\Media\Aggregate\MediaThumbnail\MediaThumbnailEntity;
 use Shopware\Core\Content\Media\Event\MediaThumbnailDeletedEvent;
 use Shopware\Core\Content\Media\MediaDefinition;
 use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Content\Media\Message\DeleteFileHandler;
 use Shopware\Core\Content\Media\Message\DeleteFileMessage;
-use Shopware\Core\Content\Media\Pathname\UrlGeneratorInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\BeforeDeleteEvent;
@@ -35,8 +35,6 @@ class MediaDeletionSubscriber implements EventSubscriberInterface
 
     private Connection $connection;
 
-    private UrlGeneratorInterface $urlGenerator;
-
     private EventDispatcherInterface $dispatcher;
 
     private EntityRepositoryInterface $thumbnailRepository;
@@ -51,7 +49,6 @@ class MediaDeletionSubscriber implements EventSubscriberInterface
      * @internal
      */
     public function __construct(
-        UrlGeneratorInterface $urlGenerator,
         EventDispatcherInterface $dispatcher,
         EntityRepositoryInterface $thumbnailRepository,
         MessageBusInterface $messageBus,
@@ -59,7 +56,6 @@ class MediaDeletionSubscriber implements EventSubscriberInterface
         Connection $connection,
         EntityRepositoryInterface $mediaRepository
     ) {
-        $this->urlGenerator = $urlGenerator;
         $this->dispatcher = $dispatcher;
         $this->thumbnailRepository = $thumbnailRepository;
         $this->messageBus = $messageBus;
@@ -139,9 +135,9 @@ class MediaDeletionSubscriber implements EventSubscriberInterface
             }
 
             if ($mediaEntity->isPrivate()) {
-                $privatePaths[] = $this->urlGenerator->getRelativeMediaUrl($mediaEntity);
+                $privatePaths[] = $mediaEntity->getPath();
             } else {
-                $publicPaths[] = $this->urlGenerator->getRelativeMediaUrl($mediaEntity);
+                $publicPaths[] = $mediaEntity->getPath();
             }
 
             if (!$mediaEntity->getThumbnails()) {
@@ -217,15 +213,16 @@ class MediaDeletionSubscriber implements EventSubscriberInterface
 
         $thumbnails = $this->getThumbnails($affected, $context);
 
+        /** @var MediaThumbnailEntity $thumbnail */
         foreach ($thumbnails as $thumbnail) {
             if ($thumbnail->getMedia() === null) {
                 continue;
             }
 
             if ($thumbnail->getMedia()->isPrivate()) {
-                $privatePaths[] = $this->urlGenerator->getRelativeThumbnailUrl($thumbnail->getMedia(), $thumbnail);
+                $privatePaths[] = $thumbnail->getPath();
             } else {
-                $publicPaths[] = $this->urlGenerator->getRelativeThumbnailUrl($thumbnail->getMedia(), $thumbnail);
+                $publicPaths[] = $thumbnail->getPath();
             }
         }
 

@@ -104,19 +104,18 @@
             <argument type="service" id="media.repository"/>
             <argument type="service" id="shopware.filesystem.public"/>
             <argument type="service" id="shopware.filesystem.private"/>
-            <argument type="service" id="Shopware\Core\Content\Media\Pathname\UrlGeneratorInterface"/>
             <argument type="service" id="Shopware\Core\Content\Media\Thumbnail\ThumbnailService"/>
             <argument type="service" id="Shopware\Core\Content\Media\Metadata\MetadataLoader"/>
             <argument type="service" id="Shopware\Core\Content\Media\TypeDetector\TypeDetector"/>
             <argument type="service" id="messenger.bus.shopware" />
             <argument type="service" id="event_dispatcher" />
             <argument>%shopware.filesystem.allowed_extensions%</argument>
+            <argument type="service" id="Shopware\Core\Content\Media\Pathname\PathGenerator"/>
         </service>
 
         <service id="Shopware\Core\Content\Media\File\FileLoader">
             <argument type="service" id="shopware.filesystem.public"/>
             <argument type="service" id="shopware.filesystem.private"/>
-            <argument type="service" id="Shopware\Core\Content\Media\Pathname\UrlGeneratorInterface"/>
             <argument type="service" id="media.repository"/>
             <argument type="service" id="Nyholm\Psr7\Factory\Psr17Factory"/>
         </service>
@@ -151,11 +150,15 @@
 
         <!-- Pathname -->
         <service class="Shopware\Core\Content\Media\Pathname\UrlGenerator" id="Shopware\Core\Content\Media\Pathname\UrlGeneratorInterface">
-            <argument type="service" id="Shopware\Core\Content\Media\Pathname\PathnameStrategy\PathnameStrategyInterface"/>
+            <argument type="service" id="Shopware\Core\Content\Media\Pathname\PathGenerator"/>
             <argument type="service" id="request_stack"/>
             <argument>%shopware.filesystem.public.url%</argument>
 
             <tag name="kernel.reset" method="reset"/>
+        </service>
+
+        <service id="Shopware\Core\Content\Media\Pathname\PathGenerator">
+            <argument type="service" id="Shopware\Core\Content\Media\Pathname\PathnameStrategy\PathnameStrategyInterface"/>
         </service>
 
         <service id="Shopware\Core\Content\Media\Pathname\PathnameStrategy\StrategyFactory">
@@ -257,8 +260,8 @@
             <argument type="service" id="media_thumbnail.repository"/>
             <argument type="service" id="shopware.filesystem.public"/>
             <argument type="service" id="shopware.filesystem.private"/>
-            <argument type="service" id="Shopware\Core\Content\Media\Pathname\UrlGeneratorInterface"/>
             <argument type="service" id="media_folder.repository"/>
+            <argument type="service" id="Shopware\Core\Content\Media\Pathname\PathGenerator"/>
         </service>
 
         <service id="Shopware\Core\Content\Media\MediaService">
@@ -303,6 +306,7 @@
             <argument type="service" id="media_thumbnail.repository"/>
             <argument type="service" id="Doctrine\DBAL\Connection"/>
             <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="Shopware\Core\Content\Media\Pathname\PathGenerator"/>
         </service>
 
         <service id="Shopware\Core\Content\Media\DataAbstractionLayer\MediaFolderConfigurationIndexer">
@@ -326,7 +330,6 @@
 
         <service id="Shopware\Core\Content\Media\Subscriber\MediaDeletionSubscriber">
             <tag name="kernel.event_subscriber"/>
-            <argument type="service" id="Shopware\Core\Content\Media\Pathname\UrlGeneratorInterface"/>
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="media_thumbnail.repository"/>
             <argument type="service" id="messenger.bus.shopware"/>

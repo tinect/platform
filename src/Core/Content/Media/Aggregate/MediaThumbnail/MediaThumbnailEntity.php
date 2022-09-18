@@ -28,6 +28,11 @@ class MediaThumbnailEntity extends Entity
     protected $url = '';
 
     /**
+     * @var string|null
+     */
+    protected $path;
+
+    /**
      * @var string
      */
     protected $mediaId;
@@ -65,6 +70,16 @@ class MediaThumbnailEntity extends Entity
     public function setUrl(string $url): void
     {
         $this->url = $url;
+    }
+
+    public function getPath(): ?string
+    {
+        return $this->path;
+    }
+
+    public function setPath(?string $path): void
+    {
+        $this->path = $path;
     }
 
     public function getMediaId(): string

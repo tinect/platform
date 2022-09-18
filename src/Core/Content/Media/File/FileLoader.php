@@ -19,8 +19,6 @@ class FileLoader
 
     private FilesystemInterface $filesystemPrivate;
 
-    private UrlGeneratorInterface $urlGenerator;
-
     private FileNameValidator $fileNameValidator;
 
     private EntityRepositoryInterface $mediaRepository;
@@ -33,13 +31,11 @@ class FileLoader
     public function __construct(
         FilesystemInterface $filesystemPublic,
         FilesystemInterface $filesystemPrivate,
-        UrlGeneratorInterface $urlGenerator,
         EntityRepositoryInterface $mediaRepository,
         StreamFactoryInterface $streamFactory
     ) {
         $this->filesystemPublic = $filesystemPublic;
         $this->filesystemPrivate = $filesystemPrivate;
-        $this->urlGenerator = $urlGenerator;
         $this->fileNameValidator = new FileNameValidator();
         $this->mediaRepository = $mediaRepository;
         $this->streamFactory = $streamFactory;
@@ -67,7 +63,7 @@ class FileLoader
     {
         $this->fileNameValidator->validateFileName($media->getFileName() ?: '');
 
-        return $this->urlGenerator->getRelativeMediaUrl($media);
+        return $media->getPath();
     }
 
     private function getFileSystem(MediaEntity $media): FilesystemInterface
