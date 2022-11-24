@@ -1,7 +1,6 @@
 import { config, createLocalVue, mount } from '@vue/test-utils';
 import VueRouter from 'vue-router';
 import Vuex from 'vuex';
-import flushPromises from 'flush-promises';
 import { InvalidActionButtonParameterError } from 'src/core/service/api/app-action-button.service';
 import { createRouter, actionButtonData, actionResultData } from './_fixtures/app-action-fixtures';
 import 'src/app/component/app/sw-app-actions';
@@ -91,7 +90,7 @@ describe('sw-app-actions', () => {
         };
     });
 
-    beforeEach(() => {
+    beforeEach(async () => {
         Shopware.State.commit('shopwareApps/setSelectedIds', [Shopware.Utils.createId()]);
         document.location.href = 'http://localhost/';
     });

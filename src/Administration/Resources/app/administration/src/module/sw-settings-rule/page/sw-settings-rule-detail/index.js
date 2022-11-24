@@ -6,7 +6,7 @@ const { mapPropertyErrors } = Component.getComponentHelper();
 const { Criteria } = Shopware.Data;
 
 // eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
-Component.register('sw-settings-rule-detail', {
+export default {
     template,
 
     inject: [
@@ -80,6 +80,12 @@ Component.register('sw-settings-rule-detail', {
             criteria.addAssociation('cartPromotions');
             criteria.addAssociation('promotionDiscounts');
             criteria.addAssociation('promotionSetGroups');
+            criteria.addAssociation('flowSequences.flow');
+            criteria.addAssociation('shippingMethodPriceCalculations');
+            criteria.addAssociation('shippingMethodPrices');
+            criteria.addAssociation('productPrices');
+            criteria.addAssociation('shippingMethods');
+            criteria.addAssociation('paymentMethods');
 
             return criteria;
         },
@@ -435,4 +441,4 @@ Component.register('sw-settings-rule-detail', {
             });
         },
     },
-});
+};

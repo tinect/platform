@@ -20,6 +20,7 @@ export default class AddressEditorPlugin extends Plugin {
         changeBilling: false,
         editorModalClass: 'address-editor-modal',
         closeEditorClass: 'js-close-address-editor',
+        /** @deprecated tag:v6.5.0 - Option csrfToken will be removed. */
         csrfToken: '',
     };
 
@@ -79,6 +80,7 @@ export default class AddressEditorPlugin extends Plugin {
             },
         };
 
+        /** @deprecated tag:v6.5.0 - CSRF implementation will be removed. */
         if (window.csrf.enabled && window.csrf.mode === 'twig') {
             data['_csrf_token'] = this.options.csrfToken;
         }
@@ -188,7 +190,8 @@ export default class AddressEditorPlugin extends Plugin {
     }
 
     /**
-     * callback to close the modal after address selection
+     * callback to close the modal after address selection success
+     * callback to display the validation message nearby the invalid field
      * callback to register the modal events after ajax submit
      *
      * @param {PseudoModalUtil} pseudoModal
@@ -208,6 +211,16 @@ export default class AddressEditorPlugin extends Plugin {
                 if (FormAjaxSubmitInstance) {
                     FormAjaxSubmitInstance.addCallback(() => {
                         this._registerAjaxSubmitCallback(pseudoModal);
+
+                        const invalidFields = DomAccess.querySelectorAll(
+                            modal,
+                            `${FormAjaxSubmitInstance.options.replaceSelectors[0]}.is-invalid`,
+                            false
+                        );
+
+                        if (invalidFields) {
+                            return;
+                        }
 
                         const shouldBeClosed = ajaxForm.classList.contains(this.options.closeEditorClass);
                         if (shouldBeClosed) {

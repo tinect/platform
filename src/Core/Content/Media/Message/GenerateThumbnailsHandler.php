@@ -4,21 +4,24 @@ namespace Shopware\Core\Content\Media\Message;
 
 use Shopware\Core\Content\Media\MediaCollection;
 use Shopware\Core\Content\Media\Thumbnail\ThumbnailService;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\MessageQueue\Handler\AbstractMessageHandler;
 
+/**
+ * @deprecated tag:v6.5.0 - reason:becomes-internal - Will only implement MessageHandlerInterface and all MessageHandler will be internal and final starting with v6.5.0.0
+ */
 class GenerateThumbnailsHandler extends AbstractMessageHandler
 {
     private ThumbnailService $thumbnailService;
 
-    private EntityRepositoryInterface $mediaRepository;
+    private EntityRepository $mediaRepository;
 
     /**
      * @internal
      */
-    public function __construct(ThumbnailService $thumbnailService, EntityRepositoryInterface $mediaRepository)
+    public function __construct(ThumbnailService $thumbnailService, EntityRepository $mediaRepository)
     {
         $this->thumbnailService = $thumbnailService;
         $this->mediaRepository = $mediaRepository;

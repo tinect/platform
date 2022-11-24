@@ -1,7 +1,9 @@
 import { shallowMount } from '@vue/test-utils';
-import 'src/module/sw-customer/page/sw-customer-list';
+import swCustomerList from 'src/module/sw-customer/page/sw-customer-list';
 import { searchRankingPoint } from 'src/app/service/search-ranking.service';
 import Criteria from 'src/core/data/criteria.data';
+
+Shopware.Component.register('sw-customer-list', swCustomerList);
 
 async function createWrapper(privileges = []) {
     return shallowMount(await Shopware.Component.build('sw-customer-list'), {
@@ -32,7 +34,8 @@ async function createWrapper(privileges = []) {
                             customerId: 'd4c3b2a1',
                             productId: 'd4c3b2a1',
                             salesChannelId: 'd4c3b2a1',
-                            sourceEntitiy: 'customer'
+                            sourceEntitiy: 'customer',
+                            createdById: '123213132',
                         }] : []);
                     }
                 })
@@ -270,5 +273,12 @@ describe('module/sw-customer/page/sw-customer-list', () => {
         expect(wrapper.vm.entitySearchable).toEqual(false);
 
         wrapper.vm.searchRankingService.getSearchFieldsByEntity.mockRestore();
+    });
+
+    it('should show the manual customer', async () => {
+        const wrapper = await createWrapper();
+
+        const manualLabel = wrapper.find('.sw-customer-list__created-by-admin-label');
+        expect(manualLabel).toBeTruthy();
     });
 });

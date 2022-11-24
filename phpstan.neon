@@ -3,7 +3,7 @@ includes:
     - vendor/phpstan/phpstan/conf/bleedingEdge.neon
 
 parameters:
-    phpVersion: 70400
+    phpVersion: 80100
     level: 8
     treatPhpDocTypesAsCertain: false
     checkMissingIterableValueType: true
@@ -22,9 +22,8 @@ parameters:
         consoleApplicationLoader: src/Core/DevOps/StaticAnalyze/PHPStan/console-application.php
 
     excludePaths:
+        - src/Docs/*
         - src/Recovery/*
-        - src/Docs/Resources/current/60-references-internals/10-core/50-checkout-process/_examples/10-cart-example.php
-        - src/Docs/Resources/deprecated/2-internals/1-core/50-checkout-process/_examples/10-cart-example.php
 
         # Compatibility fixes for doctrine annotation parser https://github.com/doctrine/annotations/issues/421
         - src/Core/Framework/Compatibility/AnnotationReader.php
@@ -45,6 +44,9 @@ parameters:
 
         # class behind feature flags
         - src/Core/Checkout/Cart/Exception/InvalidCartException.php
+
+        # extends final class, which is ok for mocks
+        - src/Core/Content/Test/ImportExport/MockRepository.php
 
     ignoreErrors:
         # The symfony extension checks against the "normal" container, not the test container
@@ -78,13 +80,6 @@ parameters:
         -
             message: '#Method Shopware\\Storefront\\Framework\\Captcha\\AbstractCaptcha::isValid\(\) invoked with 2 parameters, 1 required\.#'
             path: src/Storefront/Framework/Captcha/CaptchaRouteListener.php
-        # Library wrong type hint
-        -
-            message: '#Parameter \#3 \$script of class ONGR\\ElasticsearchDSL\\Aggregation\\Metric\\StatsAggregation constructor expects string\|null, array<string, array\|string> given\.#'
-            path: src/Elasticsearch/Framework/DataAbstractionLayer/CriteriaParser.php
-        -
-            message: '#Parameter \#3 \$script of class ONGR\\ElasticsearchDSL\\Aggregation\\Metric\\StatsAggregation constructor expects string\|null, array<string, array<string, array>\|string> given\.#'
-            path: src/Elasticsearch/Framework/DataAbstractionLayer/CriteriaParser.php
         # To fix this error, the \Shopware\Core\Framework\Struct\Collection::createNew method has to be implemented
         # in every implementation of `Collection` and needs to return `new self` instead of `new static`. See https://github.com/phpstan/phpstan/issues/2773
         -
@@ -98,13 +93,6 @@ parameters:
         # @final annotation of internal classes
         - '#.*extends @final class Shopware\\Core\\Framework\\DataAbstractionLayer\\Search\\EntitySearchResult\.#'
 
-        # Invalid phpdoc in OpenAPI Library
-        -
-             message: '#Property OpenApi\\Annotations\\PathItem::\$(delete|get|patch|post|put) \(OpenApi\\Annotations\\(Delete|Get|Patch|Post|Put)\) does not accept string#'
-             path: src/Core/Framework/Api/ApiDefinition/Generator/OpenApi/OpenApiLoader.php
-        -
-            message: '#Strict comparison using#'
-            path: src/Core/Framework/Api/ApiDefinition/Generator/OpenApi/OpenApiLoader.php
         # The redis proxy and cluster has a magic __call method which is not considered by phpstan
         -
             message: '#Call to an undefined method .*RedisProxy.*::.*\(\).*#'
@@ -148,9 +136,6 @@ parameters:
             message: '#Constructor of class Shopware\\Core\\Content\\Newsletter\\Exception\\LanguageOfNewsletterDeleteException has an unused parameter \$language\.#'
             path: src/Core/Content/Newsletter/Exception/LanguageOfNewsletterDeleteException.php
         -
-            message: '#Parameter \#3 \$length of function substr expects int, int<0, max>\|false given\.#'
-            path: src/Core/Content/Product/DataAbstractionLayer/ProductExceptionHandler.php
-        -
             message: '#Constructor of class Shopware\\Core\\System\\Language\\Exception\\LanguageForeignKeyDeleteException has an unused parameter \$language\.#'
             path: src/Core/System/Language/Exception/LanguageForeignKeyDeleteException.php
         -
@@ -159,31 +144,6 @@ parameters:
         -
             message: '#Method Shopware\\Core\\Checkout\\Cart\\Facade\\.*::getIterator\(\) return type with generic class ArrayIterator does not specify its types: TKey, TValue#'
             path: src/Core/Checkout/Cart/Facade/Traits/ItemsIteratorTrait.php
-
-        # Can be removed with Symfony 6.0 upgrade
-        -
-            message: '#PHPDoc tag @param references unknown parameter: \$key#'
-            path: src/Core/Framework/Validation/DataBag/DataBag.php
-
-        -
-            message: '#Method Shopware\\Storefront\\Framework\\Twig\\TwigAppVariable::getFlashes\(\) has parameter \$types with no type specified.#'
-            path: src/Storefront/Framework/Twig/TwigAppVariable.php
-
-        -
-            message: "#^Class Shopware\\\\Core\\\\Content\\\\Mail\\\\Service\\\\MailerTransportFactory extends @final class Symfony\\\\Component\\\\Mailer\\\\Transport\\.$#"
-            count: 1
-            path: src/Core/Content/Mail/Service/MailerTransportFactory.php
-
-        -
-            message: "#^Parameter \\#1 \\$min \\(0\\) of function random_int expects lower number than parameter \\#2 \\$max \\(int\\<\\-3, max\\>\\)\\.$#"
-            count: 1
-            path: src/Core/Framework/Demodata/Generator/ProductGenerator.php
-
-        -
-            message: "#^Parameter \\#1 \\$min \\(int\\<0, 2\\>\\) of function random_int expects lower number than parameter \\#2 \\$max \\(int\\<0, 4\\>\\)\\.$#"
-            count: 1
-            path: src/Core/Framework/Demodata/Generator/ProductGenerator.php
-
         # Is in the new super class nullable as the extended class
         -
             message: "#^PHPDoc type string\\|null of property Shopware\\\\Core\\\\Framework\\\\DataAbstractionLayer\\\\Field\\\\ReferenceVersionField\\:\\:\\$storageName is not covariant with PHPDoc type string of overridden property Shopware\\\\Core\\\\Framework\\\\DataAbstractionLayer\\\\Field\\\\FkField\\:\\:\\$storageName\\.$#"
@@ -250,8 +210,18 @@ parameters:
                 - tests/unit/php
 
         -
+            message: "#^Return type of call to method PHPUnit\\\\Framework\\\\TestCase\\:\\:createMock\\(\\) contains unresolvable type.$#"
+            paths:
+                - tests/unit/php
+
+        -
             message: "#^Return type of call to method PHPUnit\\\\Framework\\\\TestCase\\:\\:createPartialMock\\(\\) contains unresolvable type.$#"
             path: tests/unit/php/Core/Content/Mail/Service/MailerTransportLoaderTest.php
+
+        - # MockRepo extends final EntityRepository class, with is ok for tests
+            message: "#^Class Shopware\\Core\\Content\\Test\\ImportExport\\MockRepository extends @final class Shopware\\Core\\Framework\\DataAbstractionLayer\\EntityRepository.$#"
+            count: 1
+            path: src/Core/Content/Test/ImportExport/MockRepository.php
 
 services:
     -
@@ -268,6 +238,11 @@ services:
             - phpstan.rules.rule
     -
         class: Shopware\Core\DevOps\StaticAnalyze\PHPStan\Rules\Tests\CoversAnnotationRule
+        tags:
+            - phpstan.rules.rule
+
+    -
+        class: Shopware\Core\DevOps\StaticAnalyze\PHPStan\Rules\FinalClassRule
         tags:
             - phpstan.rules.rule
 
@@ -300,3 +275,8 @@ services:
         class: Shopware\Core\DevOps\StaticAnalyze\PHPStan\Type\CollectionHasSpecifyingExtension
         tags:
             - phpstan.typeSpecifier.methodTypeSpecifyingExtension
+
+    -
+            class: Shopware\Core\DevOps\StaticAnalyze\PHPStan\Rules\RuleConditionHasRuleConfigRule
+            tags:
+                - phpstan.rules.rule

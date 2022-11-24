@@ -1,7 +1,8 @@
 /* eslint-disable prefer-promise-reject-errors */
 import { shallowMount } from '@vue/test-utils';
-import 'src/module/sw-sales-channel/view/sw-sales-channel-detail-products';
-import flushPromises from 'flush-promises';
+import swSalesChannelDetailProducts from 'src/module/sw-sales-channel/view/sw-sales-channel-detail-products';
+
+Shopware.Component.register('sw-sales-channel-detail-products', swSalesChannelDetailProducts);
 
 function mockCriteria() {
     return {
@@ -144,7 +145,6 @@ describe('src/module/sw-sales-channel/view/sw-sales-channel-detail-products', ()
     it('should get products successful', async () => {
         const wrapper = await createWrapper();
         await flushPromises();
-
         wrapper.vm.productRepository.search = jest.fn(() => Promise.resolve(productsMock));
 
         await wrapper.setProps({ salesChannel: { id: 'apiSalesChannelTypeId' } });
@@ -156,7 +156,6 @@ describe('src/module/sw-sales-channel/view/sw-sales-channel-detail-products', ()
     it('should get products failed', async () => {
         const wrapper = await createWrapper();
         await flushPromises();
-
         wrapper.vm.productRepository.search = jest.fn(() => Promise.reject());
 
         await wrapper.setProps({ salesChannel: { id: 'storefrontSalesChannelTypeId' } });
@@ -168,7 +167,6 @@ describe('src/module/sw-sales-channel/view/sw-sales-channel-detail-products', ()
     it('should delete product successful', async () => {
         const wrapper = await createWrapper();
         await flushPromises();
-
         await wrapper.setData({ $refs: $refsMock });
 
         wrapper.vm.productVisibilityRepository.delete = jest.fn(() => Promise.resolve());
@@ -187,7 +185,6 @@ describe('src/module/sw-sales-channel/view/sw-sales-channel-detail-products', ()
     it('should delete product failed', async () => {
         const wrapper = await createWrapper();
         await flushPromises();
-
         wrapper.vm.productVisibilityRepository.delete = jest.fn(() => Promise.reject({ message: 'Error' }));
         wrapper.vm.createNotificationError = jest.fn();
 
@@ -222,7 +219,6 @@ describe('src/module/sw-sales-channel/view/sw-sales-channel-detail-products', ()
     it('should delete products failed', async () => {
         const wrapper = await createWrapper();
         await flushPromises();
-
         wrapper.vm.productVisibilityRepository.syncDeleted = jest.fn(() => Promise.reject({ message: 'Error' }));
         wrapper.vm.createNotificationError = jest.fn();
 
@@ -250,7 +246,6 @@ describe('src/module/sw-sales-channel/view/sw-sales-channel-detail-products', ()
     it('should get products when changing search term', async () => {
         const wrapper = await createWrapper();
         await flushPromises();
-
         wrapper.vm.getProducts = jest.fn();
 
         await wrapper.setData({
@@ -271,7 +266,6 @@ describe('src/module/sw-sales-channel/view/sw-sales-channel-detail-products', ()
     it('should get products when changing page', async () => {
         const wrapper = await createWrapper();
         await flushPromises();
-
         wrapper.vm.getProducts = jest.fn();
         expect(wrapper.vm.productCriteria.sortings).toEqual([]);
         wrapper.vm.products.criteria = mockCriteria();

@@ -1,5 +1,5 @@
-import { shallowMount, enableAutoDestroy } from '@vue/test-utils';
-import 'src/module/sw-flow/component/sw-flow-sequence';
+import { shallowMount } from '@vue/test-utils';
+import swFlowSequence from 'src/module/sw-flow/component/sw-flow-sequence';
 
 const sequenceFixture = {
     id: '1',
@@ -25,7 +25,7 @@ async function createWrapper(propsData = {}) {
     });
 }
 
-enableAutoDestroy(afterEach);
+Shopware.Component.register('sw-flow-sequence', swFlowSequence);
 
 describe('src/module/sw-flow/component/sw-flow-sequence', () => {
     it('should show sequence selector type correctly', async () => {

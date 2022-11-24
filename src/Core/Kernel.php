@@ -6,7 +6,6 @@ use Doctrine\DBAL\Connection;
 use Shopware\Core\DevOps\Environment\EnvironmentHelper;
 use Shopware\Core\Framework\Adapter\Database\MySQLFactory;
 use Shopware\Core\Framework\Api\Controller\FallbackController;
-use Shopware\Core\Framework\Migration\MigrationStep;
 use Shopware\Core\Framework\Plugin\KernelPluginLoader\KernelPluginLoader;
 use Shopware\Core\Framework\Util\VersionParser;
 use Shopware\Core\Maintenance\Maintenance;
@@ -39,7 +38,7 @@ class Kernel extends HttpKernel
     /**
      * @var string Fallback version if nothing is provided via kernel constructor
      */
-    public const SHOPWARE_FALLBACK_VERSION = '6.4.9999999.9999999-dev';
+    public const SHOPWARE_FALLBACK_VERSION = '6.5.9999999.9999999-dev';
 
     /**
      * @var Connection|null
@@ -97,11 +96,9 @@ class Kernel extends HttpKernel
     }
 
     /**
-     * @return \Generator<BundleInterface>
-     *
-     * @deprecated tag:v6.5.0 - reason:return-type-change -  The return type will be native
+     * @return iterable<BundleInterface>
      */
-    public function registerBundles()/*: \Generator*/
+    public function registerBundles(): iterable
     {
         /** @var array<class-string<Bundle>, array<string, bool>> $bundles */
         $bundles = require $this->getProjectDir() . '/config/bundles.php';
@@ -124,12 +121,7 @@ class Kernel extends HttpKernel
         yield from $this->pluginLoader->getBundles($this->getKernelParameters(), $instanciatedBundleNames);
     }
 
-    /**
-     * @return string
-     *
-     * @deprecated tag:v6.5.0 - reason:return-type-change - The return type will be native
-     */
-    public function getProjectDir()/*: string*/
+    public function getProjectDir(): string
     {
         if ($this->projectDir === null) {
             if ($dir = $_ENV['PROJECT_ROOT'] ?? $_SERVER['PROJECT_ROOT'] ?? false) {
@@ -371,27 +363,6 @@ class Kernel extends HttpKernel
                 $connectionVariables[] = 'SET @@group_concat_max_len = CAST(IF(@@group_concat_max_len > 320000, @@group_concat_max_len, 320000) AS UNSIGNED)';
                 $connectionVariables[] = 'SET sql_mode=(SELECT REPLACE(@@sql_mode,\'ONLY_FULL_GROUP_BY\',\'\'))';
             }
-
-            /**
-             * @deprecated tag:v6.5.0 - old trigger logic is removed, therefore we don't need all those connection variables
-             */
-            $nonDestructiveMigrations = $connection->executeQuery('
-                SELECT `creation_timestamp`
-                FROM `migration`
-                WHERE `update` IS NOT NULL AND `update_destructive` IS NULL
-            ')->fetchFirstColumn();
-
-            $activeMigrations = $this->container->getParameter('migration.active');
-
-            $activeNonDestructiveMigrations = array_intersect($activeMigrations, $nonDestructiveMigrations);
-
-            foreach ($activeNonDestructiveMigrations as $migration) {
-                $connectionVariables[] = sprintf(
-                    'SET %s = TRUE',
-                    sprintf(MigrationStep::MIGRATION_VARIABLE_FORMAT, $migration)
-                );
-            }
-            // end deprecated
 
             if (empty($connectionVariables)) {
                 return;

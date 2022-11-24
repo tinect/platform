@@ -11,7 +11,7 @@ use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Dbal\EntityDefinitionQueryHelper;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Demodata\PersonalData\CleanPersonalDataCommand;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Util\Random;
@@ -36,7 +36,7 @@ class CleanPersonalDataCommandTest extends TestCase
     private $connection;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $customerRepository;
 
@@ -347,8 +347,8 @@ class CleanPersonalDataCommandTest extends TestCase
     private function createInputDefinition(): InputDefinition
     {
         $type = new InputArgument('type', InputArgument::OPTIONAL);
-        $days = new InputOption('days', InputOption::VALUE_REQUIRED);
-        $all = new InputOption('all', InputOption::VALUE_NONE);
+        $days = new InputOption('days', null, InputOption::VALUE_REQUIRED);
+        $all = new InputOption('all', null, InputOption::VALUE_NONE);
 
         return new InputDefinition([$type, $days, $all]);
     }
@@ -366,7 +366,7 @@ class CleanPersonalDataCommandTest extends TestCase
     private function getArrayInput(): ArrayInput
     {
         $inputArgument = new InputArgument('types', InputArgument::IS_ARRAY);
-        $inputOption = new InputOption('days', InputOption::VALUE_REQUIRED);
+        $inputOption = new InputOption('days', null, InputOption::VALUE_REQUIRED);
         $inputDefinition = new InputDefinition([$inputArgument, $inputOption]);
 
         return new ArrayInput([], $inputDefinition);

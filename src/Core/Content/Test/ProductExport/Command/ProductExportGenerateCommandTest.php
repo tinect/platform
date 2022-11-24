@@ -10,7 +10,7 @@ use Shopware\Core\Content\ProductExport\Command\ProductExportGenerateCommand;
 use Shopware\Core\Content\ProductExport\ProductExportEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Test\TestCaseBase\CommandTestBehaviour;
@@ -33,7 +33,7 @@ class ProductExportGenerateCommandTest extends TestCase
 
     private ProductExportGenerateCommand $productExportGenerateCommand;
 
-    private EntityRepositoryInterface $repository;
+    private EntityRepository $repository;
 
     private Context $context;
 
@@ -68,6 +68,7 @@ class ProductExportGenerateCommandTest extends TestCase
         $filePath = sprintf('%s/Testexport.csv', $this->getContainer()->getParameter('product_export.directory'));
         $fileContent = $this->fileSystem->read($filePath);
 
+        static::assertIsString($fileContent);
         $csvRows = explode(\PHP_EOL, $fileContent);
 
         static::assertTrue($this->fileSystem->has($this->getContainer()->getParameter('product_export.directory')));
@@ -78,7 +79,7 @@ class ProductExportGenerateCommandTest extends TestCase
 
     private function getSalesChannelId(): string
     {
-        /** @var EntityRepositoryInterface $repository */
+        /** @var EntityRepository $repository */
         $repository = $this->getContainer()->get('sales_channel.repository');
 
         return $repository->search(new Criteria(), $this->context)->first()->getId();
@@ -86,7 +87,7 @@ class ProductExportGenerateCommandTest extends TestCase
 
     private function getSalesChannelDomain(): SalesChannelDomainEntity
     {
-        /** @var EntityRepositoryInterface $repository */
+        /** @var EntityRepository $repository */
         $repository = $this->getContainer()->get('sales_channel_domain.repository');
 
         $criteria = new Criteria();

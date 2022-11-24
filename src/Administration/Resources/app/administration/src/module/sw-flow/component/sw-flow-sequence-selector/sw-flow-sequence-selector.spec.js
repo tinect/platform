@@ -1,9 +1,11 @@
-import { createLocalVue, shallowMount, enableAutoDestroy } from '@vue/test-utils';
-import 'src/module/sw-flow/component/sw-flow-sequence-selector';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
+import swFlowSequenceSelector from 'src/module/sw-flow/component/sw-flow-sequence-selector';
 import 'src/app/component/base/sw-button';
 
 import Vuex from 'vuex';
 import flowState from 'src/module/sw-flow/state/flow.state';
+
+Shopware.Component.register('sw-flow-sequence-selector', swFlowSequenceSelector);
 
 const sequences = [
     {
@@ -49,8 +51,6 @@ async function createWrapper() {
         }
     });
 }
-
-enableAutoDestroy(afterEach);
 
 describe('src/module/sw-flow/component/sw-flow-sequence-selector', () => {
     let wrapper;

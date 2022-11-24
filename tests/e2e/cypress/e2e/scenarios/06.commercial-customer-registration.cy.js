@@ -72,6 +72,7 @@ describe('Product creation via API and commercial customer registration', () => 
 
         // Country settings
         cy.visit(`${Cypress.env('admin')}#/sw/settings/country/index`);
+        cy.get('.sw-settings-country-list').should('be.visible');
         cy.get('.sw-skeleton').should('not.exist');
         cy.get('.sw-loader').should('not.exist');
         cy.url().should('include', 'settings/country/index');
@@ -79,6 +80,16 @@ describe('Product creation via API and commercial customer registration', () => 
         cy.get(`.sw-data-grid__cell--name`).contains('Germany').click();
         cy.get('[name="sw-field--country-checkVatIdPattern"]').check();
         cy.get('[name="sw-field--country-vatIdRequired"]').check();
+
+        cy.featureIsActive('v6.5.0.0').then(isActive => {
+            if (isActive) {
+                // Country handling tab
+                cy.get('.sw-settings-country__address-handling-tab').click();
+                cy.get('[name="sw-field--country-postalCodeRequired"]').check();
+                cy.get('[name="sw-field--country-checkPostalCodePattern"]').check();
+                cy.get('[name="sw-field--country-checkAdvancedPostalCodePattern"]').check();
+            }
+        })
         cy.get('[name="sw-field--country-forceStateInRegistration"]').check();
         cy.get('.sw-button-process__content').click();
         cy.wait('@saveData').its('response.statusCode').should('equal', 204);

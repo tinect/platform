@@ -9,12 +9,12 @@ use Shopware\Core\Content\Product\Aggregate\ProductVisibility\ProductVisibilityD
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Test\TestDataCollection;
 use Shopware\Core\Framework\Uuid\Uuid;
-use Shopware\Core\Migration\Migration1610523204AddInheritanceForProductCmsPage;
+use Shopware\Core\Migration\V6_4\Migration1610523204AddInheritanceForProductCmsPage;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\Test\TestDefaults;
@@ -32,7 +32,7 @@ class Migration1610523204AddInheritanceForProductCmsPageTest extends TestCase
 
     private TestDataCollection $ids;
 
-    private EntityRepositoryInterface $repository;
+    private EntityRepository $repository;
 
     protected function setUp(): void
     {

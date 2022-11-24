@@ -1,6 +1,5 @@
 import { shallowMount, createLocalVue, config } from '@vue/test-utils';
 import VueRouter from 'vue-router';
-import flushPromises from 'flush-promises';
 import 'src/app/component/structure/sw-desktop';
 
 const routes = [{
@@ -104,7 +103,7 @@ async function createWrapper() {
 }
 
 describe('src/app/component/structure/sw-desktop', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
         Shopware.State.get('session').currentUser = {
             id: 'id'
         };

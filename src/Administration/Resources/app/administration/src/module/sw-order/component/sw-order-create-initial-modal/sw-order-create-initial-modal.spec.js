@@ -1,9 +1,11 @@
-import { createLocalVue, shallowMount, enableAutoDestroy } from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import 'src/module/sw-order/mixin/cart-notification.mixin';
-import 'src/module/sw-order/component/sw-order-create-initial-modal';
+import swOrderCreateInitialModal from 'src/module/sw-order/component/sw-order-create-initial-modal';
 
 import Vuex from 'vuex';
 import orderStore from 'src/module/sw-order/state/order.store';
+
+Shopware.Component.register('sw-order-create-initial-modal', swOrderCreateInitialModal);
 
 async function createWrapper() {
     const localVue = createLocalVue();
@@ -40,7 +42,6 @@ async function createWrapper() {
     });
 }
 
-enableAutoDestroy(afterEach);
 
 const tabs = [
     '.sw-order-create-initial-modal__tab-product',

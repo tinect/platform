@@ -2,7 +2,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { kebabCase } from 'lodash';
 import uuid from 'src/../test/_helper_/uuid';
-import flushPromises from 'flush-promises';
 import 'src/app/component/form/sw-custom-field-set-renderer';
 import 'src/app/component/utils/sw-inherit-wrapper';
 import 'src/app/component/form/sw-form-field-renderer';
@@ -34,7 +33,7 @@ import 'src/app/component/media/sw-media-media-item';
 import 'src/app/component/media/sw-media-base-item';
 import 'src/app/component/media/sw-media-preview-v2';
 import 'src/app/filter/media-name.filter';
-import 'src/module/sw-settings/component/sw-system-config';
+import swSystemConfig from 'src/module/sw-settings/component/sw-system-config';
 import 'src/app/component/base/sw-card';
 import 'src/app/component/structure/sw-sales-channel-switch';
 import 'src/app/component/form/select/entity/sw-entity-single-select';
@@ -42,6 +41,8 @@ import 'src/app/component/form/sw-textarea-field';
 import 'src/app/component/form/sw-url-field';
 import 'src/app/component/form/sw-password-field';
 import 'src/app/filter/unicode-uri';
+
+Shopware.Component.register('sw-system-config', swSystemConfig);
 
 /** @type Wrapper */
 let wrapper;
@@ -695,10 +696,6 @@ function createEntityCollection(entities = []) {
 }
 
 describe('src/app/component/form/sw-custom-field-set-renderer', () => {
-    afterEach(async () => {
-        if (wrapper) await wrapper.destroy();
-    });
-
     it('should be a Vue.JS component', async () => {
         wrapper = await createWrapper();
         expect(wrapper.vm).toBeTruthy();

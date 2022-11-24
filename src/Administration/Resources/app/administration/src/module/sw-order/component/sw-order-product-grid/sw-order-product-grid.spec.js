@@ -1,7 +1,5 @@
-import { shallowMount, createLocalVue, enableAutoDestroy } from '@vue/test-utils';
-import flushPromises from 'flush-promises';
-
-import 'src/module/sw-order/component/sw-order-product-grid';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import swOrderProductGrid from 'src/module/sw-order/component/sw-order-product-grid';
 import 'src/app/component/entity/sw-entity-listing';
 import 'src/app/component/data-grid/sw-data-grid';
 import 'src/app/component/grid/sw-pagination';
@@ -11,6 +9,8 @@ import 'src/app/component/form/field-base/sw-block-field';
 import 'src/app/component/form/sw-checkbox-field';
 import 'src/app/component/form/sw-number-field';
 import 'src/app/component/form/sw-text-field';
+
+Shopware.Component.register('sw-order-product-grid', swOrderProductGrid);
 
 let productData = [];
 
@@ -102,7 +102,6 @@ async function createWrapper() {
     });
 }
 
-enableAutoDestroy(afterEach);
 
 describe('src/module/sw-order/view/sw-order-product-grid', () => {
     it('should show empty state view when there is no product', async () => {

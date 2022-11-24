@@ -3,22 +3,25 @@
 namespace Shopware\Core\Content\ProductStream\ScheduledTask;
 
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 
+/**
+ * @deprecated tag:v6.5.0 - reason:becomes-internal - MessageHandler will be internal and final starting with v6.5.0.0
+ */
 class UpdateProductStreamMappingTaskHandler extends ScheduledTaskHandler
 {
-    private EntityRepositoryInterface $productStreamRepository;
+    private EntityRepository $productStreamRepository;
 
     /**
      * @internal
      */
     public function __construct(
-        EntityRepositoryInterface $repository,
-        EntityRepositoryInterface $productStreamRepository
+        EntityRepository $repository,
+        EntityRepository $productStreamRepository
     ) {
         parent::__construct($repository);
         $this->productStreamRepository = $productStreamRepository;

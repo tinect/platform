@@ -1,5 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
-import 'src/module/sw-settings-country/component/sw-country-state-detail';
+import swCountryStateDetail from 'src/module/sw-settings-country/component/sw-country-state-detail';
+
+Shopware.Component.register('sw-country-state-detail', swCountryStateDetail);
 
 async function createWrapper(privileges = []) {
     return shallowMount(await Shopware.Component.build('sw-country-state-detail'), {
@@ -20,7 +22,9 @@ async function createWrapper(privileges = []) {
         },
 
         stubs: {
-            'sw-modal': true,
+            'sw-modal': {
+                template: '<div class="sw-modal"><slot></slot><slot name="modal-footer"></slot></div>'
+            },
             'sw-container': true,
             'sw-field': true,
             'sw-button': true,

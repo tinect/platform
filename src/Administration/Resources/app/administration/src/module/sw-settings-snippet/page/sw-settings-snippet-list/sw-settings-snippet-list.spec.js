@@ -1,10 +1,12 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import 'src/module/sw-settings/mixin/sw-settings-list.mixin';
-import 'src/module/sw-settings-snippet/page/sw-settings-snippet-list';
+import swSettingsSnippetList from 'src/module/sw-settings-snippet/page/sw-settings-snippet-list';
 import 'src/app/component/data-grid/sw-data-grid';
 import 'src/app/component/context-menu/sw-context-button';
 import 'src/app/component/context-menu/sw-context-menu-item';
 import 'src/app/component/context-menu/sw-context-menu';
+
+Shopware.Component.register('sw-settings-snippet-list', swSettingsSnippetList);
 
 function getSnippets() {
     const data = {
@@ -94,6 +96,7 @@ describe('module/sw-settings-snippet/page/sw-settings-snippet-list', () => {
                 searchRankingService: {},
                 userConfigService: {
                     search: () => ({ data: [] }),
+                    upsert: () => null,
                 },
             },
             mocks: {

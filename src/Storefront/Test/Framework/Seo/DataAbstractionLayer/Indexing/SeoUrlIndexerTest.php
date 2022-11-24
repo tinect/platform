@@ -11,8 +11,9 @@ use Shopware\Core\Content\Seo\SeoUrl\SeoUrlCollection;
 use Shopware\Core\Content\Seo\SeoUrl\SeoUrlEntity;
 use Shopware\Core\Content\Seo\SeoUrlUpdater;
 use Shopware\Core\Defaults;
+use Shopware\Core\Framework\App\Template\TemplateCollection;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Indexing\InheritanceUpdater;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -36,12 +37,12 @@ class SeoUrlIndexerTest extends TestCase
     use QueueTestBehaviour;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $templateRepository;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $productRepository;
 
@@ -576,7 +577,7 @@ class SeoUrlIndexerTest extends TestCase
             ->get(SeoUrlUpdater::class)
             ->update(ProductPageSeoUrlRoute::ROUTE_NAME, [$id]);
 
-        /** @var EntityRepositoryInterface $productRepo */
+        /** @var EntityRepository $productRepo */
         $productRepo = $this->getContainer()->get('product.repository');
 
         $criteria = new Criteria([$id]);
@@ -587,6 +588,7 @@ class SeoUrlIndexerTest extends TestCase
         /** @var SeoUrlCollection $seoUrls */
         $seoUrls = $product->getSeoUrls();
         static::assertInstanceOf(SeoUrlCollection::class, $seoUrls);
+        /** @var int $seoUrlCount */
         static::assertCount($seoUrlCount, $seoUrls);
     }
 
@@ -594,8 +596,10 @@ class SeoUrlIndexerTest extends TestCase
     {
         $templateRepository = $this->getContainer()->get('seo_url_template.repository');
 
+        /** @var string[] $ids */
         $ids = $templateRepository->searchIds(new Criteria(), Context::createDefaultContext())->getIds();
 
+        /** @var TemplateCollection $templates */
         $templates = $templateRepository->search(new Criteria($ids), Context::createDefaultContext())->getEntities();
 
         foreach ($templates as $template) {
@@ -616,7 +620,7 @@ class SeoUrlIndexerTest extends TestCase
 
     private function getSeoUrls(string $salesChannelId, string $productId): SeoUrlCollection
     {
-        /** @var EntityRepositoryInterface $repo */
+        /** @var EntityRepository $repo */
         $repo = $this->getContainer()->get('seo_url.repository');
 
         $criteria = new Criteria();
@@ -629,6 +633,9 @@ class SeoUrlIndexerTest extends TestCase
         return $seoUrlCollection;
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     private function upsertTemplate(array $data): void
     {
         $seoUrlTemplateDefaults = [
@@ -640,6 +647,9 @@ class SeoUrlIndexerTest extends TestCase
         $this->templateRepository->upsert([$seoUrlTemplate], Context::createDefaultContext());
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     private function upsertProduct(array $data, string $salesChannelId): void
     {
         $defaults = [

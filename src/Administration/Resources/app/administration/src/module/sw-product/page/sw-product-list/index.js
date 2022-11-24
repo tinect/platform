@@ -2,12 +2,12 @@ import { searchRankingPoint } from 'src/app/service/search-ranking.service';
 import template from './sw-product-list.html.twig';
 import './sw-product-list.scss';
 
-const { Component, Mixin } = Shopware;
+const { Mixin } = Shopware;
 const { Criteria } = Shopware.Data;
 const { cloneDeep } = Shopware.Utils.object;
 
 // eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
-Component.register('sw-product-list', {
+export default {
     template,
 
     inject: [
@@ -361,6 +361,16 @@ Component.register('sw-product-list', {
                 label: this.$tc('sw-product.list.columnAvailableStock'),
                 allowResize: true,
                 align: 'right',
+            }, {
+                property: 'createdAt',
+                label: this.$tc('sw-product.list.columnCreatedAt'),
+                allowResize: true,
+                visible: false,
+            }, {
+                property: 'updatedAt',
+                label: this.$tc('sw-product.list.columnUpdatedAt'),
+                allowResize: true,
+                visible: false,
             }];
         },
 
@@ -413,4 +423,4 @@ Component.register('sw-product-list', {
             this.showBulkEditModal = false;
         },
     },
-});
+};

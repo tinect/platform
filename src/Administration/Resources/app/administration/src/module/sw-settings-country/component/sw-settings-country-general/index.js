@@ -7,12 +7,13 @@ const { Criteria } = Shopware.Data;
 
 
 // eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
-Component.register('sw-settings-country-general', {
+export default {
     template,
 
     inject: [
         'repositoryFactory',
         'acl',
+        'feature',
     ],
 
     mixins: [
@@ -206,4 +207,4 @@ Component.register('sw-settings-country-general', {
             this.$emit('modal-save');
         },
     },
-});
+};

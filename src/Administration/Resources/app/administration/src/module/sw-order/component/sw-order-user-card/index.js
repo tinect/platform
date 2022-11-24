@@ -1,16 +1,17 @@
 import template from './sw-order-user-card.html.twig';
 import './sw-order-user-card.scss';
 
-const { Component, Mixin } = Shopware;
+const { Mixin } = Shopware;
 const { Criteria } = Shopware.Data;
 const ApiService = Shopware.Classes.ApiService;
 const format = Shopware.Utils.format;
 
 // eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
-Component.register('sw-order-user-card', {
+export default {
     template,
 
     inject: [
+        'customSnippetApiService',
         'orderService',
         'repositoryFactory',
         'feature',
@@ -43,6 +44,7 @@ Component.register('sw-order-user-card', {
         return {
             addressBeingEdited: null,
             countries: null,
+            formattingAddress: '',
         };
     },
 
@@ -128,6 +130,16 @@ Component.register('sw-order-user-card', {
     methods: {
         createdComponent() {
             this.reload();
+            this.renderFormattingAddress();
+        },
+
+        renderFormattingAddress() {
+            this.customSnippetApiService.render(
+                this.billingAddress,
+                this.billingAddress.country?.addressFormat,
+            ).then((res) => {
+                this.formattingAddress = res.rendered;
+            });
         },
 
         reload() {
@@ -225,4 +237,4 @@ Component.register('sw-order-user-card', {
         },
     },
 
-});
+};

@@ -14,6 +14,7 @@ use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Test\Api\ApiDefinition\ApiRoute\StoreApiTestOtherRoute;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 /**
  * @package core
@@ -85,6 +86,10 @@ class InternalClassRule implements Rule
         }
 
         if ($this->isMigrationStep($node)) {
+            return ['Migrations must be flagged @internal to not be captured by the BC checker.'];
+        }
+
+        if ($this->isMessageHandler($node)) {
             $classDeprecation = $node->getClassReflection()->getDeprecatedDescription() ?? '';
             /**
              * @deprecated tag:v6.5.0 - remove deprecation check, as all migration steps become internal in v6.5.0
@@ -93,7 +98,7 @@ class InternalClassRule implements Rule
                 return [];
             }
 
-            return ['Migrations must be flagged @internal to not be captured by the BC checker.'];
+            return ['MessageHandlers must be flagged @internal to not be captured by the BC checker.'];
         }
 
         return [];
@@ -194,5 +199,23 @@ class InternalClassRule implements Rule
         }
 
         return $class->getParentClass()->getName() === MigrationStep::class;
+    }
+
+    private function isMessageHandler(InClassNode $node): bool
+    {
+        $class = $node->getClassReflection();
+
+        if ($class->isAbstract()) {
+            // abstract base classes should not be internal
+            return false;
+        }
+
+        foreach ($class->getInterfaces() as $interface) {
+            if ($interface->getName() === MessageHandlerInterface::class) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -3,9 +3,12 @@
 namespace Shopware\Core\Content\Product\Cleanup;
 
 use Doctrine\DBAL\Connection;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 
+/**
+ * @deprecated tag:v6.5.0 - reason:becomes-internal - MessageHandler will be internal and final starting with v6.5.0.0
+ */
 class CleanupProductKeywordDictionaryTaskHandler extends ScheduledTaskHandler
 {
     private Connection $connection;
@@ -14,7 +17,7 @@ class CleanupProductKeywordDictionaryTaskHandler extends ScheduledTaskHandler
      * @internal
      */
     public function __construct(
-        EntityRepositoryInterface $repository,
+        EntityRepository $repository,
         Connection $connection
     ) {
         parent::__construct($repository);

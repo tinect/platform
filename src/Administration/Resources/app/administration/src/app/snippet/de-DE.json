@@ -635,8 +635,11 @@
         "salesChannelRule": "Verkaufskanal",
         "currencyRule": "Währung",
         "languageRule": "Sprache",
+        "customerIsActiveRule": "Kunde ist aktiv",
         "billingCountryRule": "Rechnungsadresse: Land",
+        "billingCityRule": "Rechnungsadresse: Stadt",
         "billingStreetRule": "Rechnungsadresse: Straße",
+        "billingStateRule": "Rechnungsadresse: Bundesland",
         "billingZipCodeRule": "Rechnungsadresse: Postleitzahl",
         "customerGroupRule": "Kundengruppe",
         "customerTagRule": "Kunde mit Tag",
@@ -658,9 +661,15 @@
         "isNewsletterRecipient": "Kunde ist Newsletter-Empfänger",
         "daysSinceLastOrderRule": "Tage seit letzter Bestellung",
         "shippingCountryRule": "Lieferadresse: Land",
+        "shippingCityRule": "Lieferadresse: Stadt",
         "shippingStreetRule": "Lieferadresse: Straße",
+        "shippingStateRule": "Lieferadresse: Bundesland",
         "shippingZipCodeRule": "Lieferadresse: Postleitzahl",
         "customerLoggedInRule": "Angemeldeter Kunde",
+        "customerAgeRule": "Kundenalter",
+        "customerDaysSinceLastLogin": "Tage seit der letzten Anmeldung",
+        "customerAffiliateCodeRule": "Affiliate-Code",
+        "customerCampaignCodeRule": "Kampagnen-Code",
         "cartAmountRule": "Gesamtsumme",
         "cartPositionPrice": "Summe",
         "goodsCountRule": "Gesamtanzahl unterschiedlicher Produkte",
@@ -677,6 +686,7 @@
         "lineItemUnitPriceRule": "Positionsstückpreis",
         "lineItemTotalPriceRule": "Positionszwischensumme",
         "lineItemWithQuantityRule": "Positionsanzahl",
+        "orderTagRule": "Bestellung mit Tag",
         "yes": "Ja",
         "no": "Nein",
         "withTime": "Mit Zeitabfrage",
@@ -880,7 +890,7 @@
       "promotion": "Promotion | Promotions",
       "promotion_order_rule": "Promotion qualifizierte Bestellung | Promotion qualifizierte Bestellungen",
       "promotion_cart_rule": "Promotion qualifizierter Warenkorb | Promotion qualifizierte Warenkörbe",
-      "promotion_persona_rule": "Promotion Zielgruppe | Promotion Zielgruppen",
+      "promotion_persona_rule": "Promotion-Zielgruppe | Promotion-Zielgruppen",
       "rule": "Regel | Regeln",
       "rule_condition": "Bedingung | Bedingungen",
       "sales_channel": "Verkaufskanal | Verkaufskanäle",
@@ -1393,11 +1403,16 @@
       "cartPromotions": "Warenkorb-Regel|Warenkorb-Regeln",
       "promotionDiscounts": "Produkt-Regel|Produkt-Regeln",
       "promotionSetGroups": "Produkt-Regel|Produkt-Regeln",
+      "eventActions": "Business-Event-Regel|Business-Event-Regeln",
       "notEqualsViolationTooltip": "Diese Regel verwendet Bedingungen, die die Zuweisung zu {entityLabel} verhindern. Diese Bedingungen sind: {conditions}.",
       "equalsAnyViolationTooltip": "Diese Regel muss mindestens eine der folgenden Bedingungen verwenden, um {entityLabel} zugewiesen zu werden: {conditions}."
     },
     "restrictedConditions": {
-      "restrictedPromotionConditionTooltip": "Die aktuelle Regel ist einer Rabattaktion als {assignments} zugeordnet. Der Gebrauch dieser Bedingung ist daher nicht zulässig."
+      "restrictedConditionTooltip": "Diese Regel ist an folgenden Stellen zugewiesen:<br/><br/>{assignments}<br/><br/>Die Verwendung dieser Bedingung ist in diesem Zusammenhang nicht möglich.",
+      "relation": {
+        "flowTrigger": "Flows mit Trigger: {assignments}",
+        "promotion": "Rabattaktionen als: {assignments}"
+      }
     },
     "and": "und",
     "or": "oder"

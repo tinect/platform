@@ -1,9 +1,10 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
-import 'src/module/sw-product/component/sw-product-properties';
+import swProductProperties from 'src/module/sw-product/component/sw-product-properties';
 import 'src/app/component/utils/sw-inherit-wrapper';
 import 'src/app/component/base/sw-card';
-import flushPromises from 'flush-promises';
+
+Shopware.Component.register('sw-product-properties', swProductProperties);
 
 const { Component, State } = Shopware;
 
@@ -83,7 +84,7 @@ async function createWrapper(privileges = []) {
     const localVue = createLocalVue();
     localVue.use(Vuex);
 
-    return shallowMount(Component.build('sw-product-properties'), {
+    return shallowMount(await Component.build('sw-product-properties'), {
         localVue,
         stubs: {
             'sw-inheritance-switch': {

@@ -1,8 +1,7 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import uuid from 'src/../test/_helper_/uuid';
-import Vuex from 'vuex';
-import 'src/module/sw-product/view/sw-product-detail-seo';
-import 'src/module/sw-settings-seo/component/sw-seo-url';
+import swProductDetailSeo from 'src/module/sw-product/view/sw-product-detail-seo';
+import swSeoUrl from 'src/module/sw-settings-seo/component/sw-seo-url';
 import 'src/app/component/utils/sw-inherit-wrapper';
 import 'src/app/component/structure/sw-sales-channel-switch';
 import 'src/app/component/form/sw-text-field';
@@ -19,6 +18,9 @@ import 'src/app/component/utils/sw-popover';
 import 'src/app/component/base/sw-highlight-text';
 import 'src/app/component/form/field-base/sw-field-error';
 import 'src/app/component/base/sw-inheritance-switch';
+
+Shopware.Component.register('sw-product-detail-seo', swProductDetailSeo);
+Shopware.Component.register('sw-seo-url', swSeoUrl);
 
 const { Component, State } = Shopware;
 
@@ -104,13 +106,7 @@ const repositoryMockFactory = (entity) => {
 };
 
 async function createWrapper(privileges = []) {
-    const localVue = createLocalVue();
-    localVue.use(Vuex);
-    localVue.directive('tooltip', {});
-    localVue.directive('popover', {});
-
-    return shallowMount(Component.build('sw-product-detail-seo'), {
-        localVue,
+    return shallowMount(await Component.build('sw-product-detail-seo'), {
         provide: {
             acl: {
                 can: (identifier) => {
@@ -138,15 +134,15 @@ async function createWrapper(privileges = []) {
             },
             'sw-product-seo-form': true,
             'sw-single-select': await Shopware.Component.build('sw-single-select'),
-            'sw-seo-url': Component.build('sw-seo-url'),
+            'sw-seo-url': await Component.build('sw-seo-url'),
             'sw-seo-main-category': true,
-            'sw-sales-channel-switch': Component.build('sw-sales-channel-switch'),
+            'sw-sales-channel-switch': await Component.build('sw-sales-channel-switch'),
             'sw-entity-single-select': await Shopware.Component.build('sw-entity-single-select'),
-            'sw-inherit-wrapper': Component.build('sw-inherit-wrapper'),
-            'sw-text-field': Component.build('sw-text-field'),
-            'sw-contextual-field': Component.build('sw-contextual-field'),
-            'sw-block-field': Component.build('sw-block-field'),
-            'sw-base-field': Component.build('sw-base-field'),
+            'sw-inherit-wrapper': await Component.build('sw-inherit-wrapper'),
+            'sw-text-field': await Component.build('sw-text-field'),
+            'sw-contextual-field': await Component.build('sw-contextual-field'),
+            'sw-block-field': await Component.build('sw-block-field'),
+            'sw-base-field': await Component.build('sw-base-field'),
             'sw-select-base': await Shopware.Component.build('sw-select-base'),
             'sw-highlight-text': await Shopware.Component.build('sw-highlight-text'),
             'sw-select-result-list': await Shopware.Component.build('sw-select-result-list'),
@@ -169,7 +165,11 @@ function createEntityCollection(entities = []) {
 }
 
 describe('src/module/sw-product/view/sw-product-detail-seo', () => {
-    beforeAll(() => {
+    beforeEach(() => {
+        if (Shopware.State.get('swProductDetail')) {
+            Shopware.State.unregisterModule('swProductDetail');
+        }
+
         State.registerModule('swProductDetail', {
             namespaced: true,
             state: {

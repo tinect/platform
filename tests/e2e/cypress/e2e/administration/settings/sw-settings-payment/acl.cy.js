@@ -87,6 +87,9 @@ describe('Payment: Test ACL privileges', () => {
             .contains('Edit detail')
             .click();
 
+        cy.get('.sw-skeleton').should('not.exist');
+        cy.get('.sw-loader').should('not.exist');
+        cy.get('.sw-settings-payment-detail__field-name').should('be.visible');
         cy.get('#sw-field--paymentMethod-description').type('My description');
         cy.get('#sw-field--paymentMethod-position').clearTypeAndCheck('0');
 
@@ -103,7 +106,7 @@ describe('Payment: Test ACL privileges', () => {
             .contains('My description');
     });
 
-    it('@settings: can create payment', { tags: ['pa-checkout'] }, () => {
+    it('@settings: can create payment', { tags: ['pa-checkout', 'quarantined'] }, () => {
         // Request we want to wait for later
         cy.intercept({
             url: `**/${Cypress.env('apiPath')}/payment-method`,

@@ -1,5 +1,7 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import 'src/module/sw-sales-channel/page/sw-sales-channel-detail';
+import swSalesChannelDetail from 'src/module/sw-sales-channel/page/sw-sales-channel-detail';
+
+Shopware.Component.register('sw-sales-channel-detail', swSalesChannelDetail);
 
 async function createWrapper(privileges = []) {
     const localVue = createLocalVue();
@@ -136,5 +138,21 @@ describe('src/module/sw-sales-channel/page/sw-sales-channel-detail', () => {
         expect(wrapper.vm.salesChannel.analytics.id).toEqual(wrapper.vm.salesChannel.analyticsId);
 
         wrapper.destroy();
+    });
+
+    it('should have currency criteria with sort', async () => {
+        const wrapper = await createWrapper();
+
+        const criteria = wrapper.vm.getLoadSalesChannelCriteria();
+
+        expect(criteria.parse()).toEqual(expect.objectContaining({
+            associations: expect.objectContaining({
+                currencies: expect.objectContaining({
+                    sort: expect.arrayContaining([
+                        { field: 'name', order: 'ASC', naturalSorting: false }
+                    ])
+                }),
+            })
+        }));
     });
 });

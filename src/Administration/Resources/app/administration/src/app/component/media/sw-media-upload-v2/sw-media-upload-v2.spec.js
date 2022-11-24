@@ -2,7 +2,6 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 import 'src/app/component/media/sw-media-upload-v2';
 import 'src/app/component/base/sw-button';
 import 'src/app/component/context-menu/sw-context-menu-item';
-import flushPromises from 'flush-promises';
 
 async function createWrapper(customOptions = {}) {
     const localVue = createLocalVue();
@@ -27,6 +26,8 @@ async function createWrapper(customOptions = {}) {
             mediaService: {
                 addListener: () => {},
                 addUploads: () => null,
+                removeByTag: () => null,
+                removeListener: () => null,
             },
             configService: {
                 getConfig: () => Promise.resolve({

@@ -1,10 +1,11 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
-import 'src/module/sw-profile/view/sw-profile-index-search-preferences';
+import swProfileIndexSearchPreferences from 'src/module/sw-profile/view/sw-profile-index-search-preferences';
 import 'src/app/component/base/sw-card';
 import 'src/app/component/base/sw-container';
 import 'src/app/component/base/sw-button';
-import flushPromises from 'flush-promises';
+
+Shopware.Component.register('sw-profile-index-search-preferences', swProfileIndexSearchPreferences);
 
 const swProfileStateMock = {
     namespaced: true,
@@ -61,6 +62,7 @@ async function createWrapper() {
             searchPreferencesService: {
                 getDefaultSearchPreferences: () => {},
                 getUserSearchPreferences: () => {},
+                processSearchPreferences: () => [],
                 createUserSearchPreferences: () => {
                     return {
                         key: 'search.preferences',
@@ -280,5 +282,52 @@ describe('src/module/sw-profile/view/sw-profile-index-search-preferences', () =>
                 ])
             })])
         );
+    });
+
+    it('should be merged with the default value when exists user search preferences', async () => {
+        const wrapper = await createWrapper();
+
+        wrapper.vm.searchPreferencesService.getDefaultSearchPreferences = jest.fn(() => [
+            {
+                order: {
+                    documents: {
+                        documentNumber: { _score: 80, _searchable: false },
+                        documentInvoice: { _score: 80, _searchable: false },
+                    }
+                }
+            }
+        ]);
+
+        await flushPromises();
+
+        expect(wrapper.vm.defaultSearchPreferences).toEqual([
+            {
+                order: {
+                    documents: {
+                        documentNumber: { _score: 80, _searchable: false },
+                        documentInvoice: { _score: 80, _searchable: false },
+                    }
+                }
+            }
+        ]);
+
+        await Shopware.State.commit('swProfile/setUserSearchPreferences', [
+            {
+                order: {
+                    documents: { documentNumber: { _score: 80, _searchable: true } }
+                }
+            }
+        ]);
+
+        expect(wrapper.vm.defaultSearchPreferences).toEqual([
+            {
+                order: {
+                    documents: {
+                        documentNumber: { _score: 80, _searchable: true },
+                        documentInvoice: { _score: 80, _searchable: false },
+                    }
+                }
+            }
+        ]);
     });
 });

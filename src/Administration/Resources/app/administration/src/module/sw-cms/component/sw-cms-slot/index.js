@@ -1,13 +1,12 @@
 import template from './sw-cms-slot.html.twig';
 import './sw-cms-slot.scss';
 
-const { Component } = Shopware;
 const { deepCopyObject } = Shopware.Utils.object;
 
 /**
  * @private since v6.5.0
  */
-Component.register('sw-cms-slot', {
+export default {
     template,
 
     inject: ['cmsService'],
@@ -51,7 +50,12 @@ Component.register('sw-cms-slot', {
         },
 
         cmsElements() {
-            return this.cmsService.getCmsElementRegistry();
+            const currentPageType = Shopware.State.get('cmsPageState').currentPageType;
+
+            const blocks = Object.entries(this.cmsService.getCmsElementRegistry())
+                .filter(([name]) => this.cmsService.isElementAllowedInPageType(name, currentPageType));
+
+            return Object.fromEntries(blocks);
         },
 
         componentClasses() {
@@ -114,4 +118,4 @@ Component.register('sw-cms-slot', {
             this.showElementSelection = false;
         },
     },
-});
+};

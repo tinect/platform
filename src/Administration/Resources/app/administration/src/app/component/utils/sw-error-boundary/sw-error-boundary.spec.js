@@ -1,5 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import flushPromises from 'flush-promises';
 import 'src/app/component/utils/sw-error-boundary';
 
 describe('src/app/component/utils/sw-error-boundary', () => {
@@ -11,7 +10,11 @@ describe('src/app/component/utils/sw-error-boundary', () => {
         swErrorBoundary = await Shopware.Component.build('sw-error-boundary');
     });
 
-    beforeEach(() => {
+    beforeAll(async () => {
+        swErrorBoundary = await Shopware.Component.build('sw-error-boundary');
+    });
+
+    beforeEach(async () => {
         jest.spyOn(console, 'error').mockImplementation();
     });
 

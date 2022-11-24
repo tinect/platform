@@ -1,10 +1,9 @@
-import { createLocalVue, shallowMount, enableAutoDestroy } from '@vue/test-utils';
-import flushPromises from 'flush-promises';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import EntityCollection from 'src/core/data/entity-collection.data';
 
 import 'src/module/sw-order/mixin/cart-notification.mixin';
-import 'src/module/sw-order/component/sw-order-create-options';
-import 'src/module/sw-order/component/sw-order-customer-address-select';
+import swOrderCreateOptions from 'src/module/sw-order/component/sw-order-create-options';
+import swOrderCustomerAddressSelect from 'src/module/sw-order/component/sw-order-customer-address-select';
 
 import 'src/app/component/form/select/base/sw-single-select';
 import 'src/app/component/form/field-base/sw-base-field';
@@ -14,6 +13,9 @@ import 'src/app/component/form/select/base/sw-select-result-list';
 
 import Vuex from 'vuex';
 import orderStore from 'src/module/sw-order/state/order.store';
+
+Shopware.Component.register('sw-order-create-options', swOrderCreateOptions);
+Shopware.Component.register('sw-order-customer-address-select', swOrderCustomerAddressSelect);
 
 const addresses = [
     {
@@ -127,7 +129,6 @@ async function createWrapper() {
     });
 }
 
-enableAutoDestroy(afterEach);
 
 describe('src/module/sw-order/view/sw-order-create-options', () => {
     beforeAll(() => {

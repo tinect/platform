@@ -3,12 +3,13 @@
 namespace Shopware\Core\Migration\V6_3;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Shopware\Core\Framework\Migration\MigrationStep;
 
 /**
  * @package core
  *
- * @deprecated tag:v6.5.0 - reason:becomes-internal - Migrations will be internal in v6.5.0
+ * @internal
  */
 class Migration1559050088Promotion extends MigrationStep
 {
@@ -18,7 +19,7 @@ class Migration1559050088Promotion extends MigrationStep
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function update(Connection $connection): void
     {

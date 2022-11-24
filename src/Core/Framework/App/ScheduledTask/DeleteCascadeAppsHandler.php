@@ -4,26 +4,28 @@ namespace Shopware\Core\Framework\App\ScheduledTask;
 
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 
 /**
  * @package core
+ *
+ * @deprecated tag:v6.5.0 - reason:becomes-internal - MessageHandler will be internal and final starting with v6.5.0.0
  */
 class DeleteCascadeAppsHandler extends ScheduledTaskHandler
 {
     private const HARD_DELETE_AFTER_DAYS = 1;
 
-    private EntityRepositoryInterface $aclRoleRepository;
+    private EntityRepository $aclRoleRepository;
 
-    private EntityRepositoryInterface $integrationRepository;
+    private EntityRepository $integrationRepository;
 
     /**
      * @internal
      */
-    public function __construct(EntityRepositoryInterface $scheduledTaskRepository, EntityRepositoryInterface $aclRoleRepository, EntityRepositoryInterface $integrationRepository)
+    public function __construct(EntityRepository $scheduledTaskRepository, EntityRepository $aclRoleRepository, EntityRepository $integrationRepository)
     {
         parent::__construct($scheduledTaskRepository);
         $this->aclRoleRepository = $aclRoleRepository;
@@ -49,7 +51,7 @@ class DeleteCascadeAppsHandler extends ScheduledTaskHandler
         return [DeleteCascadeAppsTask::class];
     }
 
-    private function deleteIds(EntityRepositoryInterface $repository, Criteria $criteria, Context $context): void
+    private function deleteIds(EntityRepository $repository, Criteria $criteria, Context $context): void
     {
         $data = $repository->searchIds($criteria, $context)->getData();
 

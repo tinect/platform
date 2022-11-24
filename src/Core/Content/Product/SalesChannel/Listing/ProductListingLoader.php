@@ -20,14 +20,14 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 use Shopware\Core\Framework\Feature;
 use Shopware\Core\Framework\Struct\ArrayEntity;
 use Shopware\Core\Framework\Uuid\Uuid;
-use Shopware\Core\System\SalesChannel\Entity\SalesChannelRepositoryInterface;
+use Shopware\Core\System\SalesChannel\Entity\SalesChannelRepository;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class ProductListingLoader
 {
-    private SalesChannelRepositoryInterface $repository;
+    private SalesChannelRepository $repository;
 
     private SystemConfigService $systemConfigService;
 
@@ -41,7 +41,7 @@ class ProductListingLoader
      * @internal
      */
     public function __construct(
-        SalesChannelRepositoryInterface $repository,
+        SalesChannelRepository $repository,
         SystemConfigService $systemConfigService,
         Connection $connection,
         EventDispatcherInterface $eventDispatcher,
@@ -68,11 +68,12 @@ class ProductListingLoader
         }
 
         $ids = $this->repository->searchIds($criteria, $context);
-
+        /** @var list<string> $keys */
+        $keys = $ids->getIds();
         $aggregations = $this->repository->aggregate($criteria, $context);
 
         // no products found, no need to continue
-        if (empty($ids->getIds())) {
+        if (empty($keys)) {
             return new EntitySearchResult(
                 ProductDefinition::ENTITY_NAME,
                 0,
@@ -83,11 +84,11 @@ class ProductListingLoader
             );
         }
 
-        $mapping = array_combine($ids->getIds(), $ids->getIds());
+        $mapping = array_combine($keys, $keys);
 
         $hasOptionFilter = $this->hasOptionFilter($criteria);
         if (!$hasOptionFilter) {
-            $mapping = $this->resolvePreviews($ids->getIds(), $context);
+            $mapping = $this->resolvePreviews($keys, $context);
         }
 
         $event = new ProductListingResolvePreviewEvent($context, $criteria, $mapping, $hasOptionFilter);
@@ -158,7 +159,7 @@ class ProductListingLoader
     }
 
     /**
-     * @param array<array<string>|string> $ids
+     * @param array<string> $ids
      *
      * @throws \JsonException
      *

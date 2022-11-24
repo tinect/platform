@@ -1,8 +1,9 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import 'src/module/sw-event-action/page/sw-event-action-detail';
-import flushPromises from 'flush-promises';
+import swEventActionDetail from 'src/module/sw-event-action/page/sw-event-action-detail';
 
 const { Classes: { ShopwareError } } = Shopware;
+
+Shopware.Component.register('sw-event-action-detail', swEventActionDetail);
 
 const mockEmptyEventAction = {
     eventName: '',
@@ -128,7 +129,6 @@ describe('src/module/sw-event-action/page/sw-event-action-detail', () => {
     it('should be instantiated', async () => {
         wrapper = await createWrapper();
         await flushPromises();
-
         expect(wrapper.vm).toBeTruthy();
     });
 

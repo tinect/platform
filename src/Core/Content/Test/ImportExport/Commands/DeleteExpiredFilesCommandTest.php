@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 use Shopware\Core\Content\ImportExport\Aggregate\ImportExportFile\ImportExportFileEntity;
 use Shopware\Core\Content\ImportExport\Command\DeleteExpiredFilesCommand;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Test\TestCaseBase\QueueTestBehaviour;
@@ -24,7 +24,7 @@ class DeleteExpiredFilesCommandTest extends TestCase
     use QueueTestBehaviour;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $fileRepository;
 
@@ -194,7 +194,7 @@ class DeleteExpiredFilesCommandTest extends TestCase
                 'id' => $uuid,
                 'originalName' => sprintf('file%d.xml', $i),
                 'path' => $filePath,
-                'expireDate' => date('Y-m-d H:i:s', strtotime("+$i day")),
+                'expireDate' => date('Y-m-d H:i:s', (int) strtotime('+' . $i . ' day')),
                 'size' => $i * 51,
                 'accessToken' => Random::getBase64UrlString(32),
             ];

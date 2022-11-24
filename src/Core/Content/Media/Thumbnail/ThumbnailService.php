@@ -18,19 +18,19 @@ use Shopware\Core\Content\Media\MediaType\MediaType;
 use Shopware\Core\Content\Media\Pathname\AbstractPathGenerator;
 use Shopware\Core\Content\Media\Subscriber\MediaDeletionSubscriber;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Feature;
 
 class ThumbnailService
 {
-    private EntityRepositoryInterface $thumbnailRepository;
+    private EntityRepository $thumbnailRepository;
 
     private FilesystemInterface $filesystemPublic;
 
     private FilesystemInterface $filesystemPrivate;
 
-    private EntityRepositoryInterface $mediaFolderRepository;
+    private EntityRepository $mediaFolderRepository;
 
     private AbstractPathGenerator $pathGenerator;
 
@@ -38,10 +38,10 @@ class ThumbnailService
      * @internal
      */
     public function __construct(
-        EntityRepositoryInterface $thumbnailRepository,
+        EntityRepository $thumbnailRepository,
         FilesystemInterface $fileSystemPublic,
         FilesystemInterface $fileSystemPrivate,
-        EntityRepositoryInterface $mediaFolderRepository,
+        EntityRepository $mediaFolderRepository,
         AbstractPathGenerator $pathGenerator
     ) {
         $this->thumbnailRepository = $thumbnailRepository;
@@ -86,9 +86,9 @@ class ThumbnailService
         if (!empty($delete)) {
             $context->addState(MediaDeletionSubscriber::SYNCHRONE_FILE_DELETE);
 
-            $delete = \array_map(function (string $id) {
+            $delete = \array_values(\array_map(function (string $id) {
                 return ['id' => $id];
-            }, $delete);
+            }, $delete));
 
             $this->thumbnailRepository->delete($delete, $context);
         }
@@ -152,7 +152,12 @@ class ThumbnailService
 
         /** @var MediaThumbnailCollection $toBeDeletedThumbnails */
         $toBeDeletedThumbnails = $media->getThumbnails();
-        $this->thumbnailRepository->delete($toBeDeletedThumbnails->getIds(), $context);
+        /** @var list<string> $ids */
+        $ids = $toBeDeletedThumbnails->getIds();
+        $ids = array_map(function (string $id) {
+            return ['id' => $id];
+        }, $ids);
+        $this->thumbnailRepository->delete($ids, $context);
 
         $update = $this->createThumbnailsForSizes($media, $config, $config->getMediaThumbnailSizes());
 
@@ -228,9 +233,9 @@ class ThumbnailService
             }
         }
 
-        $delete = \array_map(static function (string $id) {
+        $delete = \array_values(\array_map(static function (string $id) {
             return ['id' => $id];
-        }, $toBeDeletedThumbnails->getIds());
+        }, $toBeDeletedThumbnails->getIds()));
 
         $this->thumbnailRepository->delete($delete, $context);
 
@@ -326,12 +331,7 @@ class ThumbnailService
         $media->setMediaFolder($folder);
     }
 
-    /**
-     * @throws ThumbnailNotSupportedException
-     *
-     * @return resource
-     */
-    private function getImageResource(MediaEntity $media)
+    private function getImageResource(MediaEntity $media): \GdImage
     {
         $filePath = $this->pathGenerator->generatePath($media);
         /** @var string $file */
@@ -376,10 +376,7 @@ class ThumbnailService
         return $image;
     }
 
-    /**
-     * @param resource $image
-     */
-    private function getOriginalImageSize($image): array
+    private function getOriginalImageSize(\GdImage $image): array
     {
         return [
             'width' => imagesx($image),
@@ -440,12 +437,7 @@ class ThumbnailService
         ];
     }
 
-    /**
-     * @param resource $mediaImage
-     *
-     * @return resource
-     */
-    private function createNewImage($mediaImage, MediaType $type, array $originalImageSize, array $thumbnailSize)
+    private function createNewImage(\GdImage $mediaImage, MediaType $type, array $originalImageSize, array $thumbnailSize): \GdImage
     {
         $thumbnail = imagecreatetruecolor($thumbnailSize['width'], $thumbnailSize['height']);
 
@@ -477,12 +469,7 @@ class ThumbnailService
         return $thumbnail;
     }
 
-    /**
-     * @param resource $thumbnail
-     *
-     * @throws ThumbnailCouldNotBeSavedException
-     */
-    private function writeThumbnail($thumbnail, MediaEntity $media, string $url, int $quality): void
+    private function writeThumbnail(\GdImage $thumbnail, MediaEntity $media, string $url, int $quality): void
     {
         ob_start();
         switch ($media->getMimeType()) {
@@ -551,9 +538,9 @@ class ThumbnailService
 
         $delete = $media->getThumbnails()->getIds();
 
-        $delete = \array_map(static function (string $id) {
+        $delete = \array_values(\array_map(static function (string $id) {
             return ['id' => $id];
-        }, $delete);
+        }, $delete));
 
         $this->thumbnailRepository->delete($delete, $context);
     }

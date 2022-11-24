@@ -1,7 +1,9 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import 'src/module/sw-settings-country/component/sw-settings-country-general';
+import swSettingsCountryGeneral from 'src/module/sw-settings-country/component/sw-settings-country-general';
 import 'src/app/component/base/sw-card';
 import 'src/app/component/base/sw-container';
+
+Shopware.Component.register('sw-settings-country-general', swSettingsCountryGeneral);
 
 async function createWrapper(privileges = [], customPropsData = {}) {
     const localVue = createLocalVue();
@@ -129,9 +131,6 @@ describe('module/sw-settings-country/component/sw-settings-country-general', () 
         const countryCheckVatIdFormatField = wrapper.find(
             'sw-switch-field-stub[label="sw-settings-country.detail.labelCheckVatIdFormat"]'
         );
-        const countryForceStateInRegistrationField = wrapper.find(
-            'sw-switch-field-stub[label="sw-settings-country.detail.labelForceStateInRegistration"]'
-        );
         const countryTaxFreeFromField = wrapper.find(
             'sw-number-field-stub[label="sw-settings-country.detail.taxFreeFrom"]'
         );
@@ -148,7 +147,6 @@ describe('module/sw-settings-country/component/sw-settings-country-general', () 
         expect(countryTaxFreeField.attributes().disabled).toBeUndefined();
         expect(countryCompaniesTaxFreeField.attributes().disabled).toBeUndefined();
         expect(countryCheckVatIdFormatField.attributes().disabled).toBeUndefined();
-        expect(countryForceStateInRegistrationField.attributes().disabled).toBeUndefined();
         expect(countryTaxFreeFromField.attributes()).toBeDefined();
         expect(countryVatIdRequiredField.attributes().disabled).toBeUndefined();
     });
@@ -184,9 +182,6 @@ describe('module/sw-settings-country/component/sw-settings-country-general', () 
         const countryCheckVatIdFormatField = wrapper.find(
             'sw-switch-field-stub[label="sw-settings-country.detail.labelCheckVatIdFormat"]'
         );
-        const countryForceStateInRegistrationField = wrapper.find(
-            'sw-switch-field-stub[label="sw-settings-country.detail.labelForceStateInRegistration"]'
-        );
         const countryTaxFreeFromField = wrapper.find(
             'sw-number-field-stub[label="sw-settings-country.detail.taxFreeFrom"]'
         );
@@ -206,7 +201,6 @@ describe('module/sw-settings-country/component/sw-settings-country-general', () 
         expect(countryTaxFreeField.attributes().disabled).toBeTruthy();
         expect(countryCompaniesTaxFreeField.attributes().disabled).toBeTruthy();
         expect(countryCheckVatIdFormatField.attributes().disabled).toBeTruthy();
-        expect(countryForceStateInRegistrationField.attributes().disabled).toBeTruthy();
         expect(countryTaxFreeFromField.exists()).toBe(false);
         expect(currencyDropdownList.exists()).toBe(false);
         expect(countryVatIdRequiredField.attributes().disabled).toBeTruthy();

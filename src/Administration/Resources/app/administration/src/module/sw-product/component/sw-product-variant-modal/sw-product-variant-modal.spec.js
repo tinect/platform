@@ -1,6 +1,7 @@
-import { shallowMount, enableAutoDestroy } from '@vue/test-utils';
-import 'src/module/sw-product/component/sw-product-variant-modal';
-import flushPromises from 'flush-promises';
+import { shallowMount } from '@vue/test-utils';
+import swProductVariantModal from 'src/module/sw-product/component/sw-product-variant-modal';
+
+Shopware.Component.register('sw-product-variant-modal', swProductVariantModal);
 
 function getOptions() {
     return [
@@ -282,7 +283,6 @@ async function createWrapper() {
     });
 }
 
-enableAutoDestroy(afterEach);
 
 describe('module/sw-product/component/sw-product-variant-modal', () => {
     let wrapper;

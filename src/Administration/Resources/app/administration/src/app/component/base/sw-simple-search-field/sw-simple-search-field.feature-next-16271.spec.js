@@ -1,18 +1,17 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import 'src/app/component/form/sw-field';
 import 'src/app/component/form/sw-text-field';
 import 'src/app/component/form/field-base/sw-contextual-field';
 import 'src/app/component/form/field-base/sw-block-field';
 import 'src/app/component/form/field-base/sw-base-field';
-import 'src/app/component/base/sw-icon';
 import 'src/app/component/form/field-base/sw-field-error';
 
 async function createWrapper(additionalOptions = {}) {
     global.activeFeatureFlags = ['FEATURE_NEXT_16271'];
-    const localVue = createLocalVue();
+
     await import('src/app/component/base/sw-simple-search-field');
+
     return shallowMount(await Shopware.Component.build('sw-simple-search-field'), {
-        localVue,
         stubs: {
             'sw-field': await Shopware.Component.build('sw-field'),
             'sw-text-field': await Shopware.Component.build('sw-text-field'),
@@ -20,8 +19,7 @@ async function createWrapper(additionalOptions = {}) {
             'sw-block-field': await Shopware.Component.build('sw-block-field'),
             'sw-base-field': await Shopware.Component.build('sw-base-field'),
             'sw-field-error': await Shopware.Component.build('sw-field-error'),
-            'sw-icon': await Shopware.Component.build('sw-icon'),
-            'icons-small-search': true
+            'sw-icon': true,
         },
         provide: {
             validationService: {}
@@ -34,15 +32,10 @@ async function createWrapper(additionalOptions = {}) {
 }
 
 describe('components/base/sw-simple-search-field FEATURE_NEXT_16271', () => {
-    /** @type Wrapper */
     let wrapper;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         wrapper = await createWrapper();
-    });
-
-    afterAll(() => {
-        wrapper.destroy();
     });
 
     it('should be a Vue.js component', async () => {
@@ -50,15 +43,21 @@ describe('components/base/sw-simple-search-field FEATURE_NEXT_16271', () => {
     });
 
     it('should have `search term` as initial value', async () => {
-        expect(wrapper.find('input[type="text"]').element.value).toBe('search term');
+        expect(wrapper.get('.sw-field').props('value')).toBe('search term');
     });
 
     it('should emit `input` event with FEATURE_NEXT_16271', async () => {
-        await wrapper.find('input[type="text"]')
-            .setValue('@input Sw Simple Search Field Typing');
+        jest.useFakeTimers();
+
+        const changedValue = '@searchTermChange Sw Simple Search Field Typing';
+        await wrapper.find('input[type="text"]').setValue(changedValue);
 
         /* wait for `$emit('input')` */
         await wrapper.vm.$nextTick();
-        expect(wrapper.emitted().input).toBeTruthy();
+        expect(wrapper.emitted('input')).toEqual([[changedValue]]);
+
+        // Fast-forward until debounce is triggered
+        jest.advanceTimersByTime(1000);
+        expect(wrapper.emitted('search-term-change')).toEqual([[changedValue]]);
     });
 });

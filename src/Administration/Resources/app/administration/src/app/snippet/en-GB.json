@@ -635,8 +635,11 @@
         "salesChannelRule": "Sales Channel",
         "currencyRule": "Currency",
         "languageRule": "Language",
+        "customerIsActiveRule": "Customer is active",
         "billingCountryRule": "Billing address: Country",
+        "billingCityRule": "Billing address: City",
         "billingStreetRule": "Billing address: Street",
+        "billingStateRule": "Billing address: State",
         "billingZipCodeRule": "Billing address: Postal code",
         "customerGroupRule": "Customer group",
         "customerTagRule": "Customer with tag",
@@ -658,9 +661,15 @@
         "isNewsletterRecipient": "Customer is newsletter recipient",
         "daysSinceLastOrderRule": "Days since last order",
         "shippingCountryRule": "Shipping address: Country",
+        "shippingCityRule": "Shipping address: City",
         "shippingStreetRule": "Shipping address: Street",
+        "shippingStateRule": "Shipping address: State",
         "shippingZipCodeRule": "Shipping address: Postal code",
         "customerLoggedInRule": "Customer logged in",
+        "customerAgeRule": "Customer age",
+        "customerDaysSinceLastLogin": "Days since last login",
+        "customerAffiliateCodeRule": "Affiliate code",
+        "customerCampaignCodeRule": "Campaign code",
         "cartAmountRule": "Grand total",
         "cartPositionPrice": "Total",
         "goodsCountRule": "Total quantity of distinct products",
@@ -677,6 +686,7 @@
         "lineItemUnitPriceRule": "Item unit price",
         "lineItemTotalPriceRule": "Item subtotal",
         "lineItemWithQuantityRule": "Item quantity",
+        "orderTagRule": "Order with tag",
         "yes": "Yes",
         "no": "No",
         "withTime": "Including timestamp",
@@ -1381,7 +1391,7 @@
   },
   "sw-restricted-rules": {
     "restrictedAssignment": {
-      "general": "This rule uses condition types that are not allowed for assignment to {relation}.",
+      "general": "This rule uses conditions that are not allowed for assignment to {relation}.",
       "productPrices": "pricing rules",
       "shippingMethodPrices": "pricing rules",
       "shippingMethodPriceCalculations": "shipping cost calculation rules",
@@ -1393,11 +1403,16 @@
       "cartPromotions": "shopping cart rule|shopping cart rules",
       "promotionDiscounts": "product rule|product rules",
       "promotionSetGroups": "product rule|product rules",
+      "eventActions": "business event rule|business event rules",
       "notEqualsViolationTooltip": "This rule uses conditions that prevent assignment to {entityLabel}. These conditions are: {conditions}.",
       "equalsAnyViolationTooltip": "This rule must use at least one of the following conditions to be able to assign it to {entityLabel}: {conditions}."
     },
     "restrictedConditions": {
-      "restrictedPromotionConditionTooltip": "The current rule is assigned to a promotion as {assignments}. The use of this condition is therefore not allowed in this context."
+      "restrictedConditionTooltip": "This rule is assigned to:<br/><br/>{assignments}</br></br>The use of this condition is not allowed in this context.",
+      "relation": {
+        "flowTrigger": "Flows with trigger: {assignments}",
+        "promotion": "Promotions as {assignments}"
+      }
     },
     "and": "and",
     "or": "or"

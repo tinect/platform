@@ -6,7 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Shopware\Core\Framework\App\Hmac\Guzzle\AuthMiddleware;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\Command\WriteTypeIntendException;
 use Shopware\Core\Framework\MessageQueue\Exception\MessageFailedException;
 use Shopware\Core\Framework\MessageQueue\Handler\AbstractMessageHandler;
@@ -15,6 +15,8 @@ use Shopware\Core\Framework\Webhook\Message\WebhookEventMessage;
 
 /**
  * @package core
+ *
+ * @deprecated tag:v6.5.0 - reason:becomes-internal - Will only implement MessageHandlerInterface and all MessageHandler will be internal and final starting with v6.5.0.0
  */
 class WebhookEventMessageHandler extends AbstractMessageHandler
 {
@@ -23,14 +25,14 @@ class WebhookEventMessageHandler extends AbstractMessageHandler
 
     private Client $client;
 
-    private EntityRepositoryInterface $webhookRepository;
+    private EntityRepository $webhookRepository;
 
-    private EntityRepositoryInterface $webhookEventLogRepository;
+    private EntityRepository $webhookEventLogRepository;
 
     /**
      * @internal
      */
-    public function __construct(Client $client, EntityRepositoryInterface $webhookRepository, EntityRepositoryInterface $webhookEventLogRepository)
+    public function __construct(Client $client, EntityRepository $webhookRepository, EntityRepository $webhookEventLogRepository)
     {
         $this->client = $client;
         $this->webhookRepository = $webhookRepository;

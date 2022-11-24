@@ -5,7 +5,7 @@ namespace Shopware\Core\Content\ProductExport\ScheduledTask;
 use Shopware\Core\Content\ProductExport\ProductExportEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
@@ -14,6 +14,9 @@ use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\Context\AbstractSalesChannelContextFactory;
 use Symfony\Component\Messenger\MessageBusInterface;
 
+/**
+ * @deprecated tag:v6.5.0 - reason:becomes-internal - MessageHandler will be internal and final starting with v6.5.0.0
+ */
 class ProductExportGenerateTaskHandler extends ScheduledTaskHandler
 {
     /**
@@ -22,12 +25,12 @@ class ProductExportGenerateTaskHandler extends ScheduledTaskHandler
     private $salesChannelContextFactory;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $salesChannelRepository;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $productExportRepository;
 
@@ -40,10 +43,10 @@ class ProductExportGenerateTaskHandler extends ScheduledTaskHandler
      * @internal
      */
     public function __construct(
-        EntityRepositoryInterface $scheduledTaskRepository,
+        EntityRepository $scheduledTaskRepository,
         AbstractSalesChannelContextFactory $salesChannelContextFactory,
-        EntityRepositoryInterface $salesChannelRepository,
-        EntityRepositoryInterface $productExportRepository,
+        EntityRepository $salesChannelRepository,
+        EntityRepository $productExportRepository,
         MessageBusInterface $messageBus
     ) {
         parent::__construct($scheduledTaskRepository);

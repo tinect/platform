@@ -14,7 +14,7 @@ use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Content\Media\Message\DeleteFileHandler;
 use Shopware\Core\Content\Media\Message\DeleteFileMessage;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\BeforeDeleteEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntitySearchedEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -37,24 +37,24 @@ class MediaDeletionSubscriber implements EventSubscriberInterface
 
     private EventDispatcherInterface $dispatcher;
 
-    private EntityRepositoryInterface $thumbnailRepository;
+    private EntityRepository $thumbnailRepository;
 
     private MessageBusInterface $messageBus;
 
     private DeleteFileHandler $deleteFileHandler;
 
-    private EntityRepositoryInterface $mediaRepository;
+    private EntityRepository $mediaRepository;
 
     /**
      * @internal
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
-        EntityRepositoryInterface $thumbnailRepository,
+        EntityRepository $thumbnailRepository,
         MessageBusInterface $messageBus,
         DeleteFileHandler $deleteFileHandler,
         Connection $connection,
-        EntityRepositoryInterface $mediaRepository
+        EntityRepository $mediaRepository
     ) {
         $this->dispatcher = $dispatcher;
         $this->thumbnailRepository = $thumbnailRepository;

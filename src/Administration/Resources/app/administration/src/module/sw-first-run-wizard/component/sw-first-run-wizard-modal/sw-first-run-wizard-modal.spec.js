@@ -1,7 +1,9 @@
 import { shallowMount } from '@vue/test-utils';
-import 'src/module/sw-first-run-wizard/component/sw-first-run-wizard-modal';
+import swFirstRunWizardModal from 'src/module/sw-first-run-wizard/component/sw-first-run-wizard-modal';
 import 'src/app/component/base/sw-modal';
 import 'src/app/component/base/sw-container';
+
+Shopware.Component.register('sw-first-run-wizard-modal', swFirstRunWizardModal);
 
 describe('module/sw-first-run-wizard/component/sw-first-run-wizard-modal', () => {
     const CreateFirstRunWizardModal = async function CreateFirstRunWizardModal() {
@@ -23,13 +25,10 @@ describe('module/sw-first-run-wizard/component/sw-first-run-wizard-modal', () =>
                 $route: { name: 'sw.first.run.wizard.index.welcome' }
             },
             provide: {
-                firstRunWizardService: {
-                    setFRWStart: () => {
-                    }
-                },
+                firstRunWizardService: { setFRWStart: () => {} },
                 shortcutService: {
-                    stopEventListener: () => {
-                    }
+                    stopEventListener: () => {},
+                    startEventListener: () => {}
                 }
             },
             props: {}

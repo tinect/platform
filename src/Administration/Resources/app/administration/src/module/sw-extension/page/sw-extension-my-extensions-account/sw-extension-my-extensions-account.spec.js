@@ -1,15 +1,16 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import 'src/module/sw-extension/page/sw-extension-my-extensions-account';
+import swExtensionMyExtensionsAccount from 'src/module/sw-extension/page/sw-extension-my-extensions-account';
 import 'src/app/component/meteor/sw-meteor-card';
 import 'src/app/component/base/sw-button';
 import extensionStore from 'src/module/sw-extension/store/extensions.store';
-import flushPromises from 'flush-promises';
 
 const userInfo = {
     avatarUrl: 'https://avatar.url',
     email: 'max@muster.com',
     name: 'Max Muster'
 };
+
+Shopware.Component.register('sw-extension-my-extensions-account', swExtensionMyExtensionsAccount);
 
 async function createWrapper() {
     const localVue = createLocalVue();

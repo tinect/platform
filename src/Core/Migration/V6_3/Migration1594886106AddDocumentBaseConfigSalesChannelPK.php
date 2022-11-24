@@ -3,10 +3,13 @@
 namespace Shopware\Core\Migration\V6_3;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Shopware\Core\Framework\Migration\MigrationStep;
 
 /**
- * @deprecated tag:v6.5.0 - reason:becomes-internal - Migrations will be internal in v6.5.0
+ * @package core
+ *
+ * @internal
  */
 class Migration1594886106AddDocumentBaseConfigSalesChannelPK extends MigrationStep
 {
@@ -22,7 +25,7 @@ class Migration1594886106AddDocumentBaseConfigSalesChannelPK extends MigrationSt
                 ALTER TABLE `document_base_config_sales_channel`
                 ADD PRIMARY KEY (`id`);
             ');
-        } catch (\Doctrine\DBAL\Exception $e) {
+        } catch (Exception $e) {
             // PK already exists
         }
     }
