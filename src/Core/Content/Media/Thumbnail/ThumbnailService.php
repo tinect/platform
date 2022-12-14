@@ -550,7 +550,7 @@ class ThumbnailService
         $this->thumbnailRepository->delete($delete, $context);
     }
 
-    private function getFileSystem(MediaEntity $media): FilesystemInterface
+    private function getFileSystem(MediaEntity $media): FilesystemOperator
     {
         if ($media->isPrivate()) {
             return $this->filesystemPrivate;

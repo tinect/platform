@@ -21,7 +21,7 @@ class MediaThumbnailEntity extends Entity
 
     protected string $url = '';
 
-    protected ?string $path;
+    protected ?string $path = null;
 
     protected string $mediaId = '';
 
