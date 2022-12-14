@@ -15,35 +15,17 @@ class MediaThumbnailEntity extends Entity
     use EntityIdTrait;
     use EntityCustomFieldsTrait;
 
-    /**
-     * @var int
-     */
-    protected $width;
+    protected int $width = 0;
 
-    /**
-     * @var int
-     */
-    protected $height;
+    protected int $height = 0;
 
-    /**
-     * @var string
-     */
-    protected $url = '';
+    protected string $url = '';
 
-    /**
-     * @var string|null
-     */
-    protected $path;
+    protected ?string $path;
 
-    /**
-     * @var string
-     */
-    protected $mediaId;
+    protected string $mediaId = '';
 
-    /**
-     * @var MediaEntity|null
-     */
-    protected $media;
+    protected ?MediaEntity $media;
 
     public function getWidth(): int
     {
