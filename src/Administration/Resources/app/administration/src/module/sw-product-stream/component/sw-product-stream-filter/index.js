@@ -1,9 +1,16 @@
+/*
+ * @package inventory
+ */
+
 import template from './sw-product-stream-filter.html.twig';
 import './sw-product-stream-filter.scss';
 
 const { EntityDefinition } = Shopware;
 
-// eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
+/**
+ * @private
+ * @package business-ops
+ */
 export default {
     template,
 

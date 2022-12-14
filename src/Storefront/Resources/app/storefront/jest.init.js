@@ -1,8 +1,9 @@
-import '@babel/polyfill';
-import bootstrap from 'bootstrap5';
+/**
+ * @package storefront
+ */
 
-/** @deprecated tag:v6.5.0 - jQuery will be removed. */
-import $ from 'jquery';
+import '@babel/polyfill';
+import * as bootstrap from 'bootstrap';
 
 // log rejections so that they are not printed to stderr as a fallback
 process.on('unhandledRejection', (reason) => {
@@ -10,9 +11,6 @@ process.on('unhandledRejection', (reason) => {
 });
 
 global.bootstrap = bootstrap;
-global.$ = global.jQuery = $;
-global.$.fn.tooltip = jest.fn();
-global.$.fn.popover = jest.fn();
 
 // Global mocks for common window properties
 /** @deprecated tag:v6.5.0 - window property csrf will be removed */

@@ -38,6 +38,10 @@ use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
+ * @package business-ops
+ *
+ * @internal
+ *
  * @deprecated tag:v6.5.0 - reason:remove-subscriber - FlowActions won't be executed over the event system anymore,
  * therefore the actions won't implement the EventSubscriberInterface anymore.
  */
@@ -226,6 +230,10 @@ class SendMailAction extends FlowAction implements DelayableAction
             $data->set('binAttachments', $attachments);
         }
 
+        if (!empty($eventConfig['replyTo'])) {
+            $data->set('senderMail', $eventConfig['replyTo']);
+        }
+
         $this->eventDispatcher->dispatch(new FlowSendMailActionEvent($data, $mailTemplate, $event));
 
         if ($data->has('templateId')) {
@@ -310,6 +318,10 @@ class SendMailAction extends FlowAction implements DelayableAction
 
         if (!empty($attachments)) {
             $data->set('binAttachments', $attachments);
+        }
+
+        if (!empty($eventConfig['replyTo'])) {
+            $data->set('senderMail', $eventConfig['replyTo']);
         }
 
         $this->eventDispatcher->dispatch(new FlowSendMailActionEvent($data, $mailTemplate, $flow));

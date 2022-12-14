@@ -2,7 +2,7 @@
 
 namespace Shopware\Core\Content\Media\Thumbnail;
 
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\FilesystemOperator;
 use Shopware\Core\Content\Media\Aggregate\MediaFolder\MediaFolderEntity;
 use Shopware\Core\Content\Media\Aggregate\MediaFolderConfiguration\MediaFolderConfigurationEntity;
 use Shopware\Core\Content\Media\Aggregate\MediaThumbnail\MediaThumbnailCollection;
@@ -22,13 +22,16 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Feature;
 
+/**
+ * @package content
+ */
 class ThumbnailService
 {
     private EntityRepository $thumbnailRepository;
 
-    private FilesystemInterface $filesystemPublic;
+    private FilesystemOperator $filesystemPublic;
 
-    private FilesystemInterface $filesystemPrivate;
+    private FilesystemOperator $filesystemPrivate;
 
     private EntityRepository $mediaFolderRepository;
 
@@ -39,8 +42,8 @@ class ThumbnailService
      */
     public function __construct(
         EntityRepository $thumbnailRepository,
-        FilesystemInterface $fileSystemPublic,
-        FilesystemInterface $fileSystemPrivate,
+        FilesystemOperator $fileSystemPublic,
+        FilesystemOperator $fileSystemPrivate,
         EntityRepository $mediaFolderRepository,
         AbstractPathGenerator $pathGenerator
     ) {
@@ -222,7 +225,7 @@ class ThumbnailService
                 }
 
                 if ($strict === true
-                    && !$this->getFileSystem($media)->has($thumbnail->getPath())) {
+                    && !$this->getFileSystem($media)->fileExists($thumbnail->getPath())) {
                     continue;
                 }
 
@@ -294,8 +297,8 @@ class ThumbnailService
 
                 $mediaFilesystem = $this->getFileSystem($media);
                 if ($originalImageSize === $thumbnailSize
-                    && $mediaFilesystem->getSize($originalPath) < $mediaFilesystem->getSize($url)) {
-                    $mediaFilesystem->update($url, (string) $mediaFilesystem->read($originalPath));
+                    && $mediaFilesystem->fileSize($originalPath) < $mediaFilesystem->fileSize($url)) {
+                    $mediaFilesystem->write($url, (string) $mediaFilesystem->read($originalPath));
                 }
 
                 $savedThumbnails[] = [
@@ -498,7 +501,9 @@ class ThumbnailService
         $imageFile = ob_get_contents();
         ob_end_clean();
 
-        if ($this->getFileSystem($media)->put($url, (string) $imageFile) === false) {
+        try {
+            $this->getFileSystem($media)->write($url, (string) $imageFile);
+        } catch (\Exception $e) {
             throw new ThumbnailCouldNotBeSavedException($url);
         }
     }

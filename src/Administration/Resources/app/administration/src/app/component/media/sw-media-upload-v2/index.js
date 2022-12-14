@@ -12,6 +12,7 @@ const INPUT_TYPE_URL_UPLOAD = 'url-upload';
  * @status ready
  * @description The <u>sw-media-upload-v2</u> component is used wherever an upload is needed. It supports drag & drop-,
  * file- and url-upload and comes in various forms.
+ * @package content
  * @example-type code-only
  * @component-example
  * <sw-media-upload-v2
@@ -450,7 +451,7 @@ Component.register('sw-media-upload-v2', {
                 return true;
             }
 
-            const fileTypes = this.fileAccept.split(',');
+            const fileTypes = this.fileAccept.replaceAll(' ', '').split(',');
 
             fileTypes.forEach(fileType => {
                 const fileAcceptType = fileType.split('/');

@@ -1,3 +1,7 @@
+/**
+ * @package storefront
+ */
+
 /* eslint-disable no-console */
 const fs = require('fs');
 const puppeteer = require('puppeteer');
@@ -135,6 +139,7 @@ async function main () {
             ci: {
                 collect: {
                     url: Object.values(testCases),
+                    numberOfRuns: 8,
                     settings: {
                         port: LH_PORT,
                         chromeFlags: '--no-sandbox',
@@ -169,6 +174,7 @@ async function main () {
             ci: {
                 collect: {
                     url: Object.values(testCasesMobile),
+                    numberOfRuns: 8,
                     settings: {
                         port: LH_PORT,
                         chromeFlags: '--no-sandbox',
@@ -203,6 +209,7 @@ async function main () {
             ci: {
                 collect: {
                     url: Object.values(testCasesLoggedIn),
+                    numberOfRuns: 8,
                     puppeteerScript: './lighthouse-puppeteer.js',
                     puppeteerLaunchOptions: {args: ['--allow-no-sandbox-job', '--allow-sandbox-debugging', '--no-sandbox', '--disable-gpu', '--disable-gpu-sandbox', '--display']},
                     settings: {
@@ -239,6 +246,7 @@ async function main () {
             ci: {
                 collect: {
                     url: Object.values(testCasesLoggedInMobile),
+                    numberOfRuns: 8,
                     puppeteerScript: './lighthouse-puppeteer.js',
                     puppeteerLaunchOptions: {args: ['--allow-no-sandbox-job', '--allow-sandbox-debugging', '--no-sandbox', '--disable-gpu', '--disable-gpu-sandbox', '--display']},
                     settings: {

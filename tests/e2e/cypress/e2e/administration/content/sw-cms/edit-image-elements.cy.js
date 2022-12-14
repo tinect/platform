@@ -1,3 +1,6 @@
+/**
+ * @package content
+ */
 // / <reference types="Cypress" />
 
 import MediaPageObject from '../../../../support/pages/module/sw-media.page-object';
@@ -87,7 +90,7 @@ describe('CMS: Check usage and editing of image elements', () => {
             .and('match', /sw-login-background/);
     });
 
-    it('@content: use image slider block', { tags: ['pa-content-management'] }, () => {
+    it('@content: use image slider block', { tags: ['pa-content-management', 'quarantined'] }, () => {
         const page = new MediaPageObject();
 
         cy.intercept({

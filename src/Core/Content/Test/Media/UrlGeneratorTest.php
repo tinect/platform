@@ -1,14 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace src\Core\Content\Test\Media\Pathname;
+namespace src\Core\Content\Test\Media;
 
+use League\Flysystem\Filesystem;
+use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Content\Media\Aggregate\MediaThumbnail\MediaThumbnailEntity;
 use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Content\Media\Pathname\PathGenerator;
 use Shopware\Core\Content\Media\Pathname\PathnameStrategy\FilenamePathnameStrategy;
 use Shopware\Core\Content\Media\Pathname\UrlGenerator;
-use Shopware\Core\DevOps\Environment\EnvironmentHelper;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -29,9 +30,9 @@ class UrlGeneratorTest extends TestCase
         );
 
         $pathGenerator = new PathGenerator(new FilenamePathnameStrategy());
-        $urlGenerator = new UrlGenerator($pathGenerator, new RequestStack());
+        $urlGenerator = new UrlGenerator($pathGenerator, new Filesystem(new InMemoryFilesystemAdapter(), ['public_url' => 'http://localhost:8000']));
         static::assertSame(
-            EnvironmentHelper::getVariable('APP_URL', 'http://localhost:8000') . '/media/d0/b3/24/file.jpg',
+            'http://localhost:8000/media/d0/b3/24/file.jpg',
             $urlGenerator->getAbsoluteMediaUrl($mediaEntity)
         );
     }
@@ -49,9 +50,9 @@ class UrlGeneratorTest extends TestCase
         $pathGenerator = new PathGenerator(new FilenamePathnameStrategy());
         $requestStack = new RequestStack();
         $requestStack->push(new Request());
-        $urlGenerator = new UrlGenerator($pathGenerator, $requestStack);
+        $urlGenerator = new UrlGenerator($pathGenerator, new Filesystem(new InMemoryFilesystemAdapter(), ['public_url' => 'http://localhost:8000']));
         static::assertSame(
-            EnvironmentHelper::getVariable('APP_URL', 'http://localhost:8000') . '/media/d0/b3/24/file.jpg',
+            'http://localhost:8000/media/d0/b3/24/file.jpg',
             $urlGenerator->getAbsoluteMediaUrl($mediaEntity)
         );
     }
@@ -74,9 +75,9 @@ class UrlGeneratorTest extends TestCase
         );
 
         $pathGenerator = new PathGenerator(new FilenamePathnameStrategy());
-        $urlGenerator = new UrlGenerator($pathGenerator, new RequestStack());
+        $urlGenerator = new UrlGenerator($pathGenerator, new Filesystem(new InMemoryFilesystemAdapter(), ['public_url' => 'http://localhost:8000']));
         static::assertSame(
-            EnvironmentHelper::getVariable('APP_URL', 'http://localhost:8000') . '/thumbnail/d0/b3/24/file.jpg_100x100',
+            'http://localhost:8000/thumbnail/d0/b3/24/file.jpg_100x100',
             $urlGenerator->getAbsoluteThumbnailUrl($mediaEntity, $mediaThumbnailEntity)
         );
     }
@@ -92,14 +93,14 @@ class UrlGeneratorTest extends TestCase
         );
 
         $pathGenerator = new PathGenerator(new FilenamePathnameStrategy());
-        $urlGenerator = new UrlGenerator($pathGenerator, new RequestStack());
+        $urlGenerator = new UrlGenerator($pathGenerator, new Filesystem(new InMemoryFilesystemAdapter(), ['public_url' => 'http://localhost:8000']));
         static::assertSame(
             'media/d0/b3/24/file.jpg',
             $urlGenerator->getRelativeMediaUrl($mediaEntity)
         );
     }
 
-    public function testRelativehumbnailUrl(): void
+    public function testRelativeThumbnailUrl(): void
     {
         $mediaEntity = new MediaEntity();
         $mediaEntity->assign(
@@ -117,7 +118,7 @@ class UrlGeneratorTest extends TestCase
         );
 
         $pathGenerator = new PathGenerator(new FilenamePathnameStrategy());
-        $urlGenerator = new UrlGenerator($pathGenerator, new RequestStack());
+        $urlGenerator = new UrlGenerator($pathGenerator, new Filesystem(new InMemoryFilesystemAdapter(), ['public_url' => 'http://localhost:8000']));
         static::assertSame(
             'thumbnail/d0/b3/24/file.jpg_100x100',
             $urlGenerator->getRelativeThumbnailUrl($mediaEntity, $mediaThumbnailEntity)
@@ -135,12 +136,14 @@ class UrlGeneratorTest extends TestCase
             ]
         );
 
+        $fs = new Filesystem(new InMemoryFilesystemAdapter(), ['public_url' => 'http://localhost:8000']);
+
         $pathGenerator = new PathGenerator(new FilenamePathnameStrategy());
-        $urlGenerator = new UrlGenerator($pathGenerator, new RequestStack());
+        $urlGenerator = new UrlGenerator($pathGenerator, $fs);
         $urlGenerator->getAbsoluteMediaUrl($mediaEntity);
-        $urlGeneratorAssert = new UrlGenerator($pathGenerator, new RequestStack());
+        $urlGeneratorAssert = new UrlGenerator($pathGenerator, $fs);
         $urlGeneratorAssert->getAbsoluteMediaUrl($mediaEntity);
-        $urlGeneratorAssertStaysUntouched = new UrlGenerator($pathGenerator, new RequestStack());
+        $urlGeneratorAssertStaysUntouched = new UrlGenerator($pathGenerator, $fs);
 
         // Both $fallbackBaseUrl should be same
         static::assertSame(print_r($urlGeneratorAssert, true), print_r($urlGenerator, true));
@@ -149,8 +152,5 @@ class UrlGeneratorTest extends TestCase
 
         // Both $fallbackBaseUrl should be same
         static::assertSame(print_r($urlGeneratorAssertStaysUntouched, true), print_r($urlGenerator, true));
-
-        // Both $fallbackBaseUrl should be different
-        static::assertNotSame(print_r($urlGeneratorAssert, true), print_r($urlGenerator, true));
     }
 }

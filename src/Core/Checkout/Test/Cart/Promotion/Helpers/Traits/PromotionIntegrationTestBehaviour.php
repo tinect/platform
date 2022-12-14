@@ -19,6 +19,9 @@ use Shopware\Core\Test\TestDefaults;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 
+/**
+ * @package checkout
+ */
 trait PromotionIntegrationTestBehaviour
 {
     private SalesChannelContext $context;
@@ -84,6 +87,8 @@ trait PromotionIntegrationTestBehaviour
     /**
      * Gets all promotion codes that have been added
      * to the current session.
+     *
+     * @return array<mixed>
      */
     public function getSessionCodes(): array
     {

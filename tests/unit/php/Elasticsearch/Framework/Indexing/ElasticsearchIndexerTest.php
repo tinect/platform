@@ -3,8 +3,8 @@
 namespace Shopware\Tests\Unit\Elasticsearch\Framework\Indexing;
 
 use Doctrine\DBAL\Connection;
-use Elasticsearch\Client;
-use Elasticsearch\Namespaces\IndicesNamespace;
+use OpenSearch\Client;
+use OpenSearch\Namespaces\IndicesNamespace;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -20,6 +20,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Language\LanguageCollection;
 use Shopware\Core\System\Language\LanguageEntity;
+use Shopware\Core\Test\CollectingMessageBus;
 use Shopware\Elasticsearch\Exception\ElasticsearchIndexingException;
 use Shopware\Elasticsearch\Framework\AbstractElasticsearchDefinition;
 use Shopware\Elasticsearch\Framework\ElasticsearchHelper;
@@ -78,7 +79,7 @@ class ElasticsearchIndexerTest extends TestCase
     private $languageRepository;
 
     /**
-     * @var MessageBusInterface&MockObject
+     * @var MessageBusInterface
      */
     private $bus;
 
@@ -101,7 +102,7 @@ class ElasticsearchIndexerTest extends TestCase
         $this->client = $this->createMock(Client::class);
         $this->currencyRepository = $this->createMock(EntityRepository::class);
         $this->languageRepository = $this->createMock(EntityRepository::class);
-        $this->bus = $this->createMock(MessageBusInterface::class);
+        $this->bus = new CollectingMessageBus();
 
         $this->helper->method('allowIndexing')->willReturn(true);
 
@@ -278,18 +279,6 @@ class ElasticsearchIndexerTest extends TestCase
         $indexer->updateIds($this->createMock(EntityDefinition::class), ['1', '2']);
     }
 
-    public function testHandleInvalidMessage(): void
-    {
-        $this->helper = $this->createMock(ElasticsearchHelper::class);
-        $this->helper
-            ->expects(static::never())
-            ->method('allowIndexing');
-
-        $indexer = $this->getIndexer();
-
-        $indexer->handle(new \ArrayObject());
-    }
-
     public function testHandleESDisabled(): void
     {
         $this->helper = $this->createMock(ElasticsearchHelper::class);
@@ -298,7 +287,7 @@ class ElasticsearchIndexerTest extends TestCase
 
         $indexer = $this->getIndexer();
 
-        $indexer->handle(new ElasticsearchLanguageIndexIteratorMessage('1'));
+        $indexer(new ElasticsearchLanguageIndexIteratorMessage('1'));
     }
 
     public function testHandleLanguageInvalidLanguage(): void
@@ -312,7 +301,7 @@ class ElasticsearchIndexerTest extends TestCase
 
         $indexer = $this->getIndexer();
 
-        $indexer->handle(new ElasticsearchLanguageIndexIteratorMessage('invalid'));
+        $indexer(new ElasticsearchLanguageIndexIteratorMessage('invalid'));
     }
 
     public function testHandleLanguageMessage(): void
@@ -335,7 +324,7 @@ class ElasticsearchIndexerTest extends TestCase
 
         $indexer = $this->getIndexer();
 
-        $indexer->handle($message);
+        $indexer($message);
     }
 
     public function testHandleIndexingInvalidDefinition(): void
@@ -355,7 +344,7 @@ class ElasticsearchIndexerTest extends TestCase
         static::expectException(\RuntimeException::class);
         static::expectExceptionMessage('Entity not_existing has no registered elasticsearch definition');
 
-        $indexer->handle($message);
+        $indexer($message);
     }
 
     public function testHandleIndexing(): void
@@ -390,7 +379,7 @@ class ElasticsearchIndexerTest extends TestCase
 
         $indexer = $this->getIndexer();
 
-        $indexer->handle($message);
+        $indexer($message);
     }
 
     public function testHandleIndexingFails(): void
@@ -440,7 +429,7 @@ class ElasticsearchIndexerTest extends TestCase
 
         static::expectException(ElasticsearchIndexingException::class);
 
-        $indexer->handle($message);
+        $indexer($message);
     }
 
     private function getIndexer(?LoggerInterface $logger = null): ElasticsearchIndexer

@@ -1,3 +1,7 @@
+/*
+ * @package inventory
+ */
+
 import './acl';
 import defaultSearchConfiguration from './default-search-configuration';
 
@@ -12,7 +16,10 @@ Shopware.Component.register('sw-product-stream-modal-preview', () => import('./c
 Shopware.Component.extend('sw-product-stream-filter', 'sw-condition-base', () => import('./component/sw-product-stream-filter'));
 /* eslint-enable max-len, sw-deprecation-rules/private-feature-declarations */
 
-// eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
+/**
+ * @private
+ * @package business-ops
+ */
 Module.register('sw-product-stream', {
     type: 'core',
     name: 'product-stream',

@@ -2,22 +2,24 @@
 
 namespace Shopware\Core\Content\Media\File;
 
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\FilesystemOperator;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 use Shopware\Core\Content\Media\Exception\MediaNotFoundException;
-use Shopware\Core\Content\Media\Exception\StreamNotReadableException;
 use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Content\Media\Pathname\UrlGeneratorInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 
+/**
+ * @package content
+ */
 class FileLoader
 {
-    private FilesystemInterface $filesystemPublic;
+    private FilesystemOperator $filesystemPublic;
 
-    private FilesystemInterface $filesystemPrivate;
+    private FilesystemOperator $filesystemPrivate;
 
     private FileNameValidator $fileNameValidator;
 
@@ -29,8 +31,8 @@ class FileLoader
      * @internal
      */
     public function __construct(
-        FilesystemInterface $filesystemPublic,
-        FilesystemInterface $filesystemPrivate,
+        FilesystemOperator $filesystemPublic,
+        FilesystemOperator $filesystemPrivate,
         EntityRepository $mediaRepository,
         StreamFactoryInterface $streamFactory
     ) {
@@ -52,9 +54,6 @@ class FileLoader
     {
         $media = $this->findMediaById($mediaId, $context);
         $resource = $this->getFileSystem($media)->readStream($this->getFilePath($media));
-        if ($resource === false) {
-            throw new StreamNotReadableException($this->getFilePath($media));
-        }
 
         return $this->streamFactory->createStreamFromResource($resource);
     }
@@ -66,7 +65,7 @@ class FileLoader
         return $media->getPath();
     }
 
-    private function getFileSystem(MediaEntity $media): FilesystemInterface
+    private function getFileSystem(MediaEntity $media): FilesystemOperator
     {
         if ($media->isPrivate()) {
             return $this->filesystemPrivate;

@@ -33,6 +33,8 @@ use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * @internal
+ *
+ * @package content
  * @covers \Shopware\Core\Content\Category\SalesChannel\CachedNavigationRoute
  */
 class CachedNavigationRouteTest extends TestCase
@@ -68,7 +70,6 @@ class CachedNavigationRouteTest extends TestCase
             null,
             $salesChannel,
             new CurrencyEntity(),
-            new CustomerGroupEntity(),
             new CustomerGroupEntity(),
             new TaxCollection(),
             new PaymentMethodEntity(),

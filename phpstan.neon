@@ -71,11 +71,6 @@ parameters:
             paths:
                 - src/**/*Test.php
 
-        # Method gets always an EntityCollection
-        -
-            message: '#^Parameter \#3 \$entities of class Shopware\\Core\\Framework\\DataAbstractionLayer\\Search\\EntitySearchResult constructor expects Shopware\\Core\\Framework\\DataAbstractionLayer\\EntityCollection, iterable<Shopware\\Core\\Framework\\DataAbstractionLayer\\Entity> given\.$#'
-            path: src/Core/Framework/DataAbstractionLayer/Search/EntitySearchResult.php
-
         # @feature-deprecated tag:v6.5.0 (flag:FEATURE_NEXT_12455)
         -
             message: '#Method Shopware\\Storefront\\Framework\\Captcha\\AbstractCaptcha::isValid\(\) invoked with 2 parameters, 1 required\.#'
@@ -85,8 +80,6 @@ parameters:
         -
             message: '#Unsafe usage of new static\(\)#'
             path: src/Core/Framework/Struct/Collection.php
-        # Exception for CopyBatch file system plugin. It is called via magic method
-        - '#Call to an undefined method League\\Flysystem\\FilesystemInterface::copyBatch\(\)\.#'
         -
             message: '#Access to private property#'
             path: src/Core/Framework/Api/Controller/CacheController.php
@@ -111,11 +104,6 @@ parameters:
         -
             message: '#Method Shopware\\Core\\Framework\\DataAbstractionLayer\\Entity::\_\_.*\(\) has.*#'
             path: src/Core/Framework/DataAbstractionLayer/Entity.php
-        # Class behind feature flag - can be removed with feature flag
-        - '#Shopware\\Core\\Framework\\Api\\Sync\\SyncBehavior#'
-        -
-            message: '#^Parameter \#2 \$success of class Shopware\\Core\\Framework\\Api\\Sync\\SyncResult constructor expects bool, array<string, array<int, mixed>> given\.$#'
-            path: src/Core/Framework/Api/Sync/SyncService.php
 
         # Shopware\\Core\\Checkout\\Cart\\Exception\\InvalidCartException is behind a feature flag
         -
@@ -123,9 +111,6 @@ parameters:
             path: src/Core/Checkout/Cart/CartException.php
 
         # can be removed with feature flag FEATURE_NEXT_12455
-        -
-            message: '#Method Shopware\\Core\\Content\\Seo\\SeoUrlRoute\\SeoUrlRouteInterface::prepareCriteria\(\) invoked with 2 parameters, 1 required.#'
-            path: src/Core/Content/Seo/SeoUrlGenerator.php
         -
             message: '#Constructor of class Shopware\\Core\\Checkout\\Customer\\Exception\\DuplicateWishlistProductException has an unused parameter \$productId\.#'
             path: src/Core/Checkout/Customer/Exception/DuplicateWishlistProductException.php
@@ -179,12 +164,6 @@ parameters:
             count: 1
             path: src/Storefront/Framework/Cache/ReverseProxy/ReverseProxyCache.php
 
-        # Can be removed with 6.5 release (NEXT-20850)
-        -
-            message: "#^PHPDoc tag @param references unknown parameter\\: \\$context$#"
-            count: 1
-            path: src/Storefront/Theme/ThemeCompiler.php
-
         # can be removed with 6.5
         -
         	message: "#^Method Shopware\\\\Core\\\\HttpKernel\\:\\:handle\\(\\) has parameter \\$catch with no type specified\\.$#"
@@ -196,27 +175,8 @@ parameters:
         	count: 1
         	path: src/Core/HttpKernel.php
 
-        -
-        	message: "#^Method Shopware\\\\Core\\\\Framework\\\\Api\\\\EventListener\\\\ResponseExceptionListener\\:\\:onKernelException\\(\\) has no return type specified\\.$#"
-        	count: 1
-        	path: src/Core/Framework/Api/EventListener/ResponseExceptionListener.php
-
         # Maybe a bug in phpstan: https://github.com/phpstan/phpstan/issues/7560
         - '#Trait .* is used zero times and is not analysed.#'
-
-        - # PHPstan does not realize that we used bypass final
-            message: "#^Return type of call to method PHPUnit\\\\Framework\\\\MockObject\\\\MockBuilder\\<(.*)>\\:\\:getMock\\(\\) contains unresolvable type.$#"
-            paths:
-                - tests/unit/php
-
-        -
-            message: "#^Return type of call to method PHPUnit\\\\Framework\\\\TestCase\\:\\:createMock\\(\\) contains unresolvable type.$#"
-            paths:
-                - tests/unit/php
-
-        -
-            message: "#^Return type of call to method PHPUnit\\\\Framework\\\\TestCase\\:\\:createPartialMock\\(\\) contains unresolvable type.$#"
-            path: tests/unit/php/Core/Content/Mail/Service/MailerTransportLoaderTest.php
 
         - # MockRepo extends final EntityRepository class, with is ok for tests
             message: "#^Class Shopware\\Core\\Content\\Test\\ImportExport\\MockRepository extends @final class Shopware\\Core\\Framework\\DataAbstractionLayer\\EntityRepository.$#"
@@ -277,6 +237,11 @@ services:
             - phpstan.typeSpecifier.methodTypeSpecifyingExtension
 
     -
-            class: Shopware\Core\DevOps\StaticAnalyze\PHPStan\Rules\RuleConditionHasRuleConfigRule
-            tags:
-                - phpstan.rules.rule
+        class: Shopware\Core\DevOps\StaticAnalyze\PHPStan\Rules\RuleConditionHasRuleConfigRule
+        tags:
+            - phpstan.rules.rule
+
+    -
+        class: Shopware\Core\DevOps\StaticAnalyze\PHPStan\Rules\PackageAnnotationRule
+        tags:
+            - phpstan.rules.rule

@@ -4,7 +4,7 @@ namespace Shopware\Core\Content\Test\ProductExport\ScheduledTask;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\FilesystemOperator;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Content\Product\Aggregate\ProductVisibility\ProductVisibilityDefinition;
 use Shopware\Core\Content\ProductExport\ProductExportEntity;
@@ -38,7 +38,7 @@ class ProductExportGenerateTaskHandlerTest extends TestCase
 
     private Context $context;
 
-    private FilesystemInterface $fileSystem;
+    private FilesystemOperator $fileSystem;
 
     protected function setUp(): void
     {
@@ -66,7 +66,7 @@ class ProductExportGenerateTaskHandlerTest extends TestCase
 
         $url = '/api/_action/message-queue/consume';
         $client = $this->getBrowser();
-        $client->request('POST', $url, ['receiver' => 'default']);
+        $client->request('POST', $url, ['receiver' => 'v65']);
 
         static::assertSame(200, $client->getResponse()->getStatusCode());
 
@@ -80,8 +80,8 @@ class ProductExportGenerateTaskHandlerTest extends TestCase
 
         $csvRows = explode(\PHP_EOL, (string) $fileContent);
 
-        static::assertTrue($this->fileSystem->has($this->getContainer()->getParameter('product_export.directory')));
-        static::assertTrue($this->fileSystem->has($filePath));
+        static::assertTrue($this->fileSystem->directoryExists($this->getContainer()->getParameter('product_export.directory')));
+        static::assertTrue($this->fileSystem->fileExists($filePath));
         static::assertCount(4, $csvRows);
 
         /** @var ProductExportEntity|null $newExport */
@@ -102,7 +102,7 @@ class ProductExportGenerateTaskHandlerTest extends TestCase
 
         $url = '/api/_action/message-queue/consume';
         $client = $this->getBrowser();
-        $client->request('POST', $url, ['receiver' => 'default']);
+        $client->request('POST', $url, ['receiver' => 'v65']);
 
         static::assertSame(200, $client->getResponse()->getStatusCode());
         $response = json_decode((string) $client->getResponse()->getContent(), true);
@@ -111,7 +111,7 @@ class ProductExportGenerateTaskHandlerTest extends TestCase
         static::assertEquals(0, $response['handledMessages']);
 
         $filePath = sprintf('%s/Testexport.csv', $this->getContainer()->getParameter('product_export.directory'));
-        static::assertFalse($this->fileSystem->has($filePath));
+        static::assertFalse($this->fileSystem->fileExists($filePath));
 
         /** @var ProductExportEntity|null $newExport */
         $newExport = $this->productExportRepository->search(new Criteria([$exportId]), $this->context)->first();
@@ -138,9 +138,9 @@ class ProductExportGenerateTaskHandlerTest extends TestCase
 
         $this->clearQueue();
         // Since clearing the queue doesn't seem to really work, check difference in message number
-        $messagesBefore = $bus->getDispatchedMessages();
+        $messagesBefore = $this->getDispatchedMessages();
         $this->getTaskHandler()->run();
-        $messagesAfter = $bus->getDispatchedMessages();
+        $messagesAfter = $this->getDispatchedMessages();
 
         static::assertCount(\count($messagesBefore) + 1, $messagesAfter);
     }
@@ -388,5 +388,16 @@ class ProductExportGenerateTaskHandlerTest extends TestCase
                 'active' => $active,
             ],
         ], $this->context);
+    }
+
+    /**
+     * @return list<object>
+     */
+    private function getDispatchedMessages(): array
+    {
+        /** @var TraceableMessageBus $bus */
+        $bus = $this->getContainer()->get('messenger.bus.shopware');
+
+        return $bus->getDispatchedMessages();
     }
 }

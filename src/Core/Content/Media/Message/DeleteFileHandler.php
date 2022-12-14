@@ -2,54 +2,48 @@
 
 namespace Shopware\Core\Content\Media\Message;
 
-use League\Flysystem\AdapterInterface;
-use League\Flysystem\FileNotFoundException;
-use League\Flysystem\FilesystemInterface;
-use Shopware\Core\Framework\MessageQueue\Handler\AbstractMessageHandler;
+use League\Flysystem\FilesystemOperator;
+use League\Flysystem\UnableToDeleteFile;
+use League\Flysystem\Visibility;
+use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 /**
- * @deprecated tag:v6.5.0 - reason:becomes-internal - Will only implement MessageHandlerInterface and all MessageHandler will be internal and final starting with v6.5.0.0
+ * @package content
+ *
+ * @internal
  */
-class DeleteFileHandler extends AbstractMessageHandler
+final class DeleteFileHandler implements MessageHandlerInterface
 {
-    private FilesystemInterface $filesystemPublic;
+    private FilesystemOperator $filesystemPublic;
 
-    private FilesystemInterface $filesystemPrivate;
+    private FilesystemOperator $filesystemPrivate;
 
     /**
      * @internal
      */
-    public function __construct(FilesystemInterface $filesystemPublic, FilesystemInterface $filesystemPrivate)
+    public function __construct(FilesystemOperator $filesystemPublic, FilesystemOperator $filesystemPrivate)
     {
         $this->filesystemPublic = $filesystemPublic;
         $this->filesystemPrivate = $filesystemPrivate;
     }
 
-    /**
-     * @param DeleteFileMessage $message
-     */
-    public function handle($message): void
+    public function __invoke(DeleteFileMessage $message): void
     {
         foreach ($message->getFiles() as $file) {
             try {
                 $this->getFileSystem($message->getVisibility())->delete($file);
-            } catch (FileNotFoundException $e) {
+            } catch (UnableToDeleteFile $e) {
                 //ignore file is already deleted
             }
         }
     }
 
-    public static function getHandledMessages(): iterable
-    {
-        return [DeleteFileMessage::class];
-    }
-
-    private function getFileSystem(string $visibility): FilesystemInterface
+    private function getFileSystem(string $visibility): FilesystemOperator
     {
         switch ($visibility) {
-            case AdapterInterface::VISIBILITY_PUBLIC:
+            case Visibility::PUBLIC:
                 return $this->filesystemPublic;
-            case AdapterInterface::VISIBILITY_PRIVATE:
+            case Visibility::PRIVATE:
                 return $this->filesystemPrivate;
             default:
                 throw new \RuntimeException('Invalid filesystem visibility.');

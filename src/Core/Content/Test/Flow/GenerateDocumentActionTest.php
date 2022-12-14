@@ -58,6 +58,8 @@ use Shopware\Core\Test\TestDefaults;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * @package business-ops
+ *
  * @internal
  */
 class GenerateDocumentActionTest extends TestCase
@@ -431,7 +433,7 @@ class GenerateDocumentActionTest extends TestCase
             'paymentMethodId' => $this->getValidPaymentMethodId(),
             'currencyId' => Defaults::CURRENCY,
             'currencyFactor' => 1.0,
-            'salesChannelId' => Defaults::SALES_CHANNEL,
+            'salesChannelId' => TestDefaults::SALES_CHANNEL,
             'billingAddressId' => $billingAddressId,
             'addresses' => [
                 [
@@ -579,6 +581,8 @@ class GenerateDocumentActionTest extends TestCase
 }
 
 /**
+ * @package business-ops
+ *
  * @internal
  */
 class CustomDoc implements DocumentGeneratorInterface
@@ -602,6 +606,8 @@ class CustomDoc implements DocumentGeneratorInterface
 }
 
 /**
+ * @package business-ops
+ *
  * @internal
  */
 class CustomDocRenderer extends AbstractDocumentRenderer

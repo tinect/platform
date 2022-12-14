@@ -10,6 +10,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const WebpackCopyAfterBuildPlugin = require('@shopware-ag/webpack-copy-after-build');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const path = require('path');
 const fs = require('fs');
 const chalk = require('chalk');
@@ -73,6 +74,15 @@ if (!process.env.PROJECT_ROOT) {
     console.error(chalk.red('\n \u{26A0}️  You need to add the "PROJECT_ROOT" as an environment variable for compiling the code. \u{26A0}️\n'));
     process.exit(1);
 }
+
+const cssUrlMatcher = (url) => {
+    // Only handle font urls
+    if (url.match(/\.(woff2?|eot|ttf|otf)(\?.*)?$/)) {
+        return true;
+    }
+
+    return false;
+};
 
 /**
  * Create an array with information about all injected plugins.
@@ -141,7 +151,7 @@ const assetsPluginInstance = new AssetsPlugin({
     processOutput: function filterAssetsOutput(output) {
         const filteredOutput = { ...output };
 
-        ['', 'app', 'commons', 'runtime', 'vendors-node'].forEach((key) => {
+        ['', 'app', 'runtime'].forEach((key) => {
             delete filteredOutput[key];
         });
 
@@ -307,10 +317,9 @@ const baseConfig = ({ pluginPath, pluginFilepath }) => ({
             },
             {
                 test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-                loader: 'url-loader',
+                loader: 'file-loader',
                 options: {
-                    limit: 10000,
-                    name: 'static/fonts/[name].[hash:7].[ext]',
+                    name: 'static/fonts/[name].[hash:7].[ext]'
                 },
             },
             {
@@ -331,7 +340,7 @@ const baseConfig = ({ pluginPath, pluginFilepath }) => ({
                         loader: 'css-loader',
                         options: {
                             sourceMap: true,
-                            url: false,
+                            url: cssUrlMatcher
                         },
                     },
                 ],
@@ -345,7 +354,7 @@ const baseConfig = ({ pluginPath, pluginFilepath }) => ({
                         loader: 'css-loader',
                         options: {
                             sourceMap: true,
-                            url: false,
+                            url: cssUrlMatcher,
                         },
                     },
                 ],
@@ -359,7 +368,7 @@ const baseConfig = ({ pluginPath, pluginFilepath }) => ({
                         loader: 'css-loader',
                         options: {
                             sourceMap: true,
-                            url: false,
+                            url: cssUrlMatcher,
                         },
                     },
                     {
@@ -380,7 +389,7 @@ const baseConfig = ({ pluginPath, pluginFilepath }) => ({
                         loader: 'css-loader',
                         options: {
                             sourceMap: true,
-                            url: false,
+                            url: cssUrlMatcher,
                         },
                     },
                     {
@@ -396,12 +405,17 @@ const baseConfig = ({ pluginPath, pluginFilepath }) => ({
                 test: /\.scss$/,
                 use: [
                     'vue-style-loader',
-                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: MiniCssExtractPlugin.loader,
+                        options: {
+                            publicPath: isDev ? '/' : `../../`,
+                        }
+                    },
                     {
                         loader: 'css-loader',
                         options: {
                             sourceMap: true,
-                            url: false,
+                            url: cssUrlMatcher,
                         },
                     },
                     {
@@ -421,7 +435,7 @@ const baseConfig = ({ pluginPath, pluginFilepath }) => ({
                         loader: 'css-loader',
                         options: {
                             sourceMap: true,
-                            url: false,
+                            url: cssUrlMatcher,
                         },
                     },
                     {
@@ -441,7 +455,7 @@ const baseConfig = ({ pluginPath, pluginFilepath }) => ({
                         loader: 'css-loader',
                         options: {
                             sourceMap: true,
-                            url: false,
+                            url: cssUrlMatcher,
                         },
                     },
                     {
@@ -521,8 +535,7 @@ const coreConfig = {
     })(),
 
     entry: {
-        commons: [`${path.resolve('src')}/core/shopware.ts`],
-        app: `${path.resolve('src')}/app/main.ts`,
+        app: `${path.resolve('src')}/index.ts`,
     },
 
     ...(() => {
@@ -548,29 +561,33 @@ const coreConfig = {
             ? path.resolve(__dirname, 'v_dist/')
             : path.resolve(__dirname, '../../public/'),
         filename: isDev ? 'bundles/administration/static/js/[name].js' : 'static/js/[name].js',
-        chunkFilename: isDev ? 'bundles/administration/static/js/[name].js' : 'static/js/[name].js',
+        chunkFilename: isDev ? 'bundles/administration/static/js/[chunkhash].js' : 'static/js/[chunkhash].js',
         publicPath: isDev ? '/' : `bundles/administration/`,
         globalObject: 'this',
         jsonpFunction: `webpackJsonpAdministration`
     },
 
     optimization: {
-        runtimeChunk: { name: 'runtime' },
         splitChunks: {
-            cacheGroups: {
-                'runtime-vendor': {
-                    chunks: 'all',
-                    name: 'vendors-node',
-                    test: path.join(__dirname, 'node_modules'),
-                },
-            },
-            minSize: 0,
+            chunks: 'async',
+            minSize: 30000,
         },
     },
 
     plugins: [
+        ...(() => {
+            if (process.env.ENABLE_ANALYZE) {
+                return [
+                    new BundleAnalyzerPlugin(),
+                ]
+            }
+
+            return [];
+        })(),
+
         new MiniCssExtractPlugin({
             filename: isDev ? 'bundles/administration/static/css/[name].css' : 'static/css/[name].css',
+            chunkFilename: isDev ? 'bundles/administration/static/css/[chunkhash].css' : 'static/css/[chunkhash].css',
         }),
 
         ...(() => {
@@ -595,7 +612,7 @@ const coreConfig = {
         ...(() => {
             if (isProd) {
                 return [
-                // copy custom static assets
+                    // copy custom static assets
                     new CopyWebpackPlugin({
                         patterns: [
                             {
@@ -612,7 +629,7 @@ const coreConfig = {
 
             if (isDev) {
                 return [
-                // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
+                    // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
                     new webpack.HotModuleReplacementPlugin(),
                     new webpack.NoEmitOnErrorsPlugin(),
                     // https://github.com/ampedandwired/html-webpack-plugin
@@ -627,8 +644,7 @@ const coreConfig = {
                     new FriendlyErrorsPlugin(),
                 ];
             }
-        })(),
-
+        })()
     ],
 };
 

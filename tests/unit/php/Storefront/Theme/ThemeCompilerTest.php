@@ -3,11 +3,11 @@
 namespace Shopware\Tests\Unit\Storefront\Theme;
 
 use League\Flysystem\Filesystem;
-use League\Flysystem\Memory\MemoryAdapter;
+use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Adapter\Cache\CacheInvalidator;
-use Shopware\Core\Framework\Adapter\Filesystem\Plugin\CopyBatch;
+use Shopware\Core\Framework\Adapter\Filesystem\MemoryFilesystemAdapter;
 use Shopware\Core\Framework\Adapter\Filesystem\Plugin\CopyBatchInput;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Feature;
@@ -62,7 +62,7 @@ class ThemeCompilerTest extends TestCase
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);
 
         // Avoid filesystem operations
-        $mockFilesystem = $this->createMock(FileSystem::class);
+        $mockFilesystem = new Filesystem(new InMemoryFilesystemAdapter());
 
         $this->mockSalesChannelId = '98432def39fc4624b33213a56b8c944d';
 
@@ -373,10 +373,8 @@ PHP_EOL;
 
         $importer = $this->createMock(ThemeFileImporter::class);
 
-        $fs = new Filesystem(new MemoryAdapter());
-        $fs->addPlugin(new CopyBatch());
-        $tmpFs = new Filesystem(new MemoryAdapter());
-        $tmpFs->addPlugin(new CopyBatch());
+        $fs = new Filesystem(new MemoryFilesystemAdapter());
+        $tmpFs = new Filesystem(new MemoryFilesystemAdapter());
 
         $compiler = new ThemeCompiler(
             $fs,
@@ -416,71 +414,24 @@ PHP_EOL;
         static::assertTrue($fs->has('theme/9a11a759d278b4a55cb5e2c3414733c1'));
     }
 
-    public function testCompileDeprecationThrown(): void
-    {
-        $resolver = $this->createMock(ThemeFileResolver::class);
-        $importer = $this->createMock(ThemeFileImporter::class);
-
-        $fs = new Filesystem(new MemoryAdapter());
-        $tmpFs = new Filesystem(new MemoryAdapter());
-
-        $compiler = new ThemeCompiler(
-            $fs,
-            $tmpFs,
-            $resolver,
-            true,
-            $this->createMock(EventDispatcher::class),
-            $importer,
-            [],
-            $this->createMock(CacheInvalidator::class),
-            new MD5ThemePathBuilder(),
-            __DIR__,
-            $this->createMock(ScssPhpCompiler::class)
-        );
-
-        $config = new StorefrontPluginConfiguration('test');
-        $config->setAssetPaths(['assets']);
-
-        $pathBuilder = new MD5ThemePathBuilder();
-        static::assertEquals('9a11a759d278b4a55cb5e2c3414733c1', $pathBuilder->assemblePath(TestDefaults::SALES_CHANNEL, 'test'));
-
-        try {
-            $pathBuilder->getDecorated();
-        } catch (DecorationPatternException $e) {
-            static::assertInstanceOf(DecorationPatternException::class, $e);
-        }
-
-        if (Feature::isActive('v6.5.0.0')) {
-            static::expectExceptionMessage('Tried to access deprecated functionality: The parameter context in method compileTheme of class Shopware\Storefront\Theme\ThemeCompiler is mandatory.');
-        }
-
-        $compiler->compileTheme(
-            TestDefaults::SALES_CHANNEL,
-            'test',
-            $config,
-            new StorefrontPluginConfigurationCollection(),
-            true
-        );
-    }
-
     public function testAssetPathWillBeAbsoluteConverted(): void
     {
         $resolver = $this->createMock(ThemeFileResolver::class);
         $resolver->method('resolveFiles')->willReturn([ThemeFileResolver::SCRIPT_FILES => new FileCollection(), ThemeFileResolver::STYLE_FILES => new FileCollection()]);
 
-        $fs = new Filesystem(new MemoryAdapter());
-        $fs->addPlugin(new CopyBatch());
-        $tmpFs = new Filesystem(new MemoryAdapter());
-        $tmpFs->addPlugin(new CopyBatch());
+        $fs = new Filesystem(new MemoryFilesystemAdapter());
+        $tmpFs = new Filesystem(new MemoryFilesystemAdapter());
 
-        $fs->createDir('temp');
+        $fs->createDirectory('temp');
         $fs->write('temp/test.png', '');
-        $png = $fs->readStream('temp/test.png') ?: '';
+        $png = $fs->readStream('temp/test.png');
+
+        $prefix = '/temp';
 
         $importer = $this->createMock(ThemeFileImporter::class);
         $importer->method('getCopyBatchInputsForAssets')->with('assets')->willReturn(
             [
-                new CopyBatchInput($png, ['theme/9a11a759d278b4a55cb5e2c3414733c1/assets/test.png']),
+                new CopyBatchInput($png, ['theme' . $prefix . '/9a11a759d278b4a55cb5e2c3414733c1/assets/test.png']),
             ]
         );
 
@@ -519,7 +470,7 @@ PHP_EOL;
             Context::createDefaultContext()
         );
 
-        static::assertTrue($fs->has('theme/9a11a759d278b4a55cb5e2c3414733c1/assets/test.png'));
+        static::assertTrue($fs->fileExists('theme/9a11a759d278b4a55cb5e2c3414733c1/assets/test.png'));
     }
 
     /**
@@ -536,10 +487,8 @@ PHP_EOL;
         $importer = $this->createMock(ThemeFileImporter::class);
         $importer->method('getCopyBatchInputsForAssets')->with($testFolder);
 
-        $fs = new Filesystem(new MemoryAdapter());
-        $fs->addPlugin(new CopyBatch());
-        $tmpFs = new Filesystem(new MemoryAdapter());
-        $tmpFs->addPlugin(new CopyBatch());
+        $fs = new Filesystem(new MemoryFilesystemAdapter());
+        $tmpFs = new Filesystem(new MemoryFilesystemAdapter());
 
         $compiler = new ThemeCompiler(
             $fs,
@@ -573,8 +522,7 @@ PHP_EOL;
         } elseif ($success === false && $failedPath === 'backup') {
             $this->expectException(ThemeFileCopyException::class);
             $this->expectExceptionMessage(
-                'Unable to move the files of theme "test". File already exists at path: theme' . \DIRECTORY_SEPARATOR
-                . 'backup' . \DIRECTORY_SEPARATOR . $themePrefix
+                'Unable to move the files of theme "test". Unable to move file from /theme/' . $themePrefix . ' to /theme/backup/' . $themePrefix
             );
         }
 
@@ -593,7 +541,7 @@ PHP_EOL;
                     } elseif ($failedPath === 'temp') {
                         $event->setTmpPath('anywhere');
                     } elseif ($failedPath === 'backup') {
-                        $fs->createDir($event->getPath());
+                        $fs->createDirectory($event->getPath());
                         $fs->write($event->getBackupPath(), '');
                     }
                 }

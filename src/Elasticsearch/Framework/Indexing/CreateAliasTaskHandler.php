@@ -3,7 +3,7 @@
 namespace Shopware\Elasticsearch\Framework\Indexing;
 
 use Doctrine\DBAL\Connection;
-use Elasticsearch\Client;
+use OpenSearch\Client;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
@@ -15,7 +15,7 @@ use Shopware\Elasticsearch\Framework\Indexing\Event\ElasticsearchIndexAliasSwitc
  *
  * @deprecated tag:v6.5.0 - reason:becomes-internal - MessageHandler will be internal and final starting with v6.5.0.0
  */
-class CreateAliasTaskHandler extends ScheduledTaskHandler
+final class CreateAliasTaskHandler extends ScheduledTaskHandler
 {
     private Client $client;
 
@@ -56,7 +56,7 @@ class CreateAliasTaskHandler extends ScheduledTaskHandler
      */
     public static function getHandledMessages(): iterable
     {
-        return [CreateAliasTask::class];
+        yield CreateAliasTask::class;
     }
 
     public function run(): void

@@ -570,6 +570,7 @@
             <argument>%storefront.reverse_proxy.max_parallel_invalidations%</argument>
             <argument>%storefront.reverse_proxy.fastly.tag_prefix%</argument>
             <argument>%storefront.reverse_proxy.fastly.instance_tag%</argument>
+            <argument>%env(APP_URL)%</argument>
         </service>
 
         <service id="Shopware\Storefront\Framework\Cache\ReverseProxy\ReverseProxyCacheClearer">
@@ -582,7 +583,6 @@
             <argument type="service" id="messenger.bus.shopware"/>
             <argument type="service" id="Shopware\Storefront\Framework\Cache\CacheWarmer\CacheRouteWarmerRegistry"/>
             <argument type="service" id="Shopware\Core\Framework\Adapter\Cache\CacheIdLoader"/>
-            <argument type="service" id="Shopware\Storefront\Framework\Cache\CacheWarmer\CacheWarmerTaskHandler"/>
         </service>
 
         <service id="Shopware\Storefront\Framework\Cache\CacheWarmer\CacheWarmerTaskHandler">
@@ -622,11 +622,7 @@
         </service>
 
         <service id="Shopware\Storefront\Framework\Command\SalesChannelCreateStorefrontCommand">
-            <argument type="service" id="payment_method.repository"/>
-            <argument type="service" id="shipping_method.repository"/>
-            <argument type="service" id="country.repository"/>
             <argument type="service" id="snippet_set.repository"/>
-            <argument type="service" id="category.repository"/>
             <argument type="service" id="Shopware\Core\Maintenance\SalesChannel\Service\SalesChannelCreator"/>
 
             <tag name="console.command"/>

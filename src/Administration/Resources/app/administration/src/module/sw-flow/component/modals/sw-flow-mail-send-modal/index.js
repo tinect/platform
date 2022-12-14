@@ -6,7 +6,10 @@ const { Component, Utils, Classes: { ShopwareError } } = Shopware;
 const { Criteria } = Shopware.Data;
 const { mapState } = Component.getComponentHelper();
 
-// eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
+/**
+ * @private
+ * @package business-ops
+ */
 export default {
     template,
 
@@ -32,6 +35,9 @@ export default {
             selectedRecipient: null,
             mailTemplateIdError: null,
             recipientGridError: null,
+            showReplyToField: false,
+            replyTo: null,
+            replyToError: null,
         };
     },
 
@@ -180,6 +186,11 @@ export default {
                     this.showRecipientEmails = true;
                 }
 
+                if (config.replyTo) {
+                    this.showReplyToField = true;
+                    this.replyTo = config.replyTo;
+                }
+
                 this.mailTemplateId = config.mailTemplateId;
                 this.documentTypeIds = config.documentTypeIds;
             }
@@ -231,9 +242,12 @@ export default {
 
         onAddAction() {
             this.mailTemplateIdError = this.fieldError(this.mailTemplateId);
+            if (this.showReplyToField) {
+                this.replyToError = this.setMailError(this.replyTo);
+            }
             this.recipientGridError = this.isRecipientGridError();
 
-            if (this.mailTemplateIdError || this.recipientGridError) {
+            if (this.mailTemplateIdError || this.replyToError || this.recipientGridError) {
                 return;
             }
 
@@ -248,6 +262,7 @@ export default {
                         type: this.mailRecipient,
                         data: this.getRecipientData(),
                     },
+                    replyTo: this.replyTo,
                 },
             };
 
@@ -424,6 +439,24 @@ export default {
 
         allowDeleteRecipient(itemIndex) {
             return itemIndex !== this.recipients.length - 1;
+        },
+
+        changeShowReplyToField(show) {
+            if (!show) {
+                this.replyToError = null;
+                this.replyTo = null;
+            }
+        },
+
+        buildReplyToTooltip(snippet) {
+            const route = { name: 'sw.settings.basic.information.index' };
+            const routeData = this.$router.resolve(route);
+
+            const data = {
+                settingsLink: routeData.href,
+            };
+
+            return this.$tc(snippet, 0, data);
         },
     },
 };

@@ -19,10 +19,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
-use Shopware\Core\Framework\Feature;
 use Shopware\Core\System\SalesChannel\Entity\SalesChannelDefinitionInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
+/**
+ * @package inventory
+ */
 class SalesChannelProductDefinition extends ProductDefinition implements SalesChannelDefinitionInterface
 {
     public function getEntityClass(): string
@@ -89,10 +91,9 @@ class SalesChannelProductDefinition extends ProductDefinition implements SalesCh
             (new OneToOneAssociationField('seoCategory', 'seoCategory', 'id', CategoryDefinition::class))->addFlags(new ApiAware(), new Runtime())
         );
 
-        // CheapestPrice will only be added to SalesChannelProductEntities in the Future
-        if (Feature::isActive('FEATURE_NEXT_16151')) {
-            $fields->add((new CheapestPriceField('cheapest_price', 'cheapestPrice'))->addFlags(new WriteProtected(), new Inherited()));
-        }
+        $fields->add(
+            (new CheapestPriceField('cheapest_price', 'cheapestPrice'))->addFlags(new WriteProtected(), new Inherited())
+        );
 
         return $fields;
     }

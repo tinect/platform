@@ -27,6 +27,7 @@ use Shopware\Core\System\Tax\TaxCollection;
 /**
  * @internal
  *
+ * @package content
  * @covers \Shopware\Core\Content\Category\Service\CategoryBreadcrumbBuilder
  */
 class CategoryBreadcrumbBuilderTest extends TestCase
@@ -162,7 +163,6 @@ class CategoryBreadcrumbBuilderTest extends TestCase
             'bar',
             $salesChannelEntity,
             new CurrencyEntity(),
-            new CustomerGroupEntity(),
             new CustomerGroupEntity(),
             new TaxCollection(),
             new PaymentMethodEntity(),

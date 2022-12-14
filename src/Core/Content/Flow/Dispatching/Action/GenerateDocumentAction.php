@@ -28,6 +28,10 @@ use Shopware\Core\Framework\Feature;
 use Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface;
 
 /**
+ * @package business-ops
+ *
+ * @internal
+ *
  * @deprecated tag:v6.5.0 - reason:remove-subscriber - FlowActions won't be executed over the event system anymore,
  * therefore the actions won't implement the EventSubscriberInterface anymore.
  */

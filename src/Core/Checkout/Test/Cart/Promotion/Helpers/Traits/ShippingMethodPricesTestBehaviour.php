@@ -6,10 +6,13 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Shopware\Core\Defaults;
 
+/**
+ * @package checkout
+ */
 trait ShippingMethodPricesTestBehaviour
 {
     /**
-     * @var array
+     * @var array<mixed>
      */
     private $oldValues = [];
 

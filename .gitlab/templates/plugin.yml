@@ -76,6 +76,9 @@ workflow:
         # do not run on push
         -   if: '$CI_PIPELINE_SOURCE == "push"'
             when: never
+        -   if: '$CI_MERGE_REQUEST_LABELS =~ /.*branch::platform::match.*/'
+            variables:
+              PLATFORM_BRANCH: ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
         -   when: always
 
 .install_dependencies: &install_dependencies
@@ -122,6 +125,7 @@ default:
         - zip -rq plugin.zip .
         - mv plugin.zip /tmp/plugin.zip
         - rm -Rf .* * || true
+        - echo "Checkout platform branch $PLATFORM_BRANCH"
         - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.shopware.com/shopware/6/product/platform.git . --branch $PLATFORM_BRANCH
         - mkdir -p custom/plugins || true
         - unzip -q /tmp/plugin.zip -d custom/plugins/$PLUGIN_NAME
@@ -153,14 +157,6 @@ default:
     - '(cd $CI_PROJECT_DIR/src/Administration/Resources/app/administration/ && npm ci && npm run build)'
     - '(cd $CI_PROJECT_DIR/src/Storefront/Resources/app/storefront/ && npm ci && npm run production && node copy-to-vendor.js)'
     -  $CI_PROJECT_DIR/bin/console assets:install
-
-.install-dev-tools: &install-dev-tools
-    - >
-        composer config repo.platform-packages --json '{"type": "path", "url": "../../../src/*", "canonical": true}';
-    - composer config --global allow-plugins.composer/package-versions-deprecated true
-    - composer config --global allow-plugins.bamarni/composer-bin-plugin true
-    - composer config --global allow-plugins.phpstan/extension-installer true
-    - composer require 'shopware/core:6.4.*@dev' 'shopware/storefront:6.4.*@dev' 'shopware/administration:6.4.*@dev' 'shopware/elasticsearch:6.4.*@dev'
 
 build zip:
     stage: build
@@ -259,8 +255,7 @@ ecs:
         - exists:
               - ecs.php
     script:
-        - *install-dev-tools
-        - vendor/bin/ecs
+        - ${PROJECT_ROOT}/vendor/bin/ecs
 
 validate snippets:
     stage: test

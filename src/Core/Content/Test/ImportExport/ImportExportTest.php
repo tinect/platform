@@ -3,6 +3,7 @@
 namespace Shopware\Core\Content\Test\ImportExport;
 
 use Doctrine\DBAL\Connection;
+use League\Flysystem\FilesystemOperator;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressCollection;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerCollection;
@@ -110,6 +111,7 @@ class ImportExportTest extends AbstractImportExportTest
 
     public function testImportExport(): void
     {
+        /** @var FilesystemOperator $filesystem */
         $filesystem = $this->getContainer()->get('shopware.filesystem.private');
 
         $productId = Uuid::randomHex();
@@ -128,7 +130,9 @@ class ImportExportTest extends AbstractImportExportTest
         $file = $fileRepository->search(new Criteria(array_filter([$this->getLogEntity($progress->getLogId())->getFileId()])), Context::createDefaultContext())->first();
 
         static::assertNotNull($file);
-        static::assertSame($filesystem->getSize($file->getPath()), $file->getSize());
+        $importExportFileEntity = $this->getLogEntity($progress->getLogId())->getFile();
+        static::assertInstanceOf(ImportExportFileEntity::class, $importExportFileEntity);
+        static::assertSame($filesystem->fileSize($importExportFileEntity->getPath()), $file->getSize());
 
         $this->productRepository->delete([['id' => $productId]], Context::createDefaultContext());
         $exportFileTmp = (string) tempnam(sys_get_temp_dir(), '');
@@ -354,7 +358,7 @@ class ImportExportTest extends AbstractImportExportTest
         static::assertImportExportSucceeded($progress, $this->getInvalidLogContent($progress->getInvalidRecordsLogId()));
         $logfile = $this->getLogEntity($progress->getLogId())->getFile();
         static::assertInstanceOf(ImportExportFileEntity::class, $logfile);
-        static::assertGreaterThan(0, $filesystem->getSize($logfile->getPath()));
+        static::assertGreaterThan(0, $filesystem->fileSize($logfile->getPath()));
 
         $exportFileTmp = (string) tempnam(sys_get_temp_dir(), '');
         file_put_contents($exportFileTmp, (string) $filesystem->read($logfile->getPath()));
@@ -604,7 +608,7 @@ class ImportExportTest extends AbstractImportExportTest
     public function testProductsWithVariantsCsv(): void
     {
         $connection = $this->getContainer()->get(Connection::class);
-        $connection->executeUpdate('DELETE FROM `product`');
+        $connection->executeStatement('DELETE FROM `product`');
 
         $context = Context::createDefaultContext();
         $context->addState(EntityIndexerRegistry::DISABLE_INDEXING);
@@ -640,7 +644,7 @@ class ImportExportTest extends AbstractImportExportTest
     public function testProductsWithInvalidVariantsCsv(): void
     {
         $connection = $this->getContainer()->get(Connection::class);
-        $connection->executeUpdate('DELETE FROM `product`');
+        $connection->executeStatement('DELETE FROM `product`');
 
         $context = Context::createDefaultContext();
         $context->addState(EntityIndexerRegistry::DISABLE_INDEXING);
@@ -795,7 +799,7 @@ class ImportExportTest extends AbstractImportExportTest
     public function testInvalidFile(): void
     {
         $connection = $this->getContainer()->get(Connection::class);
-        $connection->executeUpdate('DELETE FROM `product`');
+        $connection->executeStatement('DELETE FROM `product`');
 
         $progress = $this->import(Context::createDefaultContext(), ProductDefinition::ENTITY_NAME, '/fixtures/products_with_invalid.csv', 'products.csv');
 
@@ -877,7 +881,7 @@ class ImportExportTest extends AbstractImportExportTest
         $connection = $this->getContainer()->get(Connection::class);
 
         $connection->rollBack();
-        $connection->executeUpdate('DELETE FROM `product`');
+        $connection->executeStatement('DELETE FROM `product`');
 
         $clonedProductProfile = $this->cloneDefaultProfile(ProductDefinition::ENTITY_NAME);
         static::assertIsArray($clonedProductProfile->getMapping());
@@ -905,13 +909,13 @@ class ImportExportTest extends AbstractImportExportTest
         static::assertCount(0, $ids->getIds());
 
         $result = $this->getLogEntity($progress->getLogId())->getResult();
-        static::assertEquals(2, $result['product_category']['insertError']);
+        static::assertEquals(2, $result['product_category']['insertSkip']);
         static::assertEquals(8, $result['product']['insert']);
         static::assertEquals(1, $result['product']['otherError']);
 
-        $connection->executeUpdate('DELETE FROM `import_export_log`');
-        $connection->executeUpdate('DELETE FROM `import_export_file`');
-        $connection->executeUpdate(
+        $connection->executeStatement('DELETE FROM `import_export_log`');
+        $connection->executeStatement('DELETE FROM `import_export_file`');
+        $connection->executeStatement(
             'DELETE FROM `import_export_profile` WHERE `id` = :id',
             ['id' => Uuid::fromHexToBytes($clonedProductProfile->getId())]
         );
@@ -1079,8 +1083,8 @@ class ImportExportTest extends AbstractImportExportTest
     public function testSalesChannelAssignment(string $csvPath): void
     {
         $connection = $this->getContainer()->get(Connection::class);
-        $connection->executeUpdate('DELETE FROM `product`');
-        $connection->executeUpdate('DELETE FROM `product_visibility`');
+        $connection->executeStatement('DELETE FROM `product`');
+        $connection->executeStatement('DELETE FROM `product_visibility`');
 
         $productAId = 'a5c8b8f701034e8dbea72ac0fc32521e';
         $productABId = 'abc8b8f701034e8dbea72ac0fc32521e';
@@ -1230,7 +1234,7 @@ class ImportExportTest extends AbstractImportExportTest
     public function testCustomersCsv(): void
     {
         $connection = $this->getContainer()->get(Connection::class);
-        $connection->executeUpdate('DELETE FROM `customer`');
+        $connection->executeStatement('DELETE FROM `customer`');
 
         $salesChannel = $this->createSalesChannel();
 
@@ -1325,7 +1329,7 @@ class ImportExportTest extends AbstractImportExportTest
     public function testPromotionCodeImportExport(): void
     {
         $connection = $this->getContainer()->get(Connection::class);
-        $connection->executeUpdate('DELETE FROM `promotion_individual_code`');
+        $connection->executeStatement('DELETE FROM `promotion_individual_code`');
 
         // create the promotion before the import
         $promotion = $this->createPromotion([

@@ -49,15 +49,13 @@ class NavigationPageSeoUrlRoute implements SeoUrlRouteInterface
         );
     }
 
-    /**
-     * @internal (flag:FEATURE_NEXT_13410) make $salesChannel parameter required
-     */
-    public function prepareCriteria(Criteria $criteria/*, SalesChannelEntity $salesChannel */): void
+    public function prepareCriteria(Criteria $criteria, SalesChannelEntity $salesChannel): void
     {
         $criteria->addFilter(new MultiFilter(MultiFilter::CONNECTION_AND, [
             new EqualsFilter('active', true),
-            new NotFilter(NotFilter::CONNECTION_AND, [
+            new NotFilter(NotFilter::CONNECTION_OR, [
                 new EqualsFilter('type', CategoryDefinition::TYPE_FOLDER),
+                new EqualsFilter('type', CategoryDefinition::TYPE_LINK),
             ]),
         ]));
     }
