@@ -131,13 +131,13 @@ class MediaIndexer extends EntityIndexer
 
     private function updateThumbnailsPath(Context $context, array $ids): void
     {
-        $mediaIdsWithMissingPaths = $this->connection->fetchFirstColumn(
+        $mediaThumbnailIdsWithMissingPaths = $this->connection->fetchFirstColumn(
             'SELECT LOWER(HEX(id)) from media_thumbnail WHERE media_id IN (:ids) AND path IS NULL',
             ['ids' => Uuid::fromHexToBytesList($ids)],
             ['ids' => Connection::PARAM_STR_ARRAY]
         );
 
-        if (\count($mediaIdsWithMissingPaths) === 0) {
+        if (\count($mediaThumbnailIdsWithMissingPaths) === 0) {
             return;
         }
 
@@ -148,7 +148,7 @@ class MediaIndexer extends EntityIndexer
 
         //get all media_thumbnails with missingPaths
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsAnyFilter('id', $mediaIdsWithMissingPaths));
+        $criteria->addFilter(new EqualsAnyFilter('id', $mediaThumbnailIdsWithMissingPaths));
         $criteria->addAssociation('media');
 
         $all = $this->thumbnailRepository
