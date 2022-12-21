@@ -494,6 +494,42 @@ class FileSaverTest extends TestCase
         static::assertTrue($this->getPublicFilesystem()->has($this->urlGenerator->getRelativeThumbnailUrl($updatedMedia, (new MediaThumbnailEntity())->assign(['width' => 100, 'height' => 100]))));
     }
 
+    public function testRenameMediaUpdatesPath(): void
+    {
+        $context = Context::createDefaultContext();
+        $this->setFixtureContext($context);
+
+        $png = $this->getPng();
+        $this->mediaRepository->update([[
+            'id' => $png->getId(),
+            'thumbnails' => [
+                [
+                    'width' => 100,
+                    'height' => 100,
+                    'highDpi' => false,
+                ],
+            ],
+        ]], $context);
+        $png = $this->mediaRepository->search(new Criteria([$png->getId()]), $context)->get($png->getId());
+
+        static::assertNotEmpty($png->getPath());
+        static::assertNotEmpty($png->getThumbnails()->first()->getPath());
+
+        $oldMediaPath = $this->urlGenerator->getRelativeMediaUrl($png);
+        $oldThumbnailPath = $this->urlGenerator->getRelativeThumbnailUrl($png, (new MediaThumbnailEntity())->assign(['width' => 100, 'height' => 100]));
+
+        $this->getPublicFilesystem()->write($oldMediaPath, 'test file content');
+        $this->getPublicFilesystem()->write($oldThumbnailPath, 'test file content');
+
+        $this->fileSaver->renameMedia($png->getId(), 'new destination2', $context);
+        $updatedMedia = $this->mediaRepository->search(new Criteria([$png->getId()]), $context)->get($png->getId());
+
+        static::assertNotEmpty($updatedMedia->getPath());
+        static::assertNotEmpty($updatedMedia->getThumbnails()->first()->getPath());
+        static::assertNotSame($png->getPath(), $updatedMedia->getPath());
+        static::assertNotSame($png->getThumbnails()->first()->getPath(), $updatedMedia->getThumbnails()->first()->getPath());
+    }
+
     public function testRenameMediaMakesRollbackOnFailure(): void
     {
         $this->expectException(CouldNotRenameFileException::class);
