@@ -24,7 +24,9 @@ class Migration1663402842AddPathToMediaTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->connection = KernelLifecycleManager::getConnection();
+        $this->connection->beginTransaction();
         $this->queuer = new IndexerQueuer($this->connection);
         // remove the media folder indexer from the queue, if it may be already added by some other migration
         $this->queuer->finishIndexer(['media.indexer']);
@@ -32,16 +34,35 @@ class Migration1663402842AddPathToMediaTest extends TestCase
 
     public function testTablesHaveFieldPath(): void
     {
+        if ($this->columnPathExists('media')) {
+            $this->connection->executeStatement('ALTER TABLE `media` DROP COLUMN `path`');
+        }
+
+        if ($this->columnPathExists('media_thumbnail')) {
+            $this->connection->executeStatement('ALTER TABLE `media_thumbnail` DROP COLUMN `path`');
+        }
+
+        static::assertFalse($this->columnPathExists('media'));
+        static::assertFalse($this->columnPathExists('media_thumbnail'));
+
         $migration = new Migration1663402842AddPathToMedia();
         $migration->update($this->connection);
 
-        $mediaColumns = array_column($this->connection->fetchAllAssociative('SHOW COLUMNS FROM media'), 'Field');
-        static::assertContains('path', $mediaColumns);
-
-        $mediaColumns = array_column($this->connection->fetchAllAssociative('SHOW COLUMNS FROM media_thumbnail'), 'Field');
-        static::assertContains('path', $mediaColumns);
+        static::assertTrue($this->columnPathExists('media'));
+        static::assertTrue($this->columnPathExists('media_thumbnail'));
 
         $registeredIndexers = $this->queuer->getIndexers();
         static::assertArrayHasKey('media.indexer', $registeredIndexers);
+
+        // run again to check nothing breaks
+        $migration = new Migration1663402842AddPathToMedia();
+        $migration->update($this->connection);
+    }
+
+    private function columnPathExists(string $table): bool
+    {
+        $columns = array_column($this->connection->fetchAllAssociative('SHOW COLUMNS FROM ' . $table), 'Field');
+
+        return \in_array('path', $columns, true);
     }
 }
