@@ -1,3 +1,6 @@
+/**
+ * @package system-settings
+ */
 import template from './sw-settings-language-detail.html.twig';
 import './sw-settings-language-detail.scss';
 
@@ -9,7 +12,12 @@ const { mapPropertyErrors } = Shopware.Component.getComponentHelper();
 export default {
     template,
 
-    inject: ['repositoryFactory', 'acl', 'customFieldDataProviderService'],
+    inject: [
+        'repositoryFactory',
+        'acl',
+        'customFieldDataProviderService',
+        'feature',
+    ],
 
     mixins: [
         Mixin.getByName('notification'),
@@ -253,7 +261,14 @@ export default {
             this.$router.push({ name: 'sw.settings.language.index' });
         },
 
+        /**
+         * @deprecated tag:v6.5.0 - Will be removed
+         */
         onChangeLanguage() {
+            if (this.feature.isActive('v6.5.0.0')) {
+                return;
+            }
+
             this.loadEntityData();
         },
     },

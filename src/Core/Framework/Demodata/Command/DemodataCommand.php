@@ -27,6 +27,7 @@ use Shopware\Core\Framework\Demodata\Event\DemodataRequestCreatedEvent;
 use Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetDefinition;
 use Shopware\Core\System\Tag\TagDefinition;
 use Shopware\Core\System\User\UserDefinition;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -34,36 +35,28 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * @deprecated tag:v6.5.0 - reason:becomes-internal - will be internal in 6.5.0
+ * @internal
  */
+#[AsCommand(
+    name: 'framework:demodata',
+    description: 'Generates demo data',
+)]
 class DemodataCommand extends Command
 {
-    protected static $defaultName = 'framework:demodata';
-
     /**
      * @var array<string,int>
      */
     private array $defaults = [];
 
-    private DemodataService $demodataService;
-
-    private string $kernelEnv;
-
-    private EventDispatcherInterface $eventDispatcher;
-
     /**
      * @internal
      */
     public function __construct(
-        DemodataService $demodataService,
-        EventDispatcherInterface $eventDispatcher,
-        string $kernelEnv
+        private DemodataService $demodataService,
+        private EventDispatcherInterface $eventDispatcher,
+        private string $kernelEnv
     ) {
         parent::__construct();
-
-        $this->kernelEnv = $kernelEnv;
-        $this->demodataService = $demodataService;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function addDefault(string $name, int $value): void

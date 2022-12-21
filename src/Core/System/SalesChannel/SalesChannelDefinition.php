@@ -62,6 +62,9 @@ use Shopware\Core\System\SalesChannel\Aggregate\SalesChannelTranslation\SalesCha
 use Shopware\Core\System\SalesChannel\Aggregate\SalesChannelType\SalesChannelTypeDefinition;
 use Shopware\Core\System\SystemConfig\SystemConfigDefinition;
 
+/**
+ * @package sales-channel
+ */
 class SalesChannelDefinition extends EntityDefinition
 {
     public const ENTITY_NAME = 'sales_channel';
@@ -126,7 +129,7 @@ class SalesChannelDefinition extends EntityDefinition
             (new BoolField('active', 'active'))->addFlags(new ApiAware()),
             (new BoolField('hreflang_active', 'hreflangActive'))->addFlags(new ApiAware()),
             (new BoolField('maintenance', 'maintenance'))->addFlags(new ApiAware()),
-            (new ListField('maintenance_ip_whitelist', 'maintenanceIpWhitelist'))->setStrict(true),
+            new ListField('maintenance_ip_whitelist', 'maintenanceIpWhitelist'),
             (new TranslatedField('customFields'))->addFlags(new ApiAware()),
             (new TranslationsAssociationField(SalesChannelTranslationDefinition::class, 'sales_channel_id'))->addFlags(new Required()),
             new ManyToManyAssociationField('currencies', CurrencyDefinition::class, SalesChannelCurrencyDefinition::class, 'sales_channel_id', 'currency_id'),

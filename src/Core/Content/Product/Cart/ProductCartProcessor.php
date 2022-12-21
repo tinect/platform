@@ -10,7 +10,6 @@ use Shopware\Core\Checkout\Cart\CartException;
 use Shopware\Core\Checkout\Cart\CartProcessorInterface;
 use Shopware\Core\Checkout\Cart\Delivery\Struct\DeliveryInformation;
 use Shopware\Core\Checkout\Cart\Delivery\Struct\DeliveryTime;
-use Shopware\Core\Checkout\Cart\Exception\MissingLineItemPriceException;
 use Shopware\Core\Checkout\Cart\LineItem\CartDataCollection;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
@@ -126,7 +125,7 @@ class ProductCartProcessor implements CartProcessorInterface, CartDataCollectorI
     }
 
     /**
-     * @throws MissingLineItemPriceException
+     * @throws CartException
      */
     public function process(CartDataCollection $data, Cart $original, Cart $toCalculate, SalesChannelContext $context, CartBehavior $behavior): void
     {
@@ -139,11 +138,7 @@ class ProductCartProcessor implements CartProcessorInterface, CartDataCollectorI
                 $definition = $item->getPriceDefinition();
 
                 if (!$definition instanceof QuantityPriceDefinition) {
-                    if (Feature::isActive('v6.5.0.0')) {
-                        throw CartException::missingLineItemPrice($item->getId());
-                    }
-
-                    throw new MissingLineItemPriceException($item->getId());
+                    throw CartException::missingLineItemPrice($item->getId());
                 }
                 $definition->setQuantity($item->getQuantity());
 
@@ -470,19 +465,7 @@ class ProductCartProcessor implements CartProcessorInterface, CartDataCollectorI
                 continue;
             }
 
-            // @internal (flag:FEATURE_NEXT_13250) - The IF must be removed so that $changes is filled
-            if (!Feature::isActive('FEATURE_NEXT_13250')) {
-                $ids[] = $id;
-
-                continue;
-            }
-
             $changes[$id] = $lineItem->getDataTimestamp()->format(Defaults::STORAGE_DATE_TIME_FORMAT);
-        }
-
-        // @internal (flag:FEATURE_NEXT_13250) - The IF can be removed completely so that $changes is taken into account.
-        if (!Feature::isActive('FEATURE_NEXT_13250')) {
-            return $ids;
         }
 
         if (empty($changes)) {

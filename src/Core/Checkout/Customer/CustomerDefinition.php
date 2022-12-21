@@ -52,7 +52,7 @@ use Shopware\Core\System\Tag\TagDefinition;
 use Shopware\Core\System\User\UserDefinition;
 
 /**
- * @package checkout
+ * @package customer-order
  */
 class CustomerDefinition extends EntityDefinition
 {
@@ -103,7 +103,7 @@ class CustomerDefinition extends EntityDefinition
             (new PasswordField('password', 'password'))->removeFlag(ApiAware::class),
             (new EmailField('email', 'email'))->addFlags(new ApiAware(), new Required(), new SearchRanking(SearchRanking::MIDDLE_SEARCH_RANKING, false)),
             (new StringField('title', 'title'))->addFlags(new ApiAware()),
-            (new ListField('vat_ids', 'vatIds', StringField::class))->setStrict(true)->addFlags(new ApiAware()),
+            (new ListField('vat_ids', 'vatIds', StringField::class))->addFlags(new ApiAware()),
             (new StringField('affiliate_code', 'affiliateCode'))->addFlags(new ApiAware()),
             (new StringField('campaign_code', 'campaignCode'))->addFlags(new ApiAware()),
             (new BoolField('active', 'active'))->addFlags(new ApiAware()),
@@ -115,11 +115,6 @@ class CustomerDefinition extends EntityDefinition
             (new DateTimeField('first_login', 'firstLogin'))->addFlags(new ApiAware()),
             (new DateTimeField('last_login', 'lastLogin'))->addFlags(new ApiAware()),
             (new JsonField('newsletter_sales_channel_ids', 'newsletterSalesChannelIds'))->addFlags(new WriteProtected(Context::SYSTEM_SCOPE))->removeFlag(ApiAware::class),
-            /*
-             * @deprecated tag:v6.5.0 - newsletter field will be remove on version 6.5.0.
-             * Please use the newsletterRecipient to detemine if a customer is subscribed to a newsletter
-             */
-            (new BoolField('newsletter', 'newsletter'))->addFlags(new ApiAware()),
             (new DateField('birthday', 'birthday'))->addFlags(new ApiAware()),
             (new DateTimeField('last_order_date', 'lastOrderDate'))->addFlags(new ApiAware(), new WriteProtected(Context::SYSTEM_SCOPE)),
             (new IntField('order_count', 'orderCount'))->addFlags(new ApiAware(), new WriteProtected(Context::SYSTEM_SCOPE)),

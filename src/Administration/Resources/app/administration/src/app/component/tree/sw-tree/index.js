@@ -5,6 +5,8 @@ const { Component } = Shopware;
 const { debounce, sort } = Shopware.Utils;
 
 /**
+ * @package admin
+ *
  * @public
  * @status ready
  * @example-type static
@@ -199,8 +201,6 @@ Component.register('sw-tree', {
             treeItems: [],
             draggedItem: null,
             currentTreeSearch: null,
-            // @deprecated tag:v6.5.0 - Will be removed
-            isLoading: false,
             newElementId: null,
             contextItem: null,
             currentEditMode: null,

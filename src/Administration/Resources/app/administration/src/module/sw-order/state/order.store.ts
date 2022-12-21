@@ -15,6 +15,10 @@ import type {
     ShippingMethod,
 } from '../order.types';
 
+/**
+ * @package customer-order
+ */
+
 const { Service } = Shopware;
 
 function filterEmptyLineItems(items: LineItem[]) {
@@ -39,11 +43,6 @@ interface SwOrderState {
     defaultSalesChannel: SalesChannel | null,
     context: SalesChannelContext,
     customer: Customer | null,
-
-    /**
-     * @deprecated tag:v6.5.0 - Use `context.currency` instead
-     */
-    currency: Currency,
 }
 
 const SwOrderStore: Module<SwOrderState, VuexRootState> = {
@@ -60,13 +59,6 @@ const SwOrderStore: Module<SwOrderState, VuexRootState> = {
             },
             deliveries: [],
         } as unknown as Cart,
-        currency: {
-            shortName: 'EUR',
-            symbol: '€',
-            totalRounding: {
-                decimals: 2,
-            },
-        } as unknown as Currency,
         context: {
             token: '',
             customer: null,
@@ -125,7 +117,6 @@ const SwOrderStore: Module<SwOrderState, VuexRootState> = {
 
         setCurrency(state: SwOrderState, currency: Currency) {
             state.context.currency = currency;
-            state.currency = currency;
         },
 
         setContext(state: SwOrderState, context: SalesChannelContext) {
@@ -195,7 +186,7 @@ const SwOrderStore: Module<SwOrderState, VuexRootState> = {
         },
 
         getCart({ commit }, { salesChannelId, contextToken }: { salesChannelId: string, contextToken: string }) {
-            if (Shopware.Feature.isActive('FEATURE_NEXT_7530') && (`${contextToken}`).length !== 32) {
+            if ((`${contextToken}`).length !== 32) {
                 throw new Error('Invalid context token');
             }
 
@@ -210,7 +201,7 @@ const SwOrderStore: Module<SwOrderState, VuexRootState> = {
         },
 
         cancelCart(_, { salesChannelId, contextToken }: { salesChannelId: string, contextToken: string }) {
-            if (Shopware.Feature.isActive('FEATURE_NEXT_7530') && (`${contextToken}`).length !== 32) {
+            if ((`${contextToken}`).length !== 32) {
                 throw new Error('Invalid context token');
             }
 

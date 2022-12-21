@@ -25,6 +25,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @package system-settings
+ */
 class MailService extends AbstractMailService
 {
     private DataValidator $dataValidator;

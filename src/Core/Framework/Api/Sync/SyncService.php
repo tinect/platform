@@ -48,7 +48,7 @@ class SyncService implements SyncServiceInterface
         $context = clone $context;
 
         if (\count($behavior->getSkipIndexers())) {
-            $context->addExtension(EntityIndexerRegistry::EXTENSION_INDEXER_SKIP, new ArrayEntity($behavior->getSkipIndexers()));
+            $context->addExtension(EntityIndexerRegistry::EXTENSION_INDEXER_SKIP, new ArrayEntity(['skips' => $behavior->getSkipIndexers()]));
         }
 
         if (
@@ -61,7 +61,7 @@ class SyncService implements SyncServiceInterface
         $result = $this->writer->sync($operations, WriteContext::createFromContext($context));
 
         $writes = EntityWrittenContainerEvent::createWithWrittenEvents($result->getWritten(), $context, []);
-        $deletes = EntityWrittenContainerEvent::createWithWrittenEvents($result->getDeleted(), $context, []);
+        $deletes = EntityWrittenContainerEvent::createWithDeletedEvents($result->getDeleted(), $context, []);
 
         if ($deletes->getEvents() !== null) {
             $writes->addEvent(...$deletes->getEvents()->getElements());

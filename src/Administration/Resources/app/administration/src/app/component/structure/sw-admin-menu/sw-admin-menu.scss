@@ -240,11 +240,6 @@ $sw-admin-menu-active-text: $color-white;
         vertical-align: middle;
         position: relative;
         top: -2px;
-
-        &.sw-icon {
-            // @deprecated tag:v6.5.0 - padding can be removed
-            padding: 0 !important;
-        }
     }
 
     .sw-admin-menu__sub-navigation-list {
@@ -352,6 +347,15 @@ $sw-admin-menu-active-text: $color-white;
         top: 50%;
         margin-top: -8px;
         color: $sw-admin-menu-color-text-primary;
+
+        &.sw-icon {
+            width: 16px;
+            height: 16px;
+            padding-top: 4px;
+            padding-right: 3px;
+            padding-bottom: 6px;
+            padding-left: 3px;
+        }
 
         &:hover {
             color: $sw-admin-menu-active-text;

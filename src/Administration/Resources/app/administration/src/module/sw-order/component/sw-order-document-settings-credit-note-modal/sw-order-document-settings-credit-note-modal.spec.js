@@ -7,6 +7,10 @@ import 'src/app/component/form/field-base/sw-base-field';
 import 'src/app/component/form/sw-select-field';
 import 'src/app/component/form/field-base/sw-block-field';
 
+/**
+ * @package customer-order
+ */
+
 Shopware.Component.register('sw-order-document-settings-modal', swOrderDocumentSettingsModal);
 Shopware.Component.extend('sw-order-document-settings-credit-note-modal', 'sw-order-document-settings-modal', swOrderDocumentSettingsCreditNoteModal);
 
@@ -178,7 +182,6 @@ describe('sw-order-document-settings-credit-note-modal', () => {
     let wrapper;
 
     beforeEach(async () => {
-        global.activeFeatureFlags = ['FEATURE_NEXT_7530'];
         wrapper = await createWrapper();
         await flushPromises();
     });

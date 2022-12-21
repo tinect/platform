@@ -7,6 +7,8 @@ const utils = Shopware.Utils;
 const { cloneDeep } = utils.object;
 
 /**
+ * @package admin
+ *
  * @public
  * @description
  * Renders the search bar. This component uses the search service to find entities in the administration.
@@ -117,13 +119,6 @@ Component.register('sw-search-bar', {
             criteria.addAssociation('type');
 
             return criteria;
-        },
-
-        /**
-         * @deprecated tag:v6.5.0 - Will be removed
-         */
-        canViewSalesChannels() {
-            return this.acl.can('sales_channel.viewer');
         },
 
         canCreateSalesChannels() {
@@ -592,54 +587,6 @@ Component.register('sw-search-bar', {
             });
         },
 
-        /* @deprecated tag:v6.5.0 - Will be removed */
-        navigateLeftResults() {
-            if (this.showTypeSelectContainer) {
-                if (this.activeTypeListIndex !== 0) {
-                    this.activeTypeListIndex -= 1;
-                }
-            }
-
-            if (!this.showResultsContainer) {
-                return;
-            }
-
-            if (this.activeResultColumn > 0) {
-                this.activeResultColumn -= 1;
-                const itemsInColumn = this.results[this.activeResultColumn].entities.length;
-                if (this.activeResultIndex + 1 > itemsInColumn) {
-                    this.activeResultIndex = itemsInColumn - 1;
-                }
-            }
-
-            this.setActiveResultPosition({ index: this.activeResultIndex, column: this.activeResultColumn });
-            this.checkScrollPosition();
-        },
-
-        /* @deprecated tag:v6.5.0 - Will be removed */
-        navigateRightResults() {
-            if (this.showTypeSelectContainer) {
-                if (this.activeTypeListIndex !== this.typeSelectResults.length - 1) {
-                    this.activeTypeListIndex += 1;
-                }
-            }
-
-            if (!this.showResultsContainer) {
-                return;
-            }
-
-            if (this.activeResultColumn < this.results.length - 1) {
-                this.activeResultColumn += 1;
-                const itemsInColumn = this.results[this.activeResultColumn].entities.length;
-                if (this.activeResultIndex + 1 > itemsInColumn) {
-                    this.activeResultIndex = itemsInColumn - 1;
-                }
-            }
-
-            this.setActiveResultPosition({ index: this.activeResultIndex, column: this.activeResultColumn });
-            this.checkScrollPosition();
-        },
-
         navigateUpResults() {
             if (this.showTypeSelectContainer) {
                 if (this.activeTypeListIndex !== 0) {
@@ -774,20 +721,6 @@ Component.register('sw-search-bar', {
             this.showModuleFiltersContainer = true;
             this.showTypeSelectContainer = false;
             this.showResultsSearchTrends = false;
-        },
-
-        /**
-         * @deprecated tag:v6.5.0 - Will be removed
-         */
-        loadSalesChannel() {
-            return new Promise(resolve => {
-                this.salesChannelRepository
-                    .search(this.salesChannelCriteria)
-                    .then(response => {
-                        this.salesChannels = response;
-                        resolve(response);
-                    });
-            });
         },
 
         loadSalesChannelType() {

@@ -5,6 +5,8 @@ const { Component, Mixin } = Shopware;
 const { get } = Shopware.Utils;
 
 /**
+ * @package admin
+ *
  * @public
  * @status ready
  * @description Renders a multi select field for data of any kind. This component uses the sw-field base
@@ -92,10 +94,6 @@ Component.register('sw-multi-tag-select', {
         inputIsValid() {
             return this.validate(this.searchTerm);
         },
-    },
-
-    beforeDestroy() {
-        this.beforeDestroyComponent();
     },
 
     methods: {

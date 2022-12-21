@@ -18,6 +18,9 @@ use Shopware\Elasticsearch\Framework\AbstractElasticsearchDefinition;
 use Shopware\Elasticsearch\Framework\Indexing\EntityMapper;
 use Shopware\Elasticsearch\Product\Event\ElasticsearchProductCustomFieldsMappingEvent;
 
+/**
+ * @package core
+ */
 class ElasticsearchProductDefinition extends AbstractElasticsearchDefinition
 {
     private const SEARCH_FIELD = [

@@ -9,6 +9,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,8 +17,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * @deprecated tag:v6.5.0 - reason:becomes-internal - will be internal in 6.5.0
+ * @internal
  */
+#[AsCommand(
+    name: 'database:clean-personal-data',
+    description: 'Cleans personal data from the database',
+)]
 class CleanPersonalDataCommand extends Command
 {
     protected const VALID_TYPES = [
@@ -28,22 +33,14 @@ class CleanPersonalDataCommand extends Command
     protected const TYPE_GUESTS = 'guests';
     protected const TYPE_CARTS = 'carts';
 
-    protected static $defaultName = 'database:clean-personal-data';
-
-    private Connection $connection;
-
-    private EntityRepository $customerRepository;
-
     /**
      * @internal
      */
     public function __construct(
-        Connection $connection,
-        EntityRepository $customerRepository
+        private Connection $connection,
+        private EntityRepository $customerRepository
     ) {
         parent::__construct();
-        $this->connection = $connection;
-        $this->customerRepository = $customerRepository;
     }
 
     protected function configure(): void

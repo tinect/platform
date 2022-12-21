@@ -2,9 +2,9 @@
 
 namespace Shopware\Core\Checkout\Cart\SalesChannel;
 
+use Shopware\Core\Checkout\Cart\AbstractCartPersister;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartCalculator;
-use Shopware\Core\Checkout\Cart\CartPersisterInterface;
 use Shopware\Core\Checkout\Cart\Event\CheckoutOrderPlacedCriteriaEvent;
 use Shopware\Core\Checkout\Cart\Event\CheckoutOrderPlacedEvent;
 use Shopware\Core\Checkout\Cart\Order\OrderPersisterInterface;
@@ -16,8 +16,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
-use Shopware\Core\Framework\Routing\Annotation\LoginRequired;
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\Routing\Annotation\Since;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
@@ -39,7 +37,7 @@ class CartOrderRoute extends AbstractCartOrderRoute
 
     private OrderPersisterInterface $orderPersister;
 
-    private CartPersisterInterface $cartPersister;
+    private AbstractCartPersister $cartPersister;
 
     private EventDispatcherInterface $eventDispatcher;
 
@@ -52,7 +50,7 @@ class CartOrderRoute extends AbstractCartOrderRoute
         CartCalculator $cartCalculator,
         EntityRepository $orderRepository,
         OrderPersisterInterface $orderPersister,
-        CartPersisterInterface $cartPersister,
+        AbstractCartPersister $cartPersister,
         EventDispatcherInterface $eventDispatcher,
         PreparedPaymentService $preparedPaymentService
     ) {

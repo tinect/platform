@@ -5,6 +5,10 @@ import EntityCollection from 'src/core/data/entity-collection.data';
 import Criteria from 'src/core/data/criteria.data';
 import { searchRankingPoint } from 'src/app/service/search-ranking.service';
 
+/**
+ * @package customer-order
+ */
+
 Shopware.Component.register('sw-order-list', swOrderList);
 
 const mockItem = {
@@ -79,7 +83,8 @@ async function createWrapper(privileges = []) {
             'router-link': true,
             'sw-checkbox-field': true,
             'sw-data-grid-skeleton': true,
-            'sw-time-ago': true
+            'sw-time-ago': true,
+            'sw-color-badge': true
         },
         provide: {
             acl: {

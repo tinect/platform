@@ -5,6 +5,10 @@ import 'src/app/component/base/sw-button-process';
 import 'src/app/component/base/sw-button';
 import 'src/app/component/structure/sw-page';
 
+/**
+ * @package customer-order
+ */
+
 const remindPaymentMock = jest.fn(() => {
     return Promise.resolve();
 });
@@ -64,6 +68,9 @@ describe('src/module/sw-order/page/sw-order-create', () => {
             'sw-help-center': true,
             'sw-search-bar': true,
             'sw-language-switch': true,
+            'sw-card-view': true,
+            'sw-tabs': true,
+            'sw-tabs-item': true,
             'sw-page': await Shopware.Component.build('sw-page'),
             'sw-button': await Shopware.Component.build('sw-button'),
             'sw-button-process': await Shopware.Component.build('sw-button-process'),

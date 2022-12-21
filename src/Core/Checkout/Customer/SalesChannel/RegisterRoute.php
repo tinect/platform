@@ -23,6 +23,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Validation\EntityExists;
 use Shopware\Core\Framework\Event\DataMappingEvent;
+use Shopware\Core\Framework\Feature;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\Framework\Routing\Annotation\ContextTokenRequired;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
@@ -57,6 +58,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
+ * @package customer-order
+ *
  * @Route(defaults={"_routeScope"={"store-api"}, "_contextTokenRequired"=true})
  */
 class RegisterRoute extends AbstractRegisterRoute
@@ -279,7 +282,9 @@ class RegisterRoute extends AbstractRegisterRoute
             return $customer;
         }
 
-        $customer['active'] = false;
+        if (!Feature::isActive('v6.6.0.0')) {
+            $customer['active'] = false;
+        }
         $customer['doubleOptInRegistration'] = true;
         $customer['doubleOptInEmailSentDate'] = new \DateTimeImmutable();
         $customer['hash'] = Uuid::randomHex();
@@ -490,7 +495,7 @@ class RegisterRoute extends AbstractRegisterRoute
     }
 
     /**
-     * @return array<int|string, mixed>
+     * @return array<string, mixed>
      */
     private function mapAddressData(DataBag $addressData): array
     {

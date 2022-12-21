@@ -1,3 +1,7 @@
+/**
+ * @package admin
+ */
+
 const webpack = require('webpack');
 const webpackMerge = require('webpack-merge');
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
@@ -14,6 +18,13 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 const path = require('path');
 const fs = require('fs');
 const chalk = require('chalk');
+const crypto = require('crypto');
+
+/** HACK: OpenSSL 3 does not support md4 any more,
+* but webpack hardcodes it all over the place: https://github.com/webpack/webpack/issues/13572
+*/
+const cryptoOrigCreateHash = crypto.createHash;
+crypto.createHash = algorithm => cryptoOrigCreateHash(algorithm === 'md4' ? 'sha256' : algorithm);
 
 /* eslint-disable */
 
@@ -27,16 +38,11 @@ if (fs.existsSync(flagsPath)) {
     global.featureFlags = featureFlags;
 }
 
-let refactorAlias = false;
-if (featureFlags.hasOwnProperty('FEATURE_NEXT_11634')) {
-    refactorAlias = featureFlags.FEATURE_NEXT_11634;
-}
-
 // https://regex101.com/r/OGpZFt/1
-const versionRegex = /16\.\d{1,2}\.\d{1,2}/;
+const versionRegex = /18\.\d{1,2}\.\d{1,2}/;
 if (!versionRegex.test(process.versions.node)) {
     console.log();
-    console.log(chalk.red('@Deprecated: You are using an incompatible Node.js version. Supported version range: ^16.0.0'));
+    console.log(chalk.red('@Deprecated: You are using an incompatible Node.js version. Supported version range: ^18.0.0'));
     console.log();
 }
 
@@ -223,25 +229,11 @@ const baseConfig = ({ pluginPath, pluginFilepath }) => ({
     },
 
     ...(() => {
-        if (refactorAlias) {
-            return {
-                resolve: {
-                    extensions: ['.js', '.ts', '.vue', '.json', '.less', '.twig'],
-                    alias: {
-                        scss: path.join(__dirname, 'src/app/assets/scss'),
-                    },
-                },
-            };
-        }
-
         return {
             resolve: {
                 extensions: ['.js', '.ts', '.vue', '.json', '.less', '.twig'],
                 alias: {
-                    vue$: 'vue/dist/vue.esm.js',
-                    src: path.join(__dirname, 'src'),
                     scss: path.join(__dirname, 'src/app/assets/scss'),
-                    assets: path.join(__dirname, 'static'),
                 },
             },
         };
@@ -539,19 +531,15 @@ const coreConfig = {
     },
 
     ...(() => {
-        if (refactorAlias) {
-            return {
-                resolve: {
-                    alias: {
-                        vue$: 'vue/dist/vue.esm.js',
-                        src: path.join(__dirname, 'src'),
-                        assets: path.join(__dirname, 'static'),
-                    },
+        return {
+            resolve: {
+                alias: {
+                    vue$: 'vue/dist/vue.esm.js',
+                    src: path.join(__dirname, 'src'),
+                    assets: path.join(__dirname, 'static'),
                 },
-            };
-        }
-
-        return {};
+            },
+        };
     })(),
 
     output: {
@@ -689,17 +677,13 @@ const configsForPlugins = pluginEntries.map((plugin) => {
             },
 
             ...(() => {
-                if (refactorAlias) {
-                    return {
-                        resolve: {
-                            alias: {
-                                '@administration': path.join(__dirname, 'src'),
-                            },
+                return {
+                    resolve: {
+                        alias: {
+                            '@administration': path.join(__dirname, 'src'),
                         },
-                    };
-                }
-
-                return {};
+                    },
+                };
             })(),
 
             output: {

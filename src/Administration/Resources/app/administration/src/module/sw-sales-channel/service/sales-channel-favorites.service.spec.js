@@ -1,3 +1,7 @@
+/**
+ * @package sales-channel
+ */
+
 import SalesChannelFavoritesService from 'src/module/sw-sales-channel/service/sales-channel-favorites.service';
 
 const responses = global.repositoryFactoryMock.responses;
@@ -19,7 +23,10 @@ responses.addResponse({
 responses.addResponse({
     method: 'Post',
     url: '/user-config',
-    status: 200
+    status: 200,
+    response: {
+        data: []
+    }
 });
 
 describe('module/sw-sales-channel/service/sales-channel-favorites.service.spec.js', () => {
@@ -31,10 +38,6 @@ describe('module/sw-sales-channel/service/sales-channel-favorites.service.spec.j
         };
 
         service = new SalesChannelFavoritesService();
-    });
-
-    afterEach(() => {
-        service = null;
     });
 
     it('getFavoriteIds > should return favorites from internal state', async () => {
@@ -95,7 +98,7 @@ describe('module/sw-sales-channel/service/sales-channel-favorites.service.spec.j
             value: []
         };
 
-        const entity = service.createUserConfigEntity();
+        const entity = service.createUserConfigEntity(SalesChannelFavoritesService.USER_CONFIG_KEY);
 
         expect(entity).toMatchObject(expectedValues);
     });
@@ -110,8 +113,8 @@ describe('module/sw-sales-channel/service/sales-channel-favorites.service.spec.j
         expect(Array.isArray(userConfigMock.value)).toBeTruthy();
     });
 
-    it('getCriteria > returns a criteria including specific filters', async () => {
-        const criteria = service.getCriteria();
+    it('getCriteria > returns a criteria including specific filters', () => {
+        const criteria = service.getCriteria(SalesChannelFavoritesService.USER_CONFIG_KEY);
 
         expect(criteria.filters).toContainEqual({ type: 'equals', field: 'key', value: SalesChannelFavoritesService.USER_CONFIG_KEY });
         expect(criteria.filters).toContainEqual({ type: 'equals', field: 'userId', value: '8fe88c269c214ea68badf7ebe678ab96' });

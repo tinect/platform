@@ -1,3 +1,7 @@
+/**
+ * @package admin
+ */
+
 import { config, mount, createLocalVue } from '@vue/test-utils';
 import VueRouter from 'vue-router';
 import 'src/app/component/base/sw-tabs';
@@ -6,7 +10,7 @@ import 'src/app/component/base/sw-tabs-item';
 const componentWithTabs = {
     name: 'componentWithTabs',
     template: `<div class="component-with-tabs">
-        <sw-tabs>
+        <sw-tabs positionIdentifier="test">
             <template v-for="(route, index) in routes">
                 <sw-tabs-item :route="route" :key="index">
                     {{route.name}}

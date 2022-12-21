@@ -1,9 +1,11 @@
+/**
+ * @package admin
+ */
+
 import { shallowMount } from '@vue/test-utils';
 import ComponentFactory from 'src/core/factory/async-component.factory';
 import TemplateFactory from 'src/core/factory/template.factory';
 import { cloneDeep } from 'src/core/service/utils/object.utils';
-
-global.activeFeatureFlags = ['FEATURE_NEXT_19822'];
 
 beforeEach(async () => {
     ComponentFactory.getComponentRegistry().clear();
@@ -1556,7 +1558,6 @@ describe('core/factory/async-component.factory.ts', () => {
             })
         }).forEach(({ testCase, components }) => {
             it(testCase, async () => {
-                global.activeFeatureFlags = ['FEATURE_NEXT_17978', 'FEATURE_NEXT_19822'];
                 ComponentFactory.register('first-component', components.A());
                 ComponentFactory.override('first-component', components.B());
                 ComponentFactory.extend('second-component', 'first-component', components.C());
@@ -1633,7 +1634,6 @@ describe('core/factory/async-component.factory.ts', () => {
                 const registerSecondExtension = () => ComponentFactory.extend('third-component', 'second-component', components.E());
 
                 it('should render chained extensions with multiple overrides in regular order', async () => {
-                    global.activeFeatureFlags = ['FEATURE_NEXT_17978', 'FEATURE_NEXT_19822'];
                     registerFirst();
                     registerFirstOverride();
                     registerSecondOverride();
@@ -1650,7 +1650,6 @@ describe('core/factory/async-component.factory.ts', () => {
                 });
 
                 it('should render chained extensions with multiple overrides in mixed registration order', async () => {
-                    global.activeFeatureFlags = ['FEATURE_NEXT_17978', 'FEATURE_NEXT_19822'];
                     registerSecondExtension();
                     registerFirstExtension();
                     registerFirstOverride();
@@ -1667,7 +1666,6 @@ describe('core/factory/async-component.factory.ts', () => {
                 });
 
                 it('should render chained extensions with multiple overrides in mixed build order', async () => {
-                    global.activeFeatureFlags = ['FEATURE_NEXT_17978', 'FEATURE_NEXT_19822'];
                     registerFirst();
                     registerFirstOverride();
                     registerSecondOverride();
@@ -1686,7 +1684,6 @@ describe('core/factory/async-component.factory.ts', () => {
                 it(
                     'should render chained extensions with multiple overrides in mixed registration and build order',
                     async () => {
-                        global.activeFeatureFlags = ['FEATURE_NEXT_17978', 'FEATURE_NEXT_19822'];
                         registerSecondExtension();
                         registerFirstExtension();
                         registerFirstOverride();
@@ -1719,7 +1716,6 @@ describe('core/factory/async-component.factory.ts', () => {
             })
         }).forEach(({ testCase, components }) => {
             it(testCase, async () => {
-                global.activeFeatureFlags = ['FEATURE_NEXT_17978', 'FEATURE_NEXT_19822'];
                 ComponentFactory.override('first-component', components.A());
                 ComponentFactory.extend('second-component', 'first-component', components.B());
                 ComponentFactory.register('first-component', components.C());

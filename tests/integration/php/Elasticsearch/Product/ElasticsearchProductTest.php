@@ -86,6 +86,8 @@ use function array_combine;
 /**
  * @internal
  * @group skip-paratest
+ *
+ * @package system-settings
  */
 class ElasticsearchProductTest extends TestCase
 {
@@ -2611,9 +2613,12 @@ class ElasticsearchProductTest extends TestCase
                 $criteria->addState(Criteria::STATE_ELASTICSEARCH_AWARE);
 
                 if ($case['operator']) {
+                    $operator = (string) $case['operator'];
+                    $percentage = (int) $case['percentage'];
+
                     $criteria->addFilter(
                         new RangeFilter('product.cheapestPrice.percentage', [
-                            $case['operator'] => $case['percentage'],
+                            $operator => $percentage,
                         ])
                     );
                 }

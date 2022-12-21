@@ -2,6 +2,10 @@ import { shallowMount } from '@vue/test-utils';
 import EntityCollection from 'src/core/data/entity-collection.data';
 import swOrderGeneralInfo from 'src/module/sw-order/component/sw-order-general-info';
 
+/**
+ * @package customer-order
+ */
+
 Shopware.Component.register('sw-order-general-info', swOrderGeneralInfo);
 
 const orderMock = {
@@ -146,7 +150,6 @@ describe('src/module/sw-order/component/sw-order-general-info', () => {
     });
 
     beforeEach(async () => {
-        global.activeFeatureFlags = ['FEATURE_NEXT_7530'];
         global.repositoryFactoryMock.showError = false;
         wrapper = await createWrapper();
         await flushPromises();

@@ -59,6 +59,9 @@ function createEntityCollection(entities = []) {
     return new Shopware.Data.EntityCollection('collection', 'collection', {}, null, entities);
 }
 
+/**
+ * @package system-settings
+ */
 describe('src/module/sw-bulk-edit/page/sw-bulk-edit-order', () => {
     let wrapper;
     let routes;
@@ -77,7 +80,7 @@ describe('src/module/sw-bulk-edit/page/sw-bulk-edit-order', () => {
             router,
             stubs: {
                 'sw-page': await Shopware.Component.build('sw-page'),
-                'sw-loader': await Shopware.Component.build('sw-loader'),
+                'sw-loader': true,
                 'sw-button': await Shopware.Component.build('sw-button'),
                 'sw-select-field': await Shopware.Component.build('sw-select-field'),
                 'sw-bulk-edit-custom-fields': await Shopware.Component.build('sw-bulk-edit-custom-fields'),
@@ -322,6 +325,15 @@ describe('src/module/sw-bulk-edit/page/sw-bulk-edit-order', () => {
                         }
                     }
                 ]
+            }
+        });
+
+        mockResponses.addResponse({
+            method: 'Post',
+            url: '/user-config',
+            status: 200,
+            response: {
+                data: []
             }
         });
 
@@ -681,8 +693,7 @@ describe('src/module/sw-bulk-edit/page/sw-bulk-edit-order', () => {
     it('should call fetchStatusOptions when component created', async () => {
         wrapper = await createWrapper();
         const fetchStatusOptionsSpy = jest.spyOn(wrapper.vm, 'fetchStatusOptions');
-
-        await flushPromises();
+        await wrapper.vm.createdComponent();
 
         expect(fetchStatusOptionsSpy).toHaveBeenCalledTimes(3);
         expect(fetchStatusOptionsSpy).toHaveBeenNthCalledWith(1, 'orders.id');
@@ -692,7 +703,7 @@ describe('src/module/sw-bulk-edit/page/sw-bulk-edit-order', () => {
         const orderStateCriteria = new Criteria(1, null);
         const { liveVersionId } = Shopware.Context.api;
 
-        expect(wrapper.vm.stateMachineStateRepository.searchIds).toHaveBeenCalledTimes(3);
+        expect(wrapper.vm.stateMachineStateRepository.searchIds).toHaveBeenCalledTimes(6);
 
         orderStateCriteria.addFilter(Criteria.equalsAny('orders.id', [selectedOrderId]));
         orderStateCriteria.addFilter(Criteria.equals('orders.versionId', liveVersionId));

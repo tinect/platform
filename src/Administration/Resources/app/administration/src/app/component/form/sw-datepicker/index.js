@@ -8,6 +8,8 @@ import './sw-datepicker.scss';
 const { Component, Mixin } = Shopware;
 
 /**
+ * @package admin
+ *
  * @public
  * @description Datepicker wrapper for date inputs. For all configuration options visit:
  * <a href="https://flatpickr.js.org/options/">https://flatpickr.js.org/options/</a>.
@@ -67,10 +69,9 @@ Component.register('sw-datepicker', {
         dateType: {
             type: String,
             default: 'date',
-            /* @deprecated tag:v6.5.0 'datetime-local' can be removed */
-            validValues: ['time', 'date', 'datetime', 'datetime-local'],
+            validValues: ['time', 'date', 'datetime'],
             validator(value) {
-                return ['time', 'date', 'datetime', 'datetime-local'].includes(value);
+                return ['time', 'date', 'datetime'].includes(value);
             },
         },
 
@@ -149,8 +150,7 @@ Component.register('sw-datepicker', {
         },
 
         enableTime() {
-            /* @deprecated tag:v6.5.0 'datetime-local' can be removed */
-            return this.noCalendar || ['datetime', 'datetime-local'].includes(this.dateType);
+            return this.noCalendar || this.dateType === 'datetime';
         },
 
         additionalEventListeners() {
@@ -276,9 +276,9 @@ Component.register('sw-datepicker', {
 
         mountedComponent() {
             if (this.flatpickrInstance === null) {
-                this.createFlatpickrInstance();
                 return;
             }
+
             this.updateFlatpickrInstance();
         },
 

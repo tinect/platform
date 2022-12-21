@@ -12,6 +12,7 @@ use Shopware\Core\Framework\Update\Event\UpdatePostFinishEvent;
 use Shopware\Core\Framework\Update\Event\UpdatePreFinishEvent;
 use Shopware\Core\Kernel;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,10 +26,12 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @internal should be used over the CLI only
  */
+#[AsCommand(
+    name: 'system:update:finish',
+    description: 'Finishes the update process',
+)]
 class SystemUpdateFinishCommand extends Command
 {
-    public static $defaultName = 'system:update:finish';
-
     private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
@@ -53,7 +56,7 @@ class SystemUpdateFinishCommand extends Command
         $output = new ShopwareStyle($input, $output);
 
         $dsn = trim((string) (EnvironmentHelper::getVariable('DATABASE_URL', getenv('DATABASE_URL'))));
-        if ($dsn === '' || $dsn === Kernel::PLACEHOLDER_DATABASE_URL) {
+        if ($dsn === '') {
             $output->note('Environment variable \'DATABASE_URL\' not defined. Skipping ' . $this->getName() . '...');
 
             return self::SUCCESS;

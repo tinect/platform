@@ -105,18 +105,7 @@ parameters:
             message: '#Method Shopware\\Core\\Framework\\DataAbstractionLayer\\Entity::\_\_.*\(\) has.*#'
             path: src/Core/Framework/DataAbstractionLayer/Entity.php
 
-        # Shopware\\Core\\Checkout\\Cart\\Exception\\InvalidCartException is behind a feature flag
-        -
-            message: '#.*Shopware\\Core\\Checkout\\Cart\\Exception\\InvalidCartException.*#'
-            path: src/Core/Checkout/Cart/CartException.php
-
         # can be removed with feature flag FEATURE_NEXT_12455
-        -
-            message: '#Constructor of class Shopware\\Core\\Checkout\\Customer\\Exception\\DuplicateWishlistProductException has an unused parameter \$productId\.#'
-            path: src/Core/Checkout/Customer/Exception/DuplicateWishlistProductException.php
-        -
-            message: '#Constructor of class Shopware\\Core\\Checkout\\Order\\Exception\\LanguageOfOrderDeleteException has an unused parameter \$language\.#'
-            path: src/Core/Checkout/Order/Exception/LanguageOfOrderDeleteException.php
         -
             message: '#Constructor of class Shopware\\Core\\Content\\Newsletter\\Exception\\LanguageOfNewsletterDeleteException has an unused parameter \$language\.#'
             path: src/Core/Content/Newsletter/Exception/LanguageOfNewsletterDeleteException.php
@@ -152,28 +141,11 @@ parameters:
             count: 1
             path: src/Core/Content/ProductExport/Error/Error.php
 
-        # Can be removed with 6.5 release (NEXT-19158)
-        -
-            message: "#^PHPDoc tag @param references unknown parameter\\: \\$htmlEscape$#"
-            count: 1
-            path: src/Core/Framework/Adapter/Twig/StringTemplateRenderer.php
-
         # Method will get third parameter in 6.5
         -
             message: "#^Method Shopware\\\\Storefront\\\\Framework\\\\Cache\\\\ReverseProxy\\\\AbstractReverseProxyGateway\\:\\:tag\\(\\) invoked with 3 parameters, 2 required\\.$#"
             count: 1
             path: src/Storefront/Framework/Cache/ReverseProxy/ReverseProxyCache.php
-
-        # can be removed with 6.5
-        -
-        	message: "#^Method Shopware\\\\Core\\\\HttpKernel\\:\\:handle\\(\\) has parameter \\$catch with no type specified\\.$#"
-        	count: 1
-        	path: src/Core/HttpKernel.php
-
-        -
-        	message: "#^Method Shopware\\\\Core\\\\HttpKernel\\:\\:handle\\(\\) has parameter \\$type with no type specified\\.$#"
-        	count: 1
-        	path: src/Core/HttpKernel.php
 
         # Maybe a bug in phpstan: https://github.com/phpstan/phpstan/issues/7560
         - '#Trait .* is used zero times and is not analysed.#'

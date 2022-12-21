@@ -2,6 +2,10 @@ import { DocumentEvents } from 'src/core/service/api/document.api.service';
 import template from './sw-order-document-card.html.twig';
 import './sw-order-document-card.scss';
 
+/**
+ * @package customer-order
+ */
+
 const { Mixin } = Shopware;
 const { Criteria } = Shopware.Data;
 
@@ -158,11 +162,7 @@ export default {
         },
 
         showCardFilter() {
-            if (this.feature.isActive('FEATURE_NEXT_7530')) {
-                return this.order?.documents?.length > 0;
-            }
-
-            return true;
+            return this.order?.documents?.length > 0;
         },
 
         showCreateDocumentButton() {
@@ -278,11 +278,7 @@ export default {
             this.currentDocumentType = null;
         },
 
-        onPrepareDocument(documentType) {
-            if (!this.feature.isActive('FEATURE_NEXT_7530')) {
-                this.currentDocumentType = documentType;
-            }
-
+        onPrepareDocument() {
             this.showModal = true;
         },
 

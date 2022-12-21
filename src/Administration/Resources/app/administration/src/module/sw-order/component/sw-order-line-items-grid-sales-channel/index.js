@@ -1,5 +1,10 @@
 import template from './sw-order-line-items-grid-sales-channel.html.twig';
+import { LineItemType } from '../../order.types';
 import './sw-order-line-items-grid-sales-channel.scss';
+
+/**
+ * @package customer-order
+ */
 
 const { Utils, State, Service } = Shopware;
 const { get, format } = Utils;
@@ -67,7 +72,7 @@ export default {
         },
 
         lineItemTypes() {
-            return Service('cartStoreService').getLineItemTypes();
+            return LineItemType;
         },
 
         isCartTokenAvailable() {

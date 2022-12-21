@@ -1,3 +1,7 @@
+/**
+ * @package admin
+ */
+
 import { config, shallowMount, createLocalVue } from '@vue/test-utils';
 import VueRouter from 'vue-router';
 import 'src/app/component/structure/sw-admin-menu';
@@ -317,22 +321,6 @@ describe('src/app/component/structure/sw-admin-menu', () => {
             expect(appMenuEntry.props('entry')).toEqual(
                 expect.objectContaining({
                     id: 'app-testAppB-default'
-                })
-            );
-        });
-    });
-
-    describe('deprecated functionality', () => {
-        it('renders app menu items without parent underneath my apps', async () => {
-            Shopware.State.commit('shopwareApps/setApps', testApps);
-            await wrapper.vm.$nextTick();
-
-            const topLevelEntries = wrapper.findAll('.navigation-list-item__level-1');
-            const appMenuEntry = topLevelEntries.at(2).get('.navigation-list-item__level-2');
-
-            expect(appMenuEntry.props('entry')).toEqual(
-                expect.objectContaining({
-                    id: 'app-testAppA-noParent'
                 })
             );
         });

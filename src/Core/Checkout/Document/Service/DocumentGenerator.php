@@ -31,6 +31,8 @@ use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * @package customer-order
+ *
  * @final
  */
 class DocumentGenerator
@@ -78,7 +80,7 @@ class DocumentGenerator
         /** @var DocumentEntity|null $document */
         $document = $this->documentRepository->search($criteria, $context)->get($documentId);
 
-        if ($document === null) {
+        if (!$document instanceof DocumentEntity) {
             throw new InvalidDocumentException($documentId);
         }
 

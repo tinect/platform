@@ -1,3 +1,6 @@
+/**
+ * @package system-settings
+ */
 import template from './sw-settings-language-list.html.twig';
 import './sw-settings-language-list.scss';
 
@@ -8,7 +11,11 @@ const { Criteria } = Shopware.Data;
 export default {
     template,
 
-    inject: ['repositoryFactory', 'acl'],
+    inject: [
+        'repositoryFactory',
+        'acl',
+        'feature',
+    ],
 
     mixins: [
         Mixin.getByName('listing'),
@@ -135,7 +142,14 @@ export default {
             return this.parentLanguages.get(item.parentId).name;
         },
 
+        /**
+         * @deprecated tag:v6.5.0 - Will be removed
+         */
         onChangeLanguage() {
+            if (this.feature.isActive('v6.5.0.0')) {
+                return;
+            }
+
             this.getList();
         },
 

@@ -16,7 +16,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Event\EventData\MailRecipientStruct;
-use Shopware\Core\Framework\Feature;
 use Shopware\Core\Framework\Script\Debugging\ScriptTraces;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Test\TestCaseBase\MailTemplateTestBehaviour;
@@ -43,6 +42,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
+ * @package customer-order
+ *
  * @internal
  */
 class RegisterControllerTest extends TestCase
@@ -340,6 +341,9 @@ class RegisterControllerTest extends TestCase
         static::assertArrayHasKey(CheckoutRegisterPageLoadedHook::HOOK_NAME, $traces);
     }
 
+    /**
+     * @param array<string|int, mixed> $customerData
+     */
     private function getMailRecipientStruct(array $customerData): MailRecipientStruct
     {
         return new MailRecipientStruct([
@@ -379,18 +383,8 @@ class RegisterControllerTest extends TestCase
             ],
         ];
 
-        if (Feature::isActive('FEATURE_NEXT_16236')) {
-            if (!$isGuest) {
-                $data['createCustomerAccount'] = true;
-                $data['password'] = '12345678';
-            }
-
-            return new RequestDataBag($data);
-        }
-
-        if ($isGuest) {
-            $data['guest'] = true;
-        } else {
+        if (!$isGuest) {
+            $data['createCustomerAccount'] = true;
             $data['password'] = '12345678';
         }
 

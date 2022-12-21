@@ -27,37 +27,22 @@ use Shopware\Core\System\Currency\Rule\CurrencyRule;
 use Shopware\Core\Test\TestDefaults;
 
 /**
- * @deprecated tag:v6.5.0 - reason:becomes-internal - will be internal in 6.5.0
+ * @internal
  */
 class RuleGenerator implements DemodataGeneratorInterface
 {
-    private EntityRepository $ruleRepository;
-
-    private EntityWriterInterface $writer;
-
-    private EntityRepository $paymentMethodRepository;
-
-    private EntityRepository $shippingMethodRepository;
-
-    private RuleDefinition $ruleDefinition;
-
     private Generator $faker;
 
     /**
      * @internal
      */
     public function __construct(
-        EntityRepository $ruleRepository,
-        EntityWriterInterface $writer,
-        EntityRepository $paymentMethodRepository,
-        EntityRepository $shippingMethodRepository,
-        RuleDefinition $ruleDefinition
+        private EntityRepository $ruleRepository,
+        private EntityWriterInterface $writer,
+        private EntityRepository $paymentMethodRepository,
+        private EntityRepository $shippingMethodRepository,
+        private RuleDefinition $ruleDefinition
     ) {
-        $this->ruleRepository = $ruleRepository;
-        $this->writer = $writer;
-        $this->paymentMethodRepository = $paymentMethodRepository;
-        $this->shippingMethodRepository = $shippingMethodRepository;
-        $this->ruleDefinition = $ruleDefinition;
     }
 
     public function getDefinition(): string
@@ -69,15 +54,17 @@ class RuleGenerator implements DemodataGeneratorInterface
     {
         $this->faker = $context->getFaker();
 
-        $paymentMethodIds = $this->paymentMethodRepository->searchIds(new Criteria(), $context->getContext());
-        $shippingMethodIds = $this->shippingMethodRepository->searchIds(new Criteria(), $context->getContext());
+        /** @var list<string> $paymentMethodIds */
+        $paymentMethodIds = $this->paymentMethodRepository->searchIds(new Criteria(), $context->getContext())->getIds();
+        /** @var list<string> $shippingMethodIds */
+        $shippingMethodIds = $this->shippingMethodRepository->searchIds(new Criteria(), $context->getContext())->getIds();
 
         $criteria = (new Criteria())->addFilter(
             new NotFilter(
                 NotFilter::CONNECTION_AND,
                 [
-                    new EqualsAnyFilter('rule.shippingMethods.id', $shippingMethodIds->getIds()),
-                    new EqualsAnyFilter('rule.paymentMethods.id', $paymentMethodIds->getIds()),
+                    new EqualsAnyFilter('rule.shippingMethods.id', $shippingMethodIds),
+                    new EqualsAnyFilter('rule.paymentMethods.id', $paymentMethodIds),
                 ]
             )
         );
