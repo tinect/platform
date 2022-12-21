@@ -15,6 +15,7 @@ use Shopware\Core\Content\Media\File\MediaFile;
 use Shopware\Core\Content\Media\MediaCollection;
 use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Content\Media\Metadata\MetadataLoader;
+use Shopware\Core\Content\Media\Pathname\PathGenerator;
 use Shopware\Core\Content\Media\Pathname\UrlGeneratorInterface;
 use Shopware\Core\Content\Media\Thumbnail\ThumbnailService;
 use Shopware\Core\Content\Media\TypeDetector\TypeDetector;
@@ -517,13 +518,13 @@ class FileSaverTest extends TestCase
             $repositoryMock,
             $this->getContainer()->get('shopware.filesystem.public'),
             $this->getContainer()->get('shopware.filesystem.private'),
-            $this->getContainer()->get(UrlGeneratorInterface::class),
             $this->getContainer()->get(ThumbnailService::class),
             $this->getContainer()->get(MetadataLoader::class),
             $this->getContainer()->get(TypeDetector::class),
             $this->getContainer()->get('messenger.bus.shopware'),
             $this->getContainer()->get('event_dispatcher'),
-            $this->getContainer()->getParameter('shopware.filesystem.allowed_extensions')
+            $this->getContainer()->getParameter('shopware.filesystem.allowed_extensions'),
+            $this->getContainer()->get(PathGenerator::class)
         );
 
         $mediaPath = $this->urlGenerator->getRelativeMediaUrl($png);

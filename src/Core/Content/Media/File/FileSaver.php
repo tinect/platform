@@ -18,7 +18,7 @@ use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Content\Media\MediaType\MediaType;
 use Shopware\Core\Content\Media\Message\GenerateThumbnailsMessage;
 use Shopware\Core\Content\Media\Metadata\MetadataLoader;
-use Shopware\Core\Content\Media\Pathname\UrlGeneratorInterface;
+use Shopware\Core\Content\Media\Pathname\AbstractPathGenerator;
 use Shopware\Core\Content\Media\Thumbnail\ThumbnailService;
 use Shopware\Core\Content\Media\TypeDetector\TypeDetector;
 use Shopware\Core\Framework\Api\Context\AdminApiSource;
@@ -40,8 +40,6 @@ class FileSaver
 
     private FilesystemOperator $filesystemPublic;
 
-    private UrlGeneratorInterface $urlGenerator;
-
     private ThumbnailService $thumbnailService;
 
     private FileNameValidator $fileNameValidator;
@@ -61,6 +59,8 @@ class FileSaver
 
     private EventDispatcherInterface $eventDispatcher;
 
+    private AbstractPathGenerator $pathGenerator;
+
     /**
      * @internal
      *
@@ -70,18 +70,17 @@ class FileSaver
         EntityRepository $mediaRepository,
         FilesystemOperator $filesystemPublic,
         FilesystemOperator $filesystemPrivate,
-        UrlGeneratorInterface $urlGenerator,
         ThumbnailService $thumbnailService,
         MetadataLoader $metadataLoader,
         TypeDetector $typeDetector,
         MessageBusInterface $messageBus,
         EventDispatcherInterface $eventDispatcher,
-        array $allowedExtensions
+        array $allowedExtensions,
+        AbstractPathGenerator $pathGenerator
     ) {
         $this->mediaRepository = $mediaRepository;
         $this->filesystemPublic = $filesystemPublic;
         $this->filesystemPrivate = $filesystemPrivate;
-        $this->urlGenerator = $urlGenerator;
         $this->thumbnailService = $thumbnailService;
         $this->fileNameValidator = new FileNameValidator();
         $this->metadataLoader = $metadataLoader;
@@ -89,6 +88,7 @@ class FileSaver
         $this->messageBus = $messageBus;
         $this->eventDispatcher = $eventDispatcher;
         $this->allowedExtensions = $allowedExtensions;
+        $this->pathGenerator = $pathGenerator;
     }
 
     /**
@@ -166,22 +166,33 @@ class FileSaver
         $updatedMedia->setFileName($destination);
         $updatedMedia->setUploadedAt(new \DateTime());
 
+        $newMediaPath = $this->pathGenerator->generatePath($updatedMedia);
+
         try {
             $renamedFiles = $this->renameFile(
-                $this->urlGenerator->getRelativeMediaUrl($currentMedia),
-                $this->urlGenerator->getRelativeMediaUrl($updatedMedia),
+                $currentMedia->getPath(),
+                $newMediaPath,
                 $this->getFileSystem($currentMedia)
             );
         } catch (\Exception $e) {
             throw new CouldNotRenameFileException($currentMedia->getId(), (string) $currentMedia->getFileName());
         }
 
+        $updatedThumbnails = [];
+
         foreach ($currentMedia->getThumbnails() ?? [] as $thumbnail) {
             try {
+                $renameResult = $this->renameThumbnail($thumbnail, $currentMedia, $updatedMedia);
+
                 $renamedFiles = array_merge(
                     $renamedFiles,
-                    $this->renameThumbnail($thumbnail, $currentMedia, $updatedMedia)
+                    $renameResult
                 );
+
+                $updatedThumbnails[] = [
+                    'id' => $thumbnail->getId(),
+                    'path' => $renameResult[$thumbnail->getPath()],
+                ];
             } catch (\Exception $e) {
                 $this->rollbackRenameAction($currentMedia, $renamedFiles);
             }
@@ -190,7 +201,9 @@ class FileSaver
         $updateData = [
             'id' => $updatedMedia->getId(),
             'fileName' => $updatedMedia->getFileName(),
+            'path' => $newMediaPath,
             'uploadedAt' => $updatedMedia->getUploadedAt(),
+            'thumbnails' => $updatedThumbnails,
         ];
 
         try {
@@ -211,11 +224,8 @@ class FileSaver
         MediaEntity $updatedMedia
     ): array {
         return $this->renameFile(
-            $this->urlGenerator->getRelativeThumbnailUrl(
-                $currentMedia,
-                $thumbnail
-            ),
-            $this->urlGenerator->getRelativeThumbnailUrl(
+            $thumbnail->getPath(),
+            $this->pathGenerator->generatePath(
                 $updatedMedia,
                 $thumbnail
             ),
@@ -229,10 +239,8 @@ class FileSaver
             return;
         }
 
-        $oldMediaFilePath = $this->urlGenerator->getRelativeMediaUrl($media);
-
         try {
-            $this->getFileSystem($media)->delete($oldMediaFilePath);
+            $this->getFileSystem($media)->delete($media->getPath());
         } catch (UnableToDeleteFile $e) {
             //nth
         }
@@ -246,10 +254,9 @@ class FileSaver
         if (!\is_resource($stream)) {
             throw new \RuntimeException('Could not open stream for file ' . $mediaFile->getFileName());
         }
-        $path = $this->urlGenerator->getRelativeMediaUrl($media);
 
         try {
-            $this->getFileSystem($media)->writeStream($path, $stream);
+            $this->getFileSystem($media)->writeStream($media->getPath(), $stream);
         } finally {
             // The Google Cloud Storage filesystem closes the stream even though it should not. To prevent a fatal
             // error, we therefore need to check whether the stream has been closed yet.
@@ -290,6 +297,12 @@ class FileSaver
             'mediaTypeRaw' => serialize($mediaType),
             'uploadedAt' => new \DateTime(),
         ];
+
+        // we clone the entire media here, because we need to make sure to have all possible media data set
+        // for any custom pathGenerator accessing other fields
+        $newMedia = clone $media;
+        $newMedia->assign($data);
+        $data['path'] = $this->pathGenerator->generatePath($newMedia);
 
         $context->scope(Context::SYSTEM_SCOPE, function (Context $context) use ($data): void {
             $this->mediaRepository->update([$data], $context);

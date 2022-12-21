@@ -7,7 +7,6 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 use Shopware\Core\Content\Media\Exception\MediaNotFoundException;
 use Shopware\Core\Content\Media\MediaEntity;
-use Shopware\Core\Content\Media\Pathname\UrlGeneratorInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -21,8 +20,6 @@ class FileLoader
 
     private FilesystemOperator $filesystemPrivate;
 
-    private UrlGeneratorInterface $urlGenerator;
-
     private FileNameValidator $fileNameValidator;
 
     private EntityRepository $mediaRepository;
@@ -35,13 +32,11 @@ class FileLoader
     public function __construct(
         FilesystemOperator $filesystemPublic,
         FilesystemOperator $filesystemPrivate,
-        UrlGeneratorInterface $urlGenerator,
         EntityRepository $mediaRepository,
         StreamFactoryInterface $streamFactory
     ) {
         $this->filesystemPublic = $filesystemPublic;
         $this->filesystemPrivate = $filesystemPrivate;
-        $this->urlGenerator = $urlGenerator;
         $this->fileNameValidator = new FileNameValidator();
         $this->mediaRepository = $mediaRepository;
         $this->streamFactory = $streamFactory;
@@ -66,7 +61,7 @@ class FileLoader
     {
         $this->fileNameValidator->validateFileName($media->getFileName() ?: '');
 
-        return $this->urlGenerator->getRelativeMediaUrl($media);
+        return $media->getPath();
     }
 
     private function getFileSystem(MediaEntity $media): FilesystemOperator

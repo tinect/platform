@@ -7,7 +7,6 @@ use Shopware\Core\Content\Media\Aggregate\MediaThumbnail\MediaThumbnailEntity;
 use Shopware\Core\Content\Media\Exception\EmptyMediaFilenameException;
 use Shopware\Core\Content\Media\Exception\EmptyMediaIdException;
 use Shopware\Core\Content\Media\MediaEntity;
-use Shopware\Core\Content\Media\Pathname\PathnameStrategy\PathnameStrategyInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 class UrlGenerator implements UrlGeneratorInterface, ResetInterface
@@ -16,7 +15,7 @@ class UrlGenerator implements UrlGeneratorInterface, ResetInterface
      * @internal
      */
     public function __construct(
-        private PathnameStrategyInterface $pathnameStrategy,
+        private AbstractPathGenerator $pathGenerator,
         private FilesystemOperator $filesystem
     ) {
     }
@@ -29,12 +28,11 @@ class UrlGenerator implements UrlGeneratorInterface, ResetInterface
     {
         $this->validateMedia($media);
 
-        return $this->toPathString([
-            'media',
-            $this->pathnameStrategy->generatePathHash($media),
-            $this->pathnameStrategy->generatePathCacheBuster($media),
-            $this->pathnameStrategy->generatePhysicalFilename($media),
-        ]);
+        if (empty($media->getPath())) {
+            return $this->pathGenerator->generatePath($media);
+        }
+
+        return $media->getPath();
     }
 
     /**
@@ -54,12 +52,11 @@ class UrlGenerator implements UrlGeneratorInterface, ResetInterface
     {
         $this->validateMedia($media);
 
-        return $this->toPathString([
-            'thumbnail',
-            $this->pathnameStrategy->generatePathHash($media),
-            $this->pathnameStrategy->generatePathCacheBuster($media),
-            $this->pathnameStrategy->generatePhysicalFilename($media, $thumbnail),
-        ]);
+        if (empty($thumbnail->getPath())) {
+            return $this->pathGenerator->generatePath($media, $thumbnail);
+        }
+
+        return $thumbnail->getPath();
     }
 
     /**
@@ -73,11 +70,6 @@ class UrlGenerator implements UrlGeneratorInterface, ResetInterface
 
     public function reset(): void
     {
-    }
-
-    private function toPathString(array $parts): string
-    {
-        return implode('/', array_filter($parts));
     }
 
     /**
