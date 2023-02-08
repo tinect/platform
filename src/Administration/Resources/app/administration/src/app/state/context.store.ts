@@ -39,6 +39,8 @@ interface ContextState {
         systemCurrencyISOCode: null | string,
         systemCurrencyId: null | string,
         disableExtensions: boolean,
+        /** @deprecated tag:v6.6.0 - Will be removed. Use cookie `lastActivity` instead */
+        lastActivity: number,
     },
     api: {
         apiPath: null | string,
@@ -79,6 +81,7 @@ const ContextStore: Module<ContextState, VuexRootState> = {
             systemCurrencyId: null,
             systemCurrencyISOCode: null,
             disableExtensions: false,
+            lastActivity: 0,
         },
         api: {
             apiPath: null,

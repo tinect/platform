@@ -67,6 +67,11 @@
             <tag name="flow.action" priority="680" key="action.change.customer.status"/>
         </service>
 
+        <service id="Shopware\Core\Content\Flow\Dispatching\Action\GrantDownloadAccessAction">
+            <argument type="service" id="order_line_item_download.repository"/>
+            <tag name="flow.action" priority="550" key="action.grant.download.access"/>
+        </service>
+
         <service id="Shopware\Core\Content\Flow\Dispatching\Action\SendMailAction">
             <argument type="service" id="Shopware\Core\Content\Mail\Service\MailService"/>
             <argument type="service" id="mail_template.repository"/>
@@ -172,6 +177,12 @@
             <tag name="flow.storer"/>
         </service>
 
+        <service id="Shopware\Core\Content\Flow\Dispatching\Storer\ProductStorer">
+            <argument type="service" id="product.repository"/>
+
+            <tag name="flow.storer"/>
+        </service>
+
         <service id="Shopware\Core\Content\Flow\Dispatching\Storer\CustomerStorer">
             <argument type="service" id="customer.repository"/>
 
@@ -215,6 +226,10 @@
         </service>
 
         <service id="Shopware\Core\Content\Flow\Dispatching\Storer\ContactFormDataStorer">
+            <tag name="flow.storer"/>
+        </service>
+
+        <service id="Shopware\Core\Content\Flow\Dispatching\Storer\ReviewFormDataStorer">
             <tag name="flow.storer"/>
         </service>
 
@@ -272,6 +287,20 @@
 
         <service id="Shopware\Core\Content\Flow\Rule\OrderTagRule">
             <tag name="shopware.rule.definition"/>
+        </service>
+
+        <service id="Shopware\Core\Content\Flow\Rule\OrderDeliveryStatusRule">
+            <tag name="shopware.rule.definition"/>
+        </service>
+
+        <service id="Shopware\Core\Content\Flow\Aggregate\FlowTemplate\FlowTemplateDefinition">
+            <tag name="shopware.entity.definition" />
+        </service>
+
+        <service id="Shopware\Core\Content\Flow\DataAbstractionLayer\FieldSerializer\FlowTemplateConfigFieldSerializer">
+            <argument type="service" id="validator" />
+            <argument type="service" id="Shopware\Core\Framework\DataAbstractionLayer\DefinitionInstanceRegistry" />
+            <tag name="shopware.field_serializer"/>
         </service>
     </services>
 </container>

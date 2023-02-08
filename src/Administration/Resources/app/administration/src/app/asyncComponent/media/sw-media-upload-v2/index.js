@@ -62,11 +62,23 @@ export default {
             default: true,
         },
 
+        addFilesOnMultiselect: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
+
         // eslint-disable-next-line vue/require-default-prop
         label: {
             type: String,
             required: false,
             default: null,
+        },
+
+        buttonLabel: {
+            type: String,
+            required: false,
+            default: '',
         },
 
         defaultFolder: {
@@ -114,7 +126,19 @@ export default {
             default: false,
         },
 
+        privateFilesystem: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
+
         useFileData: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
+
+        required: {
             type: Boolean,
             required: false,
             default: false,
@@ -138,25 +162,17 @@ export default {
         },
 
         mediaRepository() {
-            return this.repositoryFactory.create('media');
+            return this.repositoryFactory.create('media', '', {
+                keepApiErrors: true,
+            });
         },
 
         showPreview() {
             return !this.multiSelect;
         },
 
-        hasPreviewFile() {
-            return this.preview !== null;
-        },
-
         hasOpenMediaButtonListener() {
             return Object.keys(this.$listeners).includes('media-upload-sidebar-open');
-        },
-
-        previewClass() {
-            return {
-                'has--preview': this.showPreview,
-            };
         },
 
         isDragActiveClass() {
@@ -181,6 +197,20 @@ export default {
 
         uploadUrlFeatureEnabled() {
             return this.isUploadUrlFeatureEnabled;
+        },
+
+        swFieldLabelClasses() {
+            return {
+                'is--required': this.required,
+            };
+        },
+
+        buttonFileUploadLabel() {
+            if (this.buttonLabel === '') {
+                return this.$tc('global.sw-media-upload-v2.buttonFileUpload');
+            }
+
+            return this.buttonLabel;
         },
     },
 
@@ -343,7 +373,7 @@ export default {
 
             try {
                 fileInfo = fileReader.getNameAndExtensionFromUrl(url);
-            } catch {
+            } catch (error) {
                 this.createNotificationError({
                     title: this.$tc('global.default.error'),
                     message: this.$tc('global.sw-media-upload-v2.notification.invalidUrl.message'),
@@ -359,7 +389,12 @@ export default {
             const targetEntity = this.getMediaEntityForUpload();
 
             await this.mediaRepository.save(targetEntity, Context.api);
-            this.mediaService.addUpload(this.uploadTag, { src: url, targetId: targetEntity.id, ...fileInfo });
+            this.mediaService.addUpload(this.uploadTag, {
+                src: url,
+                targetId: targetEntity.id,
+                isPrivate: targetEntity.private,
+                ...fileInfo,
+            });
 
             this.useFileUpload();
         },
@@ -384,6 +419,16 @@ export default {
                 this.mediaService.removeByTag(this.uploadTag);
                 newMediaFiles = [newMediaFiles.pop()];
                 this.preview = newMediaFiles[0];
+            } else {
+                if (!this.preview) {
+                    this.preview = [];
+                }
+
+                if (this.addFilesOnMultiselect) {
+                    this.preview = [...this.preview, ...newMediaFiles];
+                } else {
+                    this.preview = newMediaFiles;
+                }
             }
 
             const syncEntities = [];
@@ -393,7 +438,7 @@ export default {
                 const targetEntity = this.getMediaEntityForUpload();
                 syncEntities.push(targetEntity);
 
-                return { src: fileHandle, targetId: targetEntity.id, fileName, extension };
+                return { src: fileHandle, targetId: targetEntity.id, fileName, extension, isPrivate: targetEntity.private };
             });
 
             await this.mediaRepository.saveAll(syncEntities, Context.api);
@@ -403,6 +448,7 @@ export default {
         getMediaEntityForUpload() {
             const mediaItem = this.mediaRepository.create();
             mediaItem.mediaFolderId = this.mediaFolderId;
+            mediaItem.private = this.privateFilesystem;
 
             return mediaItem;
         },

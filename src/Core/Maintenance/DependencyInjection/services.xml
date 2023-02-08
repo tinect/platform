@@ -9,10 +9,12 @@
     <services>
         <defaults autowire="true"/>
 
+        <service id="Shopware\Core\Maintenance\System\Service\DatabaseConnectionFactory"/>
+
         <service id="Shopware\Core\Maintenance\System\Command\SystemInstallCommand">
             <argument>%kernel.project_dir%</argument>
             <argument type="service" id="Shopware\Core\Maintenance\System\Service\SetupDatabaseAdapter"/>
-
+            <argument type="service" id="Shopware\Core\Maintenance\System\Service\DatabaseConnectionFactory"/>
             <tag name="console.command"/>
         </service>
 
@@ -64,7 +66,7 @@
 
         <service id="Shopware\Core\Maintenance\System\Service\AppUrlVerifier">
             <argument type="service" id="shopware.maintenance.client"/>
-            <argument type="service" id="app.repository"/>
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
             <argument>%kernel.environment%</argument>
             <argument>%env(bool:APP_URL_CHECK_DISABLED)%</argument>
         </service>

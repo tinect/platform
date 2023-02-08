@@ -34,19 +34,14 @@ use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\System\Country\SalesChannel\CachedCountryStateRoute
  */
 class CachedCountryStateRouteTest extends TestCase
 {
-    /**
-     * @var AbstractCountryStateRoute&MockObject
-     */
-    private $decorated;
+    private MockObject&AbstractCountryStateRoute $decorated;
 
-    /**
-     * @var CacheInterface&MockObject
-     */
-    private $cache;
+    private MockObject&CacheInterface $cache;
 
     private EventDispatcher $eventDispatcher;
 

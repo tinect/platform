@@ -3,11 +3,10 @@
 namespace Shopware\Core\Content\Category\Tree;
 
 use Shopware\Core\Content\Category\CategoryEntity;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Struct\Struct;
 
-/**
- * @package content
- */
+#[Package('content')]
 class TreeItem extends Struct
 {
     /**
@@ -25,8 +24,10 @@ class TreeItem extends Struct
      */
     protected $children;
 
-    public function __construct(?CategoryEntity $category, array $children)
-    {
+    public function __construct(
+        ?CategoryEntity $category,
+        array $children
+    ) {
         $this->category = $category;
         $this->children = $children;
         $this->afterId = $category ? $category->getAfterCategoryId() : null;

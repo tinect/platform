@@ -10,7 +10,7 @@ import type { Cart, SalesChannelContext } from '../../order.types';
 const { Component, Mixin } = Shopware;
 
 /**
- * @private since v6.5.0
+ * @private
  */
 export default Component.wrapComponentConfig({
     template,
@@ -48,11 +48,11 @@ export default Component.wrapComponentConfig({
         },
 
         paymentMethodName(): string {
-            return this.context.paymentMethod.translated.distinguishableName;
+            return this.context.paymentMethod?.translated?.distinguishableName ?? '';
         },
 
         shippingMethodName(): string {
-            return this.context.shippingMethod.translated.name;
+            return this.context.shippingMethod.translated?.name ?? '';
         },
     },
 });

@@ -36,6 +36,7 @@
                 "general": {
                     "cardTitle": "Allgemeine Einstellungen",
                     "nameLabel": "Name",
+                    "namePlaceholder": "Namen eingeben ...",
                     "priorityLabel": "Priorität",
                     "validFromLabel": "Gültig ab",
                     "validFromPlaceholder": "Wähle ein Startdatum ...",
@@ -267,6 +268,13 @@
                         "labelPrice": "Wert"
                     }
                 }
+            }
+        }
+    },
+    "sw-privileges": {
+        "permissions": {
+            "promotion": {
+                "label": "Rabatte & Aktionen"
             }
         }
     }

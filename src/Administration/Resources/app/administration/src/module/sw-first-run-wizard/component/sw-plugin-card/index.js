@@ -3,6 +3,7 @@ import './sw-plugin-card.scss';
 
 /**
  * @package merchant-services
+ * @deprecated tag:v6.6.0 - Will be private
  */
 // eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
 export default {
@@ -53,6 +54,7 @@ export default {
             return this.extensionHelperService.downloadAndActivateExtension(pluginName)
                 .then(() => {
                     this.pluginIsSaveSuccessful = true;
+                    this.$emit('extension-activated');
                 })
                 .catch(error => {
                     this.showExtensionErrors(error);

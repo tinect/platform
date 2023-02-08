@@ -2,6 +2,9 @@
 
 namespace Shopware\Core\Framework\Update\Services\Archive\Entry;
 
+use Shopware\Core\Framework\Log\Package;
+
+#[Package('system-settings')]
 class Zip
 {
     /**
@@ -19,8 +22,10 @@ class Zip
      */
     protected $name;
 
-    public function __construct(\ZipArchive $stream, int $position)
-    {
+    public function __construct(
+        \ZipArchive $stream,
+        int $position
+    ) {
         $this->position = $position;
         $this->stream = $stream;
         $this->name = $stream->getNameIndex($position);

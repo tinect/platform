@@ -36,6 +36,7 @@
                 "general": {
                     "cardTitle": "General settings",
                     "nameLabel": "Name",
+                    "namePlaceholder": "Enter name...",
                     "priorityLabel": "Priority",
                     "validFromLabel": "Valid from",
                     "validFromPlaceholder": "Select start date...",
@@ -222,7 +223,7 @@
             }
         },
         "ruleSelect": {
-            "labelAddNewRule": "Add new rule"
+            "labelAddNewRule": "Create new rule"
         }
     },
     "sw-promotion": {
@@ -267,6 +268,13 @@
                         "labelPrice": "Value"
                     }
                 }
+            }
+        }
+    },
+    "sw-privileges": {
+        "permissions": {
+            "promotion": {
+                "label": "Promotions"
             }
         }
     }

@@ -8,16 +8,14 @@ use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCustomFieldsTrait;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
 use Shopware\Core\Framework\DataAbstractionLayer\TaxFreeConfig;
-use Shopware\Core\Framework\Feature;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\System\Country\Aggregate\CountryState\CountryStateCollection;
 use Shopware\Core\System\Country\Aggregate\CountryTranslation\CountryTranslationCollection;
 use Shopware\Core\System\Currency\Aggregate\CurrencyCountryRounding\CurrencyCountryRoundingCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelCollection;
 use Shopware\Core\System\Tax\Aggregate\TaxRule\TaxRuleCollection;
 
-/**
- * @package system-settings
- */
+#[Package('system-settings')]
 class CountryEntity extends Entity
 {
     use EntityIdTrait;
@@ -37,13 +35,6 @@ class CountryEntity extends Entity
      * @var int
      */
     protected $position;
-
-    /**
-     * @var bool
-     *
-     * @deprecated tag:v6.5.0 - Will be removed, use $customerTax->getEnabled() instead
-     */
-    protected $taxFree;
 
     /**
      * @var bool
@@ -69,13 +60,6 @@ class CountryEntity extends Entity
      * @var bool
      */
     protected $forceStateInRegistration;
-
-    /**
-     * @var bool
-     *
-     * @deprecated tag:v6.5.0 - Will be removed, use $companyTax->getEnabled() instead
-     */
-    protected $companyTaxFree;
 
     /**
      * @var bool
@@ -142,9 +126,9 @@ class CountryEntity extends Entity
 
     protected bool $checkAdvancedPostalCodePattern;
 
-    protected ?string $advancedPostalCodePattern;
+    protected ?string $advancedPostalCodePattern = null;
 
-    protected ?string $defaultPostalCodePattern;
+    protected ?string $defaultPostalCodePattern = null;
 
     /**
      * @var array<array<string, array<string, string>>>
@@ -179,32 +163,6 @@ class CountryEntity extends Entity
     public function setPosition(int $position): void
     {
         $this->position = $position;
-    }
-
-    /**
-     * @deprecated tag:v6.5.0 - Will be removed in version 6.5.0
-     */
-    public function getTaxFree(): bool
-    {
-        Feature::triggerDeprecationOrThrow(
-            'v6.5.0.0',
-            Feature::deprecatedMethodMessage(__CLASS__, __METHOD__, 'v6.5.0.0', 'CountryEntity->getCustomerTax->getEnabled()')
-        );
-
-        return $this->taxFree;
-    }
-
-    /**
-     * @deprecated tag:v6.5.0 - Will be removed in version 6.5.0
-     */
-    public function setTaxFree(bool $taxFree): void
-    {
-        Feature::triggerDeprecationOrThrow(
-            'v6.5.0.0',
-            Feature::deprecatedMethodMessage(__CLASS__, __METHOD__, 'v6.5.0.0', 'CountryEntity->getCustomerTax->setEnabled()')
-        );
-
-        $this->taxFree = $taxFree;
     }
 
     public function getActive(): bool
@@ -255,32 +213,6 @@ class CountryEntity extends Entity
     public function setForceStateInRegistration(bool $forceStateInRegistration): void
     {
         $this->forceStateInRegistration = $forceStateInRegistration;
-    }
-
-    /**
-     * @deprecated tag:v6.5.0 - Will be removed in version 6.5.0
-     */
-    public function getCompanyTaxFree(): bool
-    {
-        Feature::triggerDeprecationOrThrow(
-            'v6.5.0.0',
-            Feature::deprecatedMethodMessage(__CLASS__, __METHOD__, 'v6.5.0.0', 'CountryEntity->getCompanyTax->getEnabled()')
-        );
-
-        return $this->companyTaxFree;
-    }
-
-    /**
-     * @deprecated tag:v6.5.0 - Will be removed in version 6.5.0
-     */
-    public function setCompanyTaxFree(bool $companyTaxFree): void
-    {
-        Feature::triggerDeprecationOrThrow(
-            'v6.5.0.0',
-            Feature::deprecatedMethodMessage(__CLASS__, __METHOD__, 'v6.5.0.0', 'CountryEntity->getCompanyTax->setEnabled()')
-        );
-
-        $this->companyTaxFree = $companyTaxFree;
     }
 
     public function getCheckVatIdPattern(): bool

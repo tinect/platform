@@ -9,6 +9,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\RemoteAddressField;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\DataStack\KeyValuePair;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\EntityExistence;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\WriteParameterBag;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -16,6 +17,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * @internal
  */
+#[Package('core')]
 class RemoteAddressFieldSerializer extends AbstractFieldSerializer
 {
     protected const CONFIG_KEY = 'core.loginRegistration.customerIpAddressesNotAnonymously';
@@ -26,7 +28,7 @@ class RemoteAddressFieldSerializer extends AbstractFieldSerializer
     public function __construct(
         ValidatorInterface $validator,
         DefinitionInstanceRegistry $definitionRegistry,
-        private SystemConfigService $configService
+        private readonly SystemConfigService $configService
     ) {
         parent::__construct($validator, $definitionRegistry);
     }

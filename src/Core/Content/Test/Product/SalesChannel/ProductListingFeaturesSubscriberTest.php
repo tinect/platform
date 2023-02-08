@@ -263,6 +263,7 @@ class ProductListingFeaturesSubscriberTest extends TestCase
 
     /**
      * @dataProvider searchSortingProvider
+     *
      * @group slow
      *
      * @param array<string, string> $expectedFields
@@ -1317,7 +1318,7 @@ class ProductListingFeaturesSubscriberTest extends TestCase
             }
 
             if ($filter instanceof MultiFilter) {
-                $matches = array_merge($matches, $this->getFiltersOfField($filter->getQueries(), $field));
+                $matches = [...$matches, ...$this->getFiltersOfField($filter->getQueries(), $field)];
             }
         }
 

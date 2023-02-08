@@ -4,17 +4,22 @@ namespace Shopware\Core\Framework\DataAbstractionLayer\Search\Aggregation\Bucket
 
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Aggregation\Aggregation;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\Filter;
+use Shopware\Core\Framework\Log\Package;
 
 /**
  * @final
  */
+#[Package('core')]
 class FilterAggregation extends BucketAggregation
 {
     /**
      * @param Filter[] $filter
      */
-    public function __construct(string $name, Aggregation $aggregation, private array $filter)
-    {
+    public function __construct(
+        string $name,
+        Aggregation $aggregation,
+        private array $filter
+    ) {
         parent::__construct($name, '', $aggregation);
     }
 

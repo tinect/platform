@@ -2,6 +2,7 @@
 
 namespace Shopware\Storefront\Theme\Command;
 
+use Shopware\Core\Framework\Log\Package;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -15,25 +16,21 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
     name: 'theme:create',
     description: 'Create a new theme',
 )]
+#[Package('storefront')]
 class ThemeCreateCommand extends Command
 {
-    private string $projectDir;
-
     /**
      * @internal
      */
-    public function __construct(string $projectDir)
+    public function __construct(private readonly string $projectDir)
     {
         parent::__construct();
-
-        $this->projectDir = $projectDir;
     }
 
     protected function configure(): void
     {
         $this
-            ->addArgument('theme-name', InputArgument::OPTIONAL, 'Theme name')
-            ->setDescription('Creates a theme skeleton');
+            ->addArgument('theme-name', InputArgument::OPTIONAL, 'Theme name');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -46,13 +43,13 @@ class ThemeCreateCommand extends Command
             $themeName = $this->getHelper('question')->ask($input, $output, $question);
         }
 
-        if (!ctype_upper($themeName[0])) {
+        if (!ctype_upper((string) $themeName[0])) {
             $io->error('The name must start with an uppercase character');
 
             return self::FAILURE;
         }
 
-        if (preg_match('/^[A-Za-z]\w{3,}$/', $themeName) !== 1) {
+        if (preg_match('/^[A-Za-z]\w{3,}$/', (string) $themeName) !== 1) {
             $io->error('Theme name is too short (min 4 characters), contains invalid characters');
 
             return self::FAILURE;
@@ -61,7 +58,7 @@ class ThemeCreateCommand extends Command
         $snakeCaseName = (new CamelCaseToSnakeCaseNameConverter())->normalize($themeName);
         $snakeCaseName = str_replace('_', '-', $snakeCaseName);
 
-        $pluginName = ucfirst($themeName);
+        $pluginName = ucfirst((string) $themeName);
 
         $directory = $this->projectDir . '/custom/plugins/' . $pluginName;
 

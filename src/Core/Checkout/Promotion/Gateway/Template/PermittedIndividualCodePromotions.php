@@ -5,10 +5,9 @@ namespace Shopware\Core\Checkout\Promotion\Gateway\Template;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
+use Shopware\Core\Framework\Log\Package;
 
-/**
- * @package checkout
- */
+#[Package('checkout')]
 class PermittedIndividualCodePromotions extends MultiFilter
 {
     /**
@@ -16,8 +15,10 @@ class PermittedIndividualCodePromotions extends MultiFilter
      * sales channel context, that do require an individual code
      * and have not yet been used in an order.
      */
-    public function __construct(array $codes, string $salesChannelId)
-    {
+    public function __construct(
+        array $codes,
+        string $salesChannelId
+    ) {
         $activeDateRange = new ActiveDateRange();
 
         parent::__construct(

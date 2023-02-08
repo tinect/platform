@@ -7,27 +7,20 @@ use Shopware\Core\Framework\App\FlowAction\FlowAction;
 use Shopware\Core\Framework\App\Lifecycle\AbstractAppLoader;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Uuid\Uuid;
 
 /**
  * @internal
  */
+#[Package('core')]
 class FlowActionPersister
 {
-    private EntityRepository $flowActionsRepository;
-
-    private AbstractAppLoader $appLoader;
-
-    private Connection $connection;
-
     public function __construct(
-        EntityRepository $flowActionsRepository,
-        AbstractAppLoader $appLoader,
-        Connection $connection
+        private readonly EntityRepository $flowActionsRepository,
+        private readonly AbstractAppLoader $appLoader,
+        private readonly Connection $connection
     ) {
-        $this->flowActionsRepository = $flowActionsRepository;
-        $this->appLoader = $appLoader;
-        $this->connection = $connection;
     }
 
     public function updateActions(FlowAction $flowAction, string $appId, Context $context, string $defaultLocale): void
@@ -69,9 +62,7 @@ class FlowActionPersister
             return;
         }
 
-        $ids = array_map(static function (string $id): array {
-            return ['id' => $id];
-        }, array_values($ids));
+        $ids = array_map(static fn (string $id): array => ['id' => $id], array_values($ids));
 
         $this->flowActionsRepository->delete($ids, $context);
     }

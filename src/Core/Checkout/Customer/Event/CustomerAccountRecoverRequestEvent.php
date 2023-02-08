@@ -18,12 +18,11 @@ use Shopware\Core\Framework\Event\EventData\ScalarValueType;
 use Shopware\Core\Framework\Event\MailAware;
 use Shopware\Core\Framework\Event\SalesChannelAware;
 use Shopware\Core\Framework\Event\ShopwareSalesChannelEvent;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * @package customer-order
- */
+#[Package('customer-order')]
 class CustomerAccountRecoverRequestEvent extends Event implements SalesChannelAware, ShopwareSalesChannelEvent, CustomerAware, MailAware, CustomerRecoveryAware, ResetUrlAware, ShopNameAware
 {
     public const EVENT_NAME = 'customer.recovery.request';
@@ -53,8 +52,11 @@ class CustomerAccountRecoverRequestEvent extends Event implements SalesChannelAw
      */
     private $mailRecipientStruct;
 
-    public function __construct(SalesChannelContext $salesChannelContext, CustomerRecoveryEntity $customerRecovery, string $resetUrl)
-    {
+    public function __construct(
+        SalesChannelContext $salesChannelContext,
+        CustomerRecoveryEntity $customerRecovery,
+        string $resetUrl
+    ) {
         $this->salesChannelContext = $salesChannelContext;
         $this->customerRecovery = $customerRecovery;
         $this->resetUrl = $resetUrl;

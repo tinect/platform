@@ -9,6 +9,7 @@ use Shopware\Core\Content\Product\Aggregate\ProductManufacturer\ProductManufactu
 use Shopware\Core\Content\Product\Aggregate\ProductVisibility\ProductVisibilityDefinition;
 use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Content\Product\SalesChannel\Listing\ProductListingRoute;
+use Shopware\Core\Content\Product\State;
 use Shopware\Core\Content\Test\Product\ProductBuilder;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Api\Context\SystemSource;
@@ -85,6 +86,7 @@ use function array_combine;
 
 /**
  * @internal
+ *
  * @group skip-paratest
  *
  * @package system-settings
@@ -477,6 +479,7 @@ class ElasticsearchProductTest extends TestCase
 
     /**
      * @depends testIndexing
+     *
      * @dataProvider multiFilterWithOneToManyRelationProvider
      *
      * @param array<string> $expectedProducts
@@ -493,9 +496,7 @@ class ElasticsearchProductTest extends TestCase
             $products = $searcher->search($this->productDefinition, $criteria, $this->context);
 
             static::assertCount(\count($expectedProducts), $products->getIds());
-            static::assertEquals(\array_map(function ($item) use ($data) {
-                return $data->get($item);
-            }, $expectedProducts), $products->getIds());
+            static::assertEquals(\array_map(fn ($item) => $data->get($item), $expectedProducts), $products->getIds());
         } catch (\Exception $e) {
             static::tearDown();
 
@@ -1768,6 +1769,7 @@ class ElasticsearchProductTest extends TestCase
 
     /**
      * @depends      testIndexing
+     *
      * @dataProvider dateHistogramProvider
      */
     public function testDateHistogram(DateHistogramCase $case, IdsCollection $data): void
@@ -2281,10 +2283,7 @@ class ElasticsearchProductTest extends TestCase
             $searcher = $this->createEntitySearcher();
 
             foreach ($cases as $message => $case) {
-                $affected = array_merge(
-                    $ids->prefixed('p.'),
-                    $ids->prefixed('v.')
-                );
+                $affected = [...$ids->prefixed('p.'), ...$ids->prefixed('v.')];
                 $criteria = new Criteria(array_values($affected));
                 $criteria->addState(Criteria::STATE_ELASTICSEARCH_AWARE);
 
@@ -2553,10 +2552,7 @@ class ElasticsearchProductTest extends TestCase
         $context = $this->context;
 
         try {
-            $affected = array_merge(
-                $ids->prefixed('p.'),
-                $ids->prefixed('v.')
-            );
+            $affected = [...$ids->prefixed('p.'), ...$ids->prefixed('v.')];
             $criteria = new Criteria(array_values($affected));
             $criteria->addState(Criteria::STATE_ELASTICSEARCH_AWARE);
             $criteria->addFilter(new OrFilter([
@@ -2627,10 +2623,8 @@ class ElasticsearchProductTest extends TestCase
 
                 $result = $searcher->search($this->productDefinition, $criteria, $context->getContext());
 
-                static::assertCount(\count($case['ids']), $result->getIds(), sprintf('Case `%s` failed', $message));
-                static::assertEquals(array_map(function (string $id) use ($ids) {
-                    return $ids->get($id);
-                }, $case['ids']), $result->getIds(), sprintf('Case `%s` failed', $message));
+                static::assertCount(is_countable($case['ids']) ? \count($case['ids']) : 0, $result->getIds(), sprintf('Case `%s` failed', $message));
+                static::assertEquals(array_map(fn (string $id) => $ids->get($id), $case['ids']), $result->getIds(), sprintf('Case `%s` failed', $message));
             }
         } catch (\Exception $e) {
             static::tearDown();
@@ -3064,6 +3058,31 @@ class ElasticsearchProductTest extends TestCase
     /**
      * @depends testIndexing
      */
+    public function testFilterByStates(IdsCollection $ids): void
+    {
+        $context = $this->context;
+
+        try {
+            $criteria = new Criteria();
+            $criteria->addState(Criteria::STATE_ELASTICSEARCH_AWARE);
+            $criteria->addFilter(new EqualsAnyFilter('states', [State::IS_DOWNLOAD]));
+
+            $searcher = $this->createEntitySearcher();
+
+            $result = $searcher->search($this->productDefinition, $criteria, $context)->getIds();
+
+            static::assertCount(1, $result);
+            static::assertSame($ids->get('s-4'), $result[0]);
+        } catch (\Exception $e) {
+            static::tearDown();
+
+            throw $e;
+        }
+    }
+
+    /**
+     * @depends testIndexing
+     */
     public function testEmptyEntityAggregation(IdsCollection $ids): void
     {
         $criteria = new Criteria();
@@ -3146,6 +3165,7 @@ class ElasticsearchProductTest extends TestCase
 
     /**
      * @depends testIndexing
+     *
      * @dataProvider rangeAggregationDataProvider
      *
      * @param array<int, array<string, string|float>> $rangesDefinition
@@ -3183,10 +3203,7 @@ class ElasticsearchProductTest extends TestCase
     private function assertSorting(string $message, IdsCollection $ids, SalesChannelContext $context, array $case, string $direction): void
     {
         $criteria = new Criteria(
-            array_merge(
-                $ids->prefixed('p.'),
-                $ids->prefixed('v.'),
-            )
+            [...$ids->prefixed('p.'), ...$ids->prefixed('v.')]
         );
         $criteria->addState(Criteria::STATE_ELASTICSEARCH_AWARE);
 
@@ -3865,6 +3882,15 @@ class ElasticsearchProductTest extends TestCase
                 ->name('Default-4')
                 ->price(1)
                 ->visibility(Defaults::SALES_CHANNEL_TYPE_STOREFRONT, ProductVisibilityDefinition::VISIBILITY_ALL)
+                ->add('downloads', [
+                    [
+                        'media' => [
+                            'fileName' => 'foo',
+                            'fileExtension' => 'bar',
+                            'private' => true,
+                        ],
+                    ],
+                ])
                 ->build(),
             (new ProductBuilder($this->ids, 'variant-1'))
                 ->name('Main-Product-1')

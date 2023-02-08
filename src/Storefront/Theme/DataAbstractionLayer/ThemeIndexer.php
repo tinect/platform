@@ -10,6 +10,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Indexing\EntityIndexer;
 use Shopware\Core\Framework\DataAbstractionLayer\Indexing\EntityIndexingMessage;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Storefront\Theme\Event\ThemeIndexerEvent;
@@ -19,29 +20,18 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * @phpstan-import-type Offset from IterableQuery
  */
+#[Package('core')]
 class ThemeIndexer extends EntityIndexer
 {
-    private IteratorFactory $iteratorFactory;
-
-    private EntityRepository $repository;
-
-    private EventDispatcherInterface $eventDispatcher;
-
-    private Connection $connection;
-
     /**
      * @internal
      */
     public function __construct(
-        IteratorFactory $iteratorFactory,
-        EntityRepository $repository,
-        Connection $connection,
-        EventDispatcherInterface $eventDispatcher
+        private readonly IteratorFactory $iteratorFactory,
+        private readonly EntityRepository $repository,
+        private readonly Connection $connection,
+        private readonly EventDispatcherInterface $eventDispatcher
     ) {
-        $this->iteratorFactory = $iteratorFactory;
-        $this->repository = $repository;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->connection = $connection;
     }
 
     public function getName(): string

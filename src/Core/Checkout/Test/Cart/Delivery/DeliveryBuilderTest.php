@@ -17,6 +17,7 @@ use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Defaults;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\DeliveryTime\DeliveryTimeEntity;
@@ -25,10 +26,9 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\Test\TestDefaults;
 
 /**
- * @package checkout
- *
  * @internal
  */
+#[Package('checkout')]
 class DeliveryBuilderTest extends TestCase
 {
     use IntegrationTestBehaviour;
@@ -56,6 +56,17 @@ class DeliveryBuilderTest extends TestCase
 
         $this->context = $this->getContainer()->get(SalesChannelContextFactory::class)
             ->create(Uuid::randomHex(), TestDefaults::SALES_CHANNEL);
+    }
+
+    public function testIndependenceOfLineItemAndDeliveryPositionPrices(): void
+    {
+        $cart = $this->createCart();
+        $firstDelivery = $this->getDeliveries($cart)->first();
+        static::assertNotNull($firstDelivery);
+
+        $firstPosition = $firstDelivery->getPositions()->first();
+
+        static::assertNotSame($firstPosition->getPrice(), $cart->getLineItems()->first()->getPrice());
     }
 
     public function testEmptyCart(): void
@@ -95,7 +106,7 @@ class DeliveryBuilderTest extends TestCase
 
     private function createCart(bool $withoutLineItems = false): Cart
     {
-        $cart = new Cart('test', 'test');
+        $cart = new Cart('test');
         if ($withoutLineItems) {
             return $cart;
         }

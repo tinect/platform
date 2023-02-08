@@ -4,10 +4,12 @@ namespace Shopware\Elasticsearch\Framework;
 
 use OpenSearchDSL\Aggregation\AbstractAggregation;
 use OpenSearchDSL\Aggregation\Type\BucketingTrait;
+use Shopware\Core\Framework\Log\Package;
 
 /**
  * @internal
  */
+#[Package('core')]
 class ElasticsearchRangeAggregation extends AbstractAggregation
 {
     use BucketingTrait;
@@ -20,8 +22,11 @@ class ElasticsearchRangeAggregation extends AbstractAggregation
     /**
      * @param array<int, array<string, float>> $ranges
      */
-    public function __construct(string $name, string $field, array $ranges)
-    {
+    public function __construct(
+        string $name,
+        string $field,
+        array $ranges
+    ) {
         parent::__construct($name);
 
         $this->setField($field);

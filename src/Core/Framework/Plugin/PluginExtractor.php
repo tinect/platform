@@ -2,30 +2,20 @@
 
 namespace Shopware\Core\Framework\Plugin;
 
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Plugin\Exception\PluginExtractionException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @package core
- *
  * @internal
  */
+#[Package('core')]
 class PluginExtractor
 {
-    /**
-     * @var array
-     */
-    private $extensionDirectories;
-
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
-
-    public function __construct(array $extensionDirectories, Filesystem $filesystem)
-    {
-        $this->extensionDirectories = $extensionDirectories;
-        $this->filesystem = $filesystem;
+    public function __construct(
+        private readonly array $extensionDirectories,
+        private readonly Filesystem $filesystem
+    ) {
     }
 
     /**
@@ -85,7 +75,7 @@ class PluginExtractor
     {
         $entry = $archive->statIndex(0);
 
-        return explode(\DIRECTORY_SEPARATOR, $entry['name'])[0];
+        return explode(\DIRECTORY_SEPARATOR, (string) $entry['name'])[0];
     }
 
     /**

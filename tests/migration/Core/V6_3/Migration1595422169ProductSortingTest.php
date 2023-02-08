@@ -15,6 +15,7 @@ use Shopware\Tests\Migration\MigrationTestTrait;
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\Migration\V6_3\Migration1595422169AddProductSorting
  *
  * @phpstan-type Sorting array{url_key: string, fields:string, priority: string, label: string}
@@ -79,11 +80,11 @@ class Migration1595422169ProductSortingTest extends TestCase
         $actual = $this->fetchSortings();
 
         foreach ($actual as $index => $sorting) {
-            $actual[$index]['fields'] = json_decode($sorting['fields'], true);
+            $actual[$index]['fields'] = json_decode((string) $sorting['fields'], true, 512, \JSON_THROW_ON_ERROR);
         }
 
         foreach ($sortings as $index => $sorting) {
-            $sortings[$index]['fields'] = json_decode($sorting['fields'], true);
+            $sortings[$index]['fields'] = json_decode((string) $sorting['fields'], true, 512, \JSON_THROW_ON_ERROR);
         }
 
         static::assertEquals($sortings, $actual);

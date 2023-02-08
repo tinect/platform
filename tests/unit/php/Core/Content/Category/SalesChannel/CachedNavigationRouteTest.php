@@ -35,19 +35,14 @@ use Symfony\Contracts\Cache\CacheInterface;
  * @internal
  *
  * @package content
+ *
  * @covers \Shopware\Core\Content\Category\SalesChannel\CachedNavigationRoute
  */
 class CachedNavigationRouteTest extends TestCase
 {
-    /**
-     * @var AbstractNavigationRoute&MockObject
-     */
-    private $decorated;
+    private MockObject&AbstractNavigationRoute $decorated;
 
-    /**
-     * @var CacheInterface&MockObject
-     */
-    private $cache;
+    private MockObject&CacheInterface $cache;
 
     private EventDispatcher $eventDispatcher;
 

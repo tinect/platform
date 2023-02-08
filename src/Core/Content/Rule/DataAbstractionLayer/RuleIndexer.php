@@ -14,6 +14,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEve
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Indexing\EntityIndexer;
 use Shopware\Core\Framework\DataAbstractionLayer\Indexing\EntityIndexingMessage;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Plugin\Event\PluginPostActivateEvent;
 use Shopware\Core\Framework\Plugin\Event\PluginPostDeactivateEvent;
 use Shopware\Core\Framework\Plugin\Event\PluginPostInstallEvent;
@@ -24,49 +25,27 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
- * @package business-ops
- *
- * @deprecated tag:v6.5.0 - reason:becomes-internal - EventSubscribers will become internal in v6.5.0
+ * @internal
  */
+#[Package('business-ops')]
 class RuleIndexer extends EntityIndexer implements EventSubscriberInterface
 {
-    public const PAYLOAD_UPDATER = 'rule.payload';
+    final public const PAYLOAD_UPDATER = 'rule.payload';
 
-    public const AREA_UPDATER = 'rule.area';
-
-    private IteratorFactory $iteratorFactory;
-
-    private Connection $connection;
-
-    private EntityRepository $repository;
-
-    private RulePayloadUpdater $payloadUpdater;
-
-    private EventDispatcherInterface $eventDispatcher;
-
-    private CartRuleLoader $cartRuleLoader;
-
-    private RuleAreaUpdater $areaUpdater;
+    final public const AREA_UPDATER = 'rule.area';
 
     /**
      * @internal
      */
     public function __construct(
-        Connection $connection,
-        IteratorFactory $iteratorFactory,
-        EntityRepository $repository,
-        RulePayloadUpdater $payloadUpdater,
-        RuleAreaUpdater $areaUpdater,
-        CartRuleLoader $cartRuleLoader,
-        EventDispatcherInterface $eventDispatcher
+        private readonly Connection $connection,
+        private readonly IteratorFactory $iteratorFactory,
+        private readonly EntityRepository $repository,
+        private readonly RulePayloadUpdater $payloadUpdater,
+        private readonly RuleAreaUpdater $areaUpdater,
+        private readonly CartRuleLoader $cartRuleLoader,
+        private readonly EventDispatcherInterface $eventDispatcher
     ) {
-        $this->iteratorFactory = $iteratorFactory;
-        $this->repository = $repository;
-        $this->connection = $connection;
-        $this->payloadUpdater = $payloadUpdater;
-        $this->areaUpdater = $areaUpdater;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->cartRuleLoader = $cartRuleLoader;
     }
 
     public function getName(): string

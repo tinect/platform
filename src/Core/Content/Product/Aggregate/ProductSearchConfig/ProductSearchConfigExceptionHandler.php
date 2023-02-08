@@ -4,7 +4,9 @@ namespace Shopware\Core\Content\Product\Aggregate\ProductSearchConfig;
 
 use Shopware\Core\Content\Product\Exception\DuplicateProductSearchConfigLanguageException;
 use Shopware\Core\Framework\DataAbstractionLayer\Dbal\ExceptionHandlerInterface;
+use Shopware\Core\Framework\Log\Package;
 
+#[Package('inventory')]
 class ProductSearchConfigExceptionHandler implements ExceptionHandlerInterface
 {
     public function getPriority(): int

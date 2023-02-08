@@ -2,9 +2,12 @@
 
 namespace Shopware\Core\Framework\DataAbstractionLayer\Search\Filter;
 
+use Shopware\Core\Framework\Log\Package;
+
 /**
  * @internal
  */
+#[Package('core')]
 abstract class SingleFieldFilter extends Filter
 {
     protected bool $isPrimary = false;

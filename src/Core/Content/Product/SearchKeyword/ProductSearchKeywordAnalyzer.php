@@ -8,22 +8,20 @@ use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Term\Filter\AbstractTokenFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Term\TokenizerInterface;
+use Shopware\Core\Framework\Log\Package;
 
+#[Package('inventory')]
 class ProductSearchKeywordAnalyzer implements ProductSearchKeywordAnalyzerInterface
 {
     private const MAXIMUM_KEYWORD_LENGTH = 500;
 
-    private TokenizerInterface $tokenizer;
-
-    private AbstractTokenFilter $tokenFilter;
-
     /**
      * @internal
      */
-    public function __construct(TokenizerInterface $tokenizer, AbstractTokenFilter $tokenFilter)
-    {
-        $this->tokenizer = $tokenizer;
-        $this->tokenFilter = $tokenFilter;
+    public function __construct(
+        private readonly TokenizerInterface $tokenizer,
+        private readonly AbstractTokenFilter $tokenFilter
+    ) {
     }
 
     /**
@@ -41,9 +39,7 @@ class ProductSearchKeywordAnalyzer implements ProductSearchKeywordAnalyzerInterf
             $values = array_filter($this->resolveEntityValue($product, $path));
 
             if ($isTokenize) {
-                $nonScalarValues = array_filter($values, function ($value) {
-                    return !\is_scalar($value);
-                });
+                $nonScalarValues = array_filter($values, fn ($value) => !\is_scalar($value));
 
                 if ($nonScalarValues !== []) {
                     continue;
@@ -111,7 +107,7 @@ class ProductSearchKeywordAnalyzer implements ProductSearchKeywordAnalyzerInterf
                         $part .= sprintf('.%s', implode('.', $parts));
                     }
                     foreach ($value as $item) {
-                        $values = array_merge($values, $this->resolveEntityValue($item, $part));
+                        $values = [...$values, ...$this->resolveEntityValue($item, $part)];
                     }
 
                     return $values;

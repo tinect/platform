@@ -2,9 +2,12 @@
 
 namespace Shopware\Core\Framework\DataAbstractionLayer\Dbal;
 
+use Shopware\Core\Framework\Log\Package;
+
 /**
  * @internal
  */
+#[Package('core')]
 class ExceptionHandlerRegistry
 {
     /**

@@ -11,6 +11,7 @@ use Shopware\Core\Checkout\Test\Cart\Promotion\Helpers\Traits\PromotionIntegrati
 use Shopware\Core\Checkout\Test\Cart\Promotion\Helpers\Traits\PromotionTestFixtureBehaviour;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Util\Random;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -18,10 +19,9 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
 use Shopware\Core\Test\TestDefaults;
 
 /**
- * @package checkout
- *
  * @internal
  */
+#[Package('checkout')]
 class PromotionFixedPriceCalculationTest extends TestCase
 {
     use IntegrationTestBehaviour;
@@ -51,7 +51,6 @@ class PromotionFixedPriceCalculationTest extends TestCase
      * Our price would be 40 EUR. It must not matter how many items and products we have in there,
      * the final price should always be 40 EUR.
      *
-     * @test
      * @group promotions
      */
     public function testFixedUnitDiscount(): void
@@ -86,7 +85,6 @@ class PromotionFixedPriceCalculationTest extends TestCase
      * if a automatic fixed price promotion (no code necessary) discount is removed
      * it should not be added again. This is a new feature - to block automatic promotions.
      *
-     * @test
      * @group promotions
      */
     public function testRemoveOfFixedUnitPromotionsWithoutCode(): void
@@ -134,7 +132,6 @@ class PromotionFixedPriceCalculationTest extends TestCase
      * But for your currency defined price, we use 65 as fixed price instead.
      * Our test needs to verify that we use 30 EUR, and end with a product sum of 65 EUR in the end.
      *
-     * @test
      * @group promotions
      */
     public function testFixedUnitPriceDiscountWithCurrencyPrices(): void
@@ -179,7 +176,6 @@ class PromotionFixedPriceCalculationTest extends TestCase
      * This means that our final cart price should be 100 EUR and the discount need to be calculated correctly
      * by considering the existing cart items.
      *
-     * @test
      * @group promotions
      */
     public function testFixedCartPriceDiscount(): void

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Shopware\Tests\Unit\Core\Framework\Test\Store\Services;
+namespace Shopware\Tests\Unit\Core\Framework\Store\Services;
 
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -13,6 +13,7 @@ use Shopware\Core\Framework\Store\Services\VerifyResponseSignatureMiddleware;
  * @package merchant-services
  *
  * @internal
+ *
  * @covers \Shopware\Core\Framework\Store\Services\VerifyResponseSignatureMiddleware
  */
 class VerifyResponseSignatureMiddlewareTest extends TestCase
@@ -82,7 +83,7 @@ class VerifyResponseSignatureMiddlewareTest extends TestCase
     }
 
     /**
-     * @return OpenSSLVerifier|MockObject
+     * @return OpenSSLVerifier&MockObject
      */
     private function createOpenSslVerifier(bool $isSystemSupported, bool $isValid): MockObject
     {

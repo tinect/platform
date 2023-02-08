@@ -3,25 +3,23 @@
 namespace Shopware\Core\Checkout\Customer\Rule;
 
 use Shopware\Core\Checkout\CheckoutRuleScope;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Rule\Rule;
 use Shopware\Core\Framework\Rule\RuleConfig;
 use Shopware\Core\Framework\Rule\RuleConstraints;
 use Shopware\Core\Framework\Rule\RuleScope;
 
-/**
- * @package business-ops
- */
+#[Package('business-ops')]
 class IsActiveRule extends Rule
 {
-    protected bool $isActive;
+    final public const RULE_NAME = 'customerIsActive';
 
     /**
      * @internal
      */
-    public function __construct(bool $isActive = false)
+    public function __construct(protected bool $isActive = false)
     {
         parent::__construct();
-        $this->isActive = $isActive;
     }
 
     public function match(RuleScope $scope): bool
@@ -36,11 +34,6 @@ class IsActiveRule extends Rule
         }
 
         return $this->isActive === $customer->getActive();
-    }
-
-    public function getName(): string
-    {
-        return 'customerIsActive';
     }
 
     public function getConfig(): RuleConfig

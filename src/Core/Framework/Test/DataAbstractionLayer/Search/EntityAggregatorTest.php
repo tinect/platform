@@ -43,6 +43,7 @@ use Shopware\Core\System\Tax\TaxDefinition;
 
 /**
  * @internal
+ *
  * @group slow
  */
 class EntityAggregatorTest extends TestCase
@@ -1080,6 +1081,7 @@ class EntityAggregatorTest extends TestCase
 
     /**
      * @dataProvider dateHistogramProvider
+     *
      * @group slow
      */
     public function testDateHistogram(DateHistogramCase $case): void
@@ -1329,9 +1331,7 @@ class EntityAggregatorTest extends TestCase
      */
     private function getProduct(string $key, string $taxKey, string $manufacturerKey, float $price, array $categoryKeys, string $releaseDate): array
     {
-        $categories = array_map(function (string $categoryKey) {
-            return ['id' => $this->ids->create($categoryKey), 'name' => $categoryKey];
-        }, $categoryKeys);
+        $categories = array_map(fn (string $categoryKey) => ['id' => $this->ids->create($categoryKey), 'name' => $categoryKey], $categoryKeys);
 
         $data = [
             'id' => $this->ids->create($key),

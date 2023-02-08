@@ -3,6 +3,7 @@
 namespace Shopware\Core\Content\Flow\Rule;
 
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Rule\FlowRule;
 use Shopware\Core\Framework\Rule\RuleComparison;
 use Shopware\Core\Framework\Rule\RuleConfig;
@@ -10,33 +11,21 @@ use Shopware\Core\Framework\Rule\RuleConstraints;
 use Shopware\Core\Framework\Rule\RuleScope;
 use Shopware\Core\System\Tag\TagDefinition;
 
-/**
- * @package business-ops
- */
+#[Package('business-ops')]
 class OrderTagRule extends FlowRule
 {
-    protected string $operator;
-
-    /**
-     * @var string[]|null
-     */
-    protected ?array $identifiers;
+    final public const RULE_NAME = 'orderTag';
 
     /**
      * @internal
      *
-     * @param string[]|null $identifiers
+     * @param list<string>|null $identifiers
      */
-    public function __construct(string $operator = self::OPERATOR_EQ, ?array $identifiers = null)
-    {
+    public function __construct(
+        protected string $operator = self::OPERATOR_EQ,
+        protected ?array $identifiers = null
+    ) {
         parent::__construct();
-        $this->operator = $operator;
-        $this->identifiers = $identifiers;
-    }
-
-    public function getName(): string
-    {
-        return 'orderTag';
     }
 
     public function match(RuleScope $scope): bool
@@ -71,7 +60,7 @@ class OrderTagRule extends FlowRule
     }
 
     /**
-     * @return string[]
+     * @return list<string>
      */
     private function extractTagIds(OrderEntity $order): array
     {

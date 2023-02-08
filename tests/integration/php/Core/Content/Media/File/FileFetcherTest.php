@@ -17,13 +17,14 @@ use Symfony\Component\HttpFoundation\Request;
  * @internal
  *
  * @package content
+ *
  * @group needsWebserver
  *
  * @covers \Shopware\Core\Content\Media\File\FileFetcher
  */
 class FileFetcherTest extends TestCase
 {
-    public const TEST_IMAGE = __DIR__ . '/../../../../../../../src/Core/Content/Test/Media/fixtures/shopware-logo.png';
+    final public const TEST_IMAGE = __DIR__ . '/../../../../../../../src/Core/Content/Test/Media/fixtures/shopware-logo.png';
 
     private FileFetcher $fileFetcher;
 

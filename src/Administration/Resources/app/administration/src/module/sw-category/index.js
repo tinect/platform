@@ -11,7 +11,6 @@ Shopware.Component.register('sw-category-tree', () => import('./component/sw-cat
 Shopware.Component.register('sw-landing-page-tree', () => import('./component/sw-landing-page-tree'));
 Shopware.Component.register('sw-landing-page-view', () => import('./component/sw-landing-page-view'));
 Shopware.Component.register('sw-category-view', () => import('./component/sw-category-view'));
-Shopware.Component.register('sw-category-sales-channel-card', () => import('./component/sw-category-sales-channel-card'));
 Shopware.Component.register('sw-category-link-settings', () => import('./component/sw-category-link-settings'));
 Shopware.Component.register('sw-category-layout-card', () => import('./component/sw-category-layout-card'));
 Shopware.Component.register('sw-category-detail-menu', () => import('./component/sw-category-detail-menu'));
@@ -23,6 +22,7 @@ Shopware.Component.extend('sw-category-sales-channel-multi-select', 'sw-entity-m
 Shopware.Component.register('sw-category-detail', () => import('./page/sw-category-detail'));
 Shopware.Component.register('sw-category-detail-base', () => import('./view/sw-category-detail-base'));
 Shopware.Component.register('sw-category-detail-cms', () => import('./view/sw-category-detail-cms'));
+Shopware.Component.register('sw-category-detail-custom-entity', () => import('./view/sw-category-detail-custom-entity'));
 Shopware.Component.register('sw-landing-page-detail-base', () => import('./view/sw-landing-page-detail-base'));
 Shopware.Component.register('sw-landing-page-detail-cms', () => import('./view/sw-landing-page-detail-cms'));
 Shopware.Component.register('sw-category-detail-products', () => import('./view/sw-category-detail-products'));
@@ -111,6 +111,14 @@ Module.register('sw-category', {
                 products: {
                     component: 'sw-category-detail-products',
                     path: 'products',
+                    meta: {
+                        parentPath: 'sw.category.index',
+                        privilege: 'category.viewer',
+                    },
+                },
+                customEntity: {
+                    component: 'sw-category-detail-custom-entity',
+                    path: 'customEntity',
                     meta: {
                         parentPath: 'sw.category.index',
                         privilege: 'category.viewer',

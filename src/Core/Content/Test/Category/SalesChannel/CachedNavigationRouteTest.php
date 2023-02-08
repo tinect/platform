@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @internal
+ *
  * @group cache
  * @group store-api
  */
@@ -86,9 +87,7 @@ class CachedNavigationRouteTest extends TestCase
         yield 'Test root call' => [
             $ids,
             2,
-            function (IdsCollection $ids): string {
-                return $ids->get('navigation');
-            },
+            fn (IdsCollection $ids): string => $ids->get('navigation'),
             function (IdsCollection $ids): void {
             },
             1,
@@ -97,9 +96,7 @@ class CachedNavigationRouteTest extends TestCase
         yield 'Test when active inside base navigation' => [
             $ids,
             3,
-            function (IdsCollection $ids): string {
-                return $ids->get('cat-1.1.1');
-            },
+            fn (IdsCollection $ids): string => $ids->get('cat-1.1.1'),
             function (IdsCollection $ids): void {
             },
             1,
@@ -108,9 +105,7 @@ class CachedNavigationRouteTest extends TestCase
         yield 'Test when active outside base navigation' => [
             $ids,
             1,
-            function (IdsCollection $ids): string {
-                return $ids->get('cat-1.1.1');
-            },
+            fn (IdsCollection $ids): string => $ids->get('cat-1.1.1'),
             function (IdsCollection $ids): void {
             },
             2,
@@ -119,9 +114,7 @@ class CachedNavigationRouteTest extends TestCase
         yield 'Test invalidated if category disabled' => [
             $ids,
             1,
-            function (IdsCollection $ids): string {
-                return $ids->get('cat-1.1.1');
-            },
+            fn (IdsCollection $ids): string => $ids->get('cat-1.1.1'),
             function (IdsCollection $ids): void {
                 $this->getContainer()->get('category.repository')->update([
                     ['id' => $ids->get('cat-1.2.0'), 'active' => false],
@@ -133,9 +126,7 @@ class CachedNavigationRouteTest extends TestCase
         yield 'Test invalidated if category deleted' => [
             $ids,
             1,
-            function (IdsCollection $ids): string {
-                return $ids->get('cat-1.1.1');
-            },
+            fn (IdsCollection $ids): string => $ids->get('cat-1.1.1'),
             function (IdsCollection $ids): void {
                 $this->getContainer()->get('category.repository')->delete([
                     ['id' => $ids->get('cat-1.2.2')],
@@ -147,9 +138,7 @@ class CachedNavigationRouteTest extends TestCase
         yield 'Test invalidated if category created' => [
             $ids,
             1,
-            function (IdsCollection $ids): string {
-                return $ids->get('cat-1.1.1');
-            },
+            fn (IdsCollection $ids): string => $ids->get('cat-1.1.1'),
             function (IdsCollection $ids): void {
                 $this->getContainer()->get('category.repository')->create([
                     ['id' => $ids->get('cat-1.2.4'), 'name' => 'cat 1.2.4', 'active' => true],

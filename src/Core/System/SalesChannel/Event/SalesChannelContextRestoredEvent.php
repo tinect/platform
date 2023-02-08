@@ -4,32 +4,16 @@ namespace Shopware\Core\System\SalesChannel\Event;
 
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Event\NestedEvent;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-/**
- * @package core
- */
+#[Package('core')]
 class SalesChannelContextRestoredEvent extends NestedEvent
 {
-    /**
-     * @deprecated tag:v6.5.0 - reason:visibility-change - will become private and natively typed to SalesChannelContext, use the getter instead
-     *
-     * @var SalesChannelContext
-     */
-    protected $restoredContext;
-
-    /**
-     * @deprecated tag:v6.5.0 - reason:visibility-change - will become private, use the getter instead
-     */
-    protected ?SalesChannelContext $currentContext;
-
-    /**
-     * @deprecated tag:v6.5.0 - Parameter $currentContext will be mandatory
-     */
-    public function __construct(SalesChannelContext $restoredContext, ?SalesChannelContext $currentContext = null)
-    {
-        $this->restoredContext = $restoredContext;
-        $this->currentContext = $currentContext;
+    public function __construct(
+        private readonly SalesChannelContext $restoredContext,
+        private readonly SalesChannelContext $currentContext
+    ) {
     }
 
     public function getRestoredSalesChannelContext(): SalesChannelContext
@@ -42,7 +26,7 @@ class SalesChannelContextRestoredEvent extends NestedEvent
         return $this->restoredContext->getContext();
     }
 
-    public function getCurrentSalesChannelContext(): ?SalesChannelContext
+    public function getCurrentSalesChannelContext(): SalesChannelContext
     {
         return $this->currentContext;
     }

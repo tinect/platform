@@ -25,6 +25,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Write\Command\UpdateCommand;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\Command\WriteCommandQueue;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\Validation\RestrictDeleteViolation;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\Validation\RestrictDeleteViolationException;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Language\LanguageLoaderInterface;
 
@@ -35,24 +36,26 @@ use Shopware\Core\System\Language\LanguageLoaderInterface;
  * Builds first a command queue over the WriteCommandExtractor and let execute this queue
  * over the EntityWriteGateway (sql implementation in default).
  */
+#[Package('core')]
 class EntityWriter implements EntityWriterInterface
 {
     /**
      * @internal
      */
     public function __construct(
-        private WriteCommandExtractor $commandExtractor,
-        private EntityForeignKeyResolver $foreignKeyResolver,
-        private EntityWriteGatewayInterface $gateway,
-        private LanguageLoaderInterface $languageLoader,
-        private DefinitionInstanceRegistry $registry,
-        private EntityWriteResultFactory $factory
+        private readonly WriteCommandExtractor $commandExtractor,
+        private readonly EntityForeignKeyResolver $foreignKeyResolver,
+        private readonly EntityWriteGatewayInterface $gateway,
+        private readonly LanguageLoaderInterface $languageLoader,
+        private readonly DefinitionInstanceRegistry $registry,
+        private readonly EntityWriteResultFactory $factory
     ) {
     }
 
     // TODO: prefetch
     /**
      * @param SyncOperation[] $operations
+     *
      * @throw InvalidSyncOperationException
      */
     public function sync(array $operations, WriteContext $context): WriteResult
@@ -216,7 +219,9 @@ class EntityWriter implements EntityWriterInterface
 
         $writeContext->getExceptions()->tryToThrow();
 
-        $this->gateway->execute($commandQueue->getCommandsInOrder(), $writeContext);
+        $ordered = $commandQueue->getCommandsInOrder();
+
+        $this->gateway->execute($ordered, $writeContext);
 
         $result = $this->factory->build($commandQueue);
 
@@ -389,14 +394,10 @@ class EntityWriter implements EntityWriterInterface
 
                 $fieldKeys = $fields
                     ->filter(
-                        function (Field $field) {
-                            return !$field instanceof VersionField && !$field instanceof ReferenceVersionField;
-                        }
+                        fn (Field $field) => !$field instanceof VersionField && !$field instanceof ReferenceVersionField
                     )
                     ->map(
-                        function (Field $field) {
-                            return $field->getPropertyName();
-                        }
+                        fn (Field $field) => $field->getPropertyName()
                     );
 
                 throw new IncompletePrimaryKeyException($fieldKeys);

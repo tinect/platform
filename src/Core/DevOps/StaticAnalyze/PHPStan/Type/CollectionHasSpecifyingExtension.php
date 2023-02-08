@@ -11,13 +11,13 @@ use PHPStan\Analyser\TypeSpecifierContext;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Type\MethodTypeSpecifyingExtension;
 use PHPStan\Type\TypeCombinator;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Struct\Collection;
 
 /**
- * @package core
- *
  * @internal
  */
+#[Package('core')]
 class CollectionHasSpecifyingExtension implements MethodTypeSpecifyingExtension, TypeSpecifierAwareExtension
 {
     private TypeSpecifier $typeSpecifier;
@@ -30,9 +30,9 @@ class CollectionHasSpecifyingExtension implements MethodTypeSpecifyingExtension,
     public function isMethodSupported(MethodReflection $methodReflection, MethodCall $node, TypeSpecifierContext $context): bool
     {
         return (
-                $methodReflection->getDeclaringClass()->getName() === Collection::class
-                || $methodReflection->getDeclaringClass()->isSubclassOf(Collection::class)
-            )
+            $methodReflection->getDeclaringClass()->getName() === Collection::class
+            || $methodReflection->getDeclaringClass()->isSubclassOf(Collection::class)
+        )
             && $methodReflection->getName() === 'has' && $context->truthy();
     }
 

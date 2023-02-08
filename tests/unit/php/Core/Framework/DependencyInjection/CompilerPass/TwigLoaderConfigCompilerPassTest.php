@@ -12,6 +12,7 @@ use Twig\Loader\FilesystemLoader;
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\Framework\DependencyInjection\CompilerPass\TwigLoaderConfigCompilerPass
  */
 class TwigLoaderConfigCompilerPassTest extends TestCase
@@ -37,10 +38,10 @@ class TwigLoaderConfigCompilerPassTest extends TestCase
 
     public function testDevModeNoPluginsButApps(): void
     {
-        /** @var ContainerBuilder|MockObject $containerMock */
+        /** @var ContainerBuilder&MockObject $containerMock */
         $containerMock = $this->createMock(ContainerBuilder::class);
 
-        /** @var Definition|MockObject $filesystemLoaderMock */
+        /** @var Definition&MockObject $filesystemLoaderMock */
         $filesystemLoaderMock = $this->createMock(Definition::class);
 
         $containerMock->expects(static::exactly(3))->method('getParameter')->withConsecutive(
@@ -80,10 +81,10 @@ class TwigLoaderConfigCompilerPassTest extends TestCase
 
     public function testDevModeNoPluginsAndApps(): void
     {
-        /** @var ContainerBuilder|MockObject $containerMock */
+        /** @var ContainerBuilder&MockObject $containerMock */
         $containerMock = $this->createMock(ContainerBuilder::class);
 
-        /** @var Definition|MockObject $filesystemLoaderMock */
+        /** @var Definition&MockObject $filesystemLoaderMock */
         $filesystemLoaderMock = $this->createMock(Definition::class);
 
         $containerMock->expects(static::exactly(3))->method('getParameter')->withConsecutive(

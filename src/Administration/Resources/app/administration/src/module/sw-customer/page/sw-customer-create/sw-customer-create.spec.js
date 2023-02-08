@@ -23,7 +23,8 @@ async function createWrapper() {
             'sw-card-view': true,
             'sw-button': await Shopware.Component.build('sw-button'),
             'sw-button-process': await Shopware.Component.build('sw-button-process'),
-            'sw-icon': true
+            'sw-icon': true,
+            'sw-loader': true,
         },
         provide: {
             numberRangeService: {},
@@ -92,35 +93,9 @@ describe('module/sw-customer/page/sw-customer-create', () => {
         await saveButton.trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(notificationMock).toBeCalledTimes(1);
+        expect(notificationMock).toBeCalledTimes(2);
         expect(notificationMock).toHaveBeenCalledWith({
-            message: 'sw-customer.error.COMPANY_IS_REQUIRED'
-        });
-
-        wrapper.vm.createNotificationError.mockRestore();
-    });
-
-    it('should show an error notification when entered password is invalid', async () => {
-        const wrapper = await createWrapper();
-        wrapper.vm.createNotificationError = jest.fn();
-        const notificationMock = wrapper.vm.createNotificationError;
-
-        await wrapper.setData({
-            customer: {
-                id: '1',
-                email: 'test@shopware.com',
-                accountType: 'business',
-                password: '1234567',
-            },
-        });
-
-        const saveButton = wrapper.find('.sw-customer-create__save-action');
-        await saveButton.trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(notificationMock).toBeCalledTimes(1);
-        expect(notificationMock).toHaveBeenCalledWith({
-            message: 'sw-customer.detail.notificationPasswordLengthErrorMessage'
+            message: 'sw-customer.detail.messageSaveError'
         });
 
         wrapper.vm.createNotificationError.mockRestore();

@@ -12,7 +12,7 @@ Shopware.Component.register('sw-cms-sidebar', swCmsSidebar);
 
 const { EntityCollection, Entity } = Shopware.Data;
 
-function getBlockData(id = '1a2b', position) {
+function getBlockData(position, id = '1a2b') {
     return {
         id,
         position,
@@ -53,7 +53,9 @@ async function createWrapper({ cmsBlockRegistry } = { cmsBlockRegistry: null }) 
         namespaced: true,
         state: {
             isSystemDefaultLanguage: true,
-            currentPageType: 'product_list'
+            currentPageType: 'product_list',
+            selectedBlock: {},
+            selectedSection: {}
         }
     });
 
@@ -127,6 +129,7 @@ async function createWrapper({ cmsBlockRegistry } = { cmsBlockRegistry: null }) 
             'sw-checkbox-field': true,
             'sw-collapse': await Shopware.Component.build('sw-collapse'),
             'sw-icon': true,
+            'sw-cms-visibility-config': true
         },
         provide: {
             repositoryFactory: {
@@ -180,6 +183,19 @@ async function createWrapper({ cmsBlockRegistry } = { cmsBlockRegistry: null }) 
                     };
                 },
                 isBlockAllowedInPageType: (name, pageType) => name.startsWith(pageType)
+            },
+            cmsPageTypeService: {
+                getTypes: () => {
+                    return [{
+                        name: 'page',
+                    }, {
+                        name: 'landingpage',
+                    }, {
+                        name: 'product_list',
+                    }, {
+                        name: 'product_detail',
+                    }];
+                }
             }
         }
     });
@@ -227,12 +243,12 @@ describe('module/sw-cms/component/sw-cms-sidebar', () => {
         await wrapper.vm.$nextTick();
 
         const blockDrag = {
-            block: getBlockData('1a2b', 0),
+            block: getBlockData(0, '1a2b'),
             sectionIndex: 0,
             position: 0
         };
         const blockDrop = {
-            block: getBlockData('7gh8', 3),
+            block: getBlockData(3, '7gh8'),
             sectionIndex: 0,
         };
 
@@ -252,11 +268,11 @@ describe('module/sw-cms/component/sw-cms-sidebar', () => {
         const wrapper = await createWrapper();
 
         const blockDrag = {
-            block: getBlockData('1a2b', 0),
+            block: getBlockData(0, '1a2b'),
             sectionIndex: 0
         };
         const blockDrop = {
-            block: getBlockData('7gh8', 2),
+            block: getBlockData(2, '7gh8'),
             sectionIndex: 1
         };
 
@@ -358,7 +374,7 @@ describe('module/sw-cms/component/sw-cms-sidebar', () => {
 
         await flushPromises();
 
-        const layoutTypeSelect = wrapper.get('sw-select-field-stub[label="sw-cms.detail.label.pageType"]');
+        const layoutTypeSelect = wrapper.get('sw-select-field-stub[label="sw-cms.detail.label.pageTypeSelection"]');
 
         expect(layoutTypeSelect.attributes()['tooltip-message'])
             .toBe('sw-cms.detail.tooltip.cannotSelectProductPageLayout');
@@ -376,8 +392,7 @@ describe('module/sw-cms/component/sw-cms-sidebar', () => {
             }
         });
 
-
-        const layoutTypeSelect = wrapper.find('sw-select-field-stub[label="sw-cms.detail.label.pageType"]');
+        const layoutTypeSelect = wrapper.find('sw-select-field-stub[label="sw-cms.detail.label.pageTypeSelection"]');
         const productPageOption = wrapper.find('option[value="product_detail"]');
 
         expect(layoutTypeSelect.attributes().disabled).toBeFalsy();

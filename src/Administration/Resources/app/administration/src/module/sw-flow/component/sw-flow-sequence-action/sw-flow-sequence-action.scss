@@ -98,6 +98,8 @@
 
     &__action-item {
         padding: 12px 16px 16px 24px;
+        cursor: pointer;
+        transition: all 100ms ease-in-out;
 
         &:not(:last-child) {
             border-bottom: 1px solid $color-gray-300;
@@ -105,6 +107,10 @@
 
         &:only-child {
             border: none;
+        }
+
+        &:hover {
+            background: $color-gray-50;
         }
     }
 
@@ -262,12 +268,6 @@
                 color: $color-gray-900;
                 text-transform: none;
                 padding: 0 !important;
-
-                // @deprecated tag:v6.5.0 - rule can be removed
-                &.icon--regular-file-signature {
-                    width: 15px !important;
-                    height: 12px !important;
-                }
             }
 
             img {

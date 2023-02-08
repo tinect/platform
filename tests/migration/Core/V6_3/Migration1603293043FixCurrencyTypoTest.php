@@ -11,15 +11,16 @@ use Shopware\Tests\Migration\MigrationTestTrait;
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\Migration\V6_3\Migration1603293043FixCurrencyTypo
  */
 class Migration1603293043FixCurrencyTypoTest extends TestCase
 {
     use MigrationTestTrait;
 
-    public const wrongTranslation = 'Swedish krone';
+    final public const wrongTranslation = 'Swedish krone';
 
-    public const correctTranslation = 'Swedish krona';
+    final public const correctTranslation = 'Swedish krona';
 
     private Connection $connection;
 

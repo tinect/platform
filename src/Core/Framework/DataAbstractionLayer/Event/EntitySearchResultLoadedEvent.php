@@ -7,10 +7,9 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\Event\GenericEvent;
 use Shopware\Core\Framework\Event\NestedEvent;
+use Shopware\Core\Framework\Log\Package;
 
-/**
- * @package core
- */
+#[Package('core')]
 class EntitySearchResultLoadedEvent extends NestedEvent implements GenericEvent
 {
     /**
@@ -28,8 +27,10 @@ class EntitySearchResultLoadedEvent extends NestedEvent implements GenericEvent
      */
     protected $name;
 
-    public function __construct(EntityDefinition $definition, EntitySearchResult $result)
-    {
+    public function __construct(
+        EntityDefinition $definition,
+        EntitySearchResult $result
+    ) {
         $this->result = $result;
         $this->definition = $definition;
         $this->name = $this->definition->getEntityName() . '.search.result.loaded';

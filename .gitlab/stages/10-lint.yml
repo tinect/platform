@@ -26,6 +26,21 @@
     - src/Administration/Resources/app/administration/.jestcache
   policy: push
 
+.e2e-node-cache: &e2e-node-cache
+  key:
+    files:
+      - tests/e2e/package-lock.json
+  paths:
+    - tests/e2e/node_modules/
+    - .Cypress/
+  policy: push
+
+.e2e-eslint-cache: &e2e-eslint-cache
+  key: 'eslint-e2e'
+  paths:
+    - tests/e2e/.eslintcache
+  policy: push
+
 .storefront-node-cache: &storefront-node-cache
   key:
     files:
@@ -89,9 +104,8 @@ Danger:
         - danger ci
 
 ESLint (Administration):
-    extends: .base-no-setup
+    extends: .base
     stage: lint
-    image: node:lts-alpine
     rules:
         - !reference [.rules, skip]
         - !reference [.rules, run]
@@ -102,8 +116,12 @@ ESLint (Administration):
         policy: pull
       - <<: *administration-eslint-cache
         policy: pull
+    before_script:
+      - composer install --no-scripts --quiet
+      - '[[ -d src/Administration/Resources/app/administration/node_modules/ ]] || npm --prefix src/Administration/Resources/app/administration/ ci'
+      - composer run admin:generate-entity-schema-types
+      - !reference [ .scripts, install-node, script ]
     script:
-        - '[[ -d src/Administration/Resources/app/administration/node_modules/ ]] || npm --prefix src/Administration/Resources/app/administration/ ci'
         - cd src/Administration/Resources/app/administration
         - npm run lint -- --format junit --output-file $CI_PROJECT_DIR/eslint.junit.xml
         - npm run lint:types
@@ -142,6 +160,35 @@ ESLint (Storefront):
             - eslint.junit.xml
         reports:
             junit: eslint.junit.xml
+
+ESLint (E2E):
+  extends: .base
+  stage: lint
+  rules:
+    - !reference [.rules, skip]
+    - !reference [.rules, run]
+    - changes:
+        - 'tests/e2e/**/*'
+  cache:
+    - <<: *e2e-node-cache
+      policy: pull
+    - <<: *e2e-eslint-cache
+      policy: pull
+  before_script:
+    - composer install --no-scripts --quiet
+    - '[[ -d tests/e2e/node_modules/ ]] || npm --prefix tests/e2e/ ci'
+    - !reference [ .scripts, install-node, script ]
+  script:
+    - cd tests/e2e
+    - npm run lint -- --format junit --output-file $CI_PROJECT_DIR/eslint.junit.xml
+  after_script:
+    - grep 'failure message' eslint.junit.xml
+  artifacts:
+    when: on_failure
+    paths:
+      - eslint.junit.xml
+    reports:
+      junit: eslint.junit.xml
 
 Stylelint (Administration):
     extends: .base-no-setup
@@ -252,8 +299,9 @@ PHP lint:
         - composer run ecs -- --no-progress-bar
         - composer run lint:changelog
         - composer run lint:snippets
-        # TODO: Re-Enable BC-Check ASAP
+        # TODO: Re-Enable BC-Check "real" after RC release
         # - composer run bc-check
+        - composer run bc-check-65
 
 NPM CI:
     extends: .base-no-setup
@@ -285,9 +333,8 @@ NPM CI:
 ## Caching
 
 Administration Cache (Push):
-  extends: .base-no-setup
+  extends: .base
   stage: lint
-  image: shopware/development:8.1-composer-2
   rules:
     - if: '$CI_COMMIT_BRANCH == "trunk"'
   cache:
@@ -299,11 +346,12 @@ Administration Cache (Push):
       policy: push
     - <<: *administration-jest-cache
       policy: push
-  before_script: []
-  script:
-    - composer install --no-scripts
-    - bin/console framework:schema -s 'entity-schema' $ADMIN_PATH/test/_mocks_/entity-schema.json 2>/dev/null
+  before_script:
+    - composer install --no-scripts --quiet
+    - !reference [ .scripts, install-node, script ]
     - npm --prefix src/Administration/Resources/app/administration ci
+    - composer run admin:generate-entity-schema-types
+  script:
     - cd src/Administration/Resources/app/administration
     - npm run lint
     - npm run lint:scss

@@ -13,7 +13,6 @@ use Shopware\Core\Framework\App\Lifecycle\AppLoader;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Feature;
 use Shopware\Core\Framework\Plugin;
-use Shopware\Core\Framework\Test\App\AppSystemTestBehaviour;
 use Shopware\Core\Framework\Test\TestCaseBase\DatabaseTransactionBehaviour;
 use Shopware\Core\Framework\Test\TestCaseBase\EnvTestBehaviour;
 use Shopware\Core\Framework\Test\TestCaseBase\KernelLifecycleManager;
@@ -25,7 +24,6 @@ use Shopware\Core\System\SystemConfig\Util\ConfigReader;
 use Shopware\Core\Test\TestDefaults;
 use Shopware\Storefront\Event\ThemeCompilerConcatenatedScriptsEvent;
 use Shopware\Storefront\Event\ThemeCompilerConcatenatedStylesEvent;
-use Shopware\Storefront\Event\ThemeCompilerEnrichScssVariablesEvent as ThemeCompilerEnrichScssVariablesEventDep;
 use Shopware\Storefront\Test\Theme\fixtures\MockThemeCompilerConcatenatedSubscriber;
 use Shopware\Storefront\Test\Theme\fixtures\MockThemeVariablesSubscriber;
 use Shopware\Storefront\Test\Theme\fixtures\SimplePlugin\SimplePlugin;
@@ -42,12 +40,15 @@ use Shopware\Storefront\Theme\Subscriber\ThemeCompilerEnrichScssVarSubscriber;
 use Shopware\Storefront\Theme\ThemeCompiler;
 use Shopware\Storefront\Theme\ThemeFileImporter;
 use Shopware\Storefront\Theme\ThemeFileResolver;
+use Shopware\Tests\Integration\Core\Framework\App\AppSystemTestBehaviour;
 use Symfony\Component\Asset\UrlPackage;
 use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Messenger\MessageBus;
 
 /**
  * @internal
+ *
  * @covers \Shopware\Storefront\Theme\ThemeCompiler
  */
 class ThemeCompilerTest extends TestCase
@@ -84,7 +85,9 @@ class ThemeCompilerTest extends TestCase
             $this->getContainer()->get(CacheInvalidator::class),
             new MD5ThemePathBuilder(),
             $this->getContainer()->getParameter('kernel.project_dir'),
-            $this->getContainer()->get(ScssPhpCompiler::class)
+            $this->getContainer()->get(ScssPhpCompiler::class),
+            new MessageBus(),
+            0
         );
     }
 
@@ -322,13 +325,8 @@ PHP_EOL;
             'sw-border-color' => '#bcc1c7',
         ];
 
-        if (Feature::isActive('v6.5.0.0')) {
-            $event = new ThemeCompilerEnrichScssVariablesEvent($variables, $this->mockSalesChannelId, Context::createDefaultContext());
-            $subscriber->onAddVariables($event);
-        } else {
-            $event = new ThemeCompilerEnrichScssVariablesEventDep($variables, $this->mockSalesChannelId);
-            $subscriber->onAddVariablesDep($event);
-        }
+        $event = new ThemeCompilerEnrichScssVariablesEvent($variables, $this->mockSalesChannelId, Context::createDefaultContext());
+        $subscriber->onAddVariables($event);
 
         $actual = $event->getVariables();
 
@@ -428,7 +426,9 @@ PHP_EOL;
             $this->createMock(CacheInvalidator::class),
             new MD5ThemePathBuilder(),
             $this->getContainer()->getParameter('kernel.project_dir'),
-            $this->getContainer()->get(ScssPhpCompiler::class)
+            $this->getContainer()->get(ScssPhpCompiler::class),
+            new MessageBus(),
+            0
         );
 
         $config = new StorefrontPluginConfiguration('test');
@@ -522,7 +522,7 @@ PHP_EOL;
             $this->eventDispatcher->removeSubscriber($subscriber);
         }
 
-        static::assertSame(trim($expectedCssOutput), trim($actual));
+        static::assertSame(trim($expectedCssOutput), trim((string) $actual));
     }
 
     public function testOutputsOnlyExpectedCssWhenUsingFeatureFlagFunction(): void
@@ -582,7 +582,7 @@ PHP_EOL;
             Context::createDefaultContext()
         );
 
-        static::assertSame(trim($expectedCssOutput), trim($actual));
+        static::assertSame(trim($expectedCssOutput), trim((string) $actual));
     }
 
     public function testVendorImportFiles(): void
@@ -627,7 +627,7 @@ PHP_EOL;
             Context::createDefaultContext()
         );
 
-        static::assertSame(trim($expectedCssOutput), trim($actual));
+        static::assertSame(trim($expectedCssOutput), trim((string) $actual));
     }
 
     /**

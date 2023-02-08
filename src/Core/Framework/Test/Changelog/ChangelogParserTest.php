@@ -16,7 +16,7 @@ class ChangelogParserTest extends TestCase
     use ChangelogTestBehaviour;
 
     /**
-     * @return list<array{0: string, 1: array<string, string|null>,2: string, 3: int}>
+     * @return list<array{0: string, 1: array<string, string|null>, 2: string, 3: int}>
      */
     public function provide(): array
     {
@@ -91,7 +91,7 @@ class ChangelogParserTest extends TestCase
         static::assertIsArray($lines);
 
         /** @var array<string> $templateLines */
-        $templateLines = explode(\PHP_EOL, $logEntry->toTemplate());
+        $templateLines = explode(\PHP_EOL, (string) $logEntry->toTemplate());
 
         foreach ($lines as $index => $line) {
             static::assertSame(trim($line), trim($templateLines[$index]));

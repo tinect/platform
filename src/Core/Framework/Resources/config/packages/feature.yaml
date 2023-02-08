@@ -2,66 +2,8 @@ shopware:
   feature:
     flags:
       - name: v6.5.0.0
-        default: false
+        default: true
         major: true
       - name: v6.6.0.0
         default: false
         major: true
-      - name: FEATURE_NEXT_1797
-        default: false
-        major: true
-        description: "composer require for plugins"
-      - name: FEATURE_NEXT_19501
-        default: false
-        major: false
-        description: "Disables the cart.container function"
-        # issue: NEXT-19501
-      - name: FEATURE_NEXT_15053
-        default: false
-        major: false
-        description: "Replace wrong displayed characters in number format"
-        # issue: NEXT-15053
-      - name: FEATURE_NEXT_18215
-        default: false
-        major: true
-        description: "Rules are aware of their assignment"
-        # issue: NEXT-18215
-      - name: FEATURE_NEXT_14699
-        default: false
-        major: true
-        description: "Refactoring of Storefront theme assets"
-      - name: FEATURE_NEXT_14360
-        default: false
-        major: true
-        description: "App System 4.0 - Build action button messaging system"
-        # issue: NEXT-14360
-      - name: FEATURE_NEXT_15172
-        default: false
-        major: true
-        description: "Sanitize html of fields with AllowHtml flag"
-        # issue: NEXT-15172
-      - name: FEATURE_NEXT_16200
-        default: false
-        major: false
-        description: "Register Doi Domain"
-        # issue: NEXT-16200
-      - name: FEATURE_NEXT_15917
-        default: false
-        major: true
-        description: "Move storefront script tags to head with defer"
-        # issue: NEXT-15917
-      - name: FEATURE_NEXT_17275
-        default: false
-        major: true
-        description: "StorefrontRenderEvent only gets original view"
-        # issue: NEXT-17275
-      - name: FEATURE_NEXT_19048
-        default: false
-        major: true
-        description: "Fix media resolution in theme"
-        # issue: NEXT-19048
-      - name: FEATURE_NEXT_18187
-        default: false
-        major: true
-        description: "Move admin dashboard statistics into separate component"
-        # issue: NEXT-18187

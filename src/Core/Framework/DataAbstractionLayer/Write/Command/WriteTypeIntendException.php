@@ -3,15 +3,17 @@
 namespace Shopware\Core\Framework\DataAbstractionLayer\Write\Command;
 
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\ShopwareHttpException;
 
-/**
- * @package core
- */
+#[Package('core')]
 class WriteTypeIntendException extends ShopwareHttpException
 {
-    public function __construct(EntityDefinition $definition, string $expectedClass, string $actualClass)
-    {
+    public function __construct(
+        EntityDefinition $definition,
+        string $expectedClass,
+        string $actualClass
+    ) {
         parent::__construct(
             'Expected command for "{{ definition }}" to be "{{ expectedClass }}". (Got: {{ actualClass }})',
             ['definition' => $definition->getEntityName(), 'expectedClass' => $expectedClass, 'actualClass' => $actualClass]

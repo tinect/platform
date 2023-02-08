@@ -2,9 +2,9 @@
 
 namespace Shopware\Core\Framework\Util;
 
-/**
- * @package core
- */
+use Shopware\Core\Framework\Log\Package;
+
+#[Package('core')]
 class MemorySizeCalculator
 {
     /**
@@ -28,11 +28,11 @@ class MemorySizeCalculator
 
         switch (substr(rtrim($memoryLimit, 'b'), -1)) {
             case 't': $max *= 1024;
-            // no break
+                // no break
             case 'g': $max *= 1024;
-            // no break
+                // no break
             case 'm': $max *= 1024;
-            // no break
+                // no break
             case 'k': $max *= 1024;
         }
 

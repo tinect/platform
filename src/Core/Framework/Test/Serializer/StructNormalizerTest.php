@@ -13,10 +13,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  */
 class StructNormalizerTest extends TestCase
 {
-    /**
-     * @var StructNormalizer
-     */
-    private $normalizer;
+    private StructNormalizer $normalizer;
 
     protected function setUp(): void
     {
@@ -220,6 +217,7 @@ class TestStruct extends Struct
 
 /**
  * @internal
+ *
  * @extends Collection<TestStruct>
  */
 class TestStructCollection extends Collection

@@ -11,12 +11,14 @@ use Shopware\Core\Framework\DataAbstractionLayer\Write\DataStack\KeyValuePair;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\EntityExistence;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\WriteCommandExtractor;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\WriteParameterBag;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\System\CustomField\CustomFieldService;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @internal
  */
+#[Package('core')]
 class CustomFieldsSerializer extends JsonFieldSerializer
 {
     /**
@@ -25,8 +27,8 @@ class CustomFieldsSerializer extends JsonFieldSerializer
     public function __construct(
         DefinitionInstanceRegistry $compositeHandler,
         ValidatorInterface $validator,
-        private CustomFieldService $attributeService,
-        private WriteCommandExtractor $writeExtractor
+        private readonly CustomFieldService $attributeService,
+        private readonly WriteCommandExtractor $writeExtractor
     ) {
         parent::__construct($validator, $compositeHandler);
     }
@@ -77,7 +79,7 @@ class CustomFieldsSerializer extends JsonFieldSerializer
 
         if ($value) {
             // set fields dynamically
-            $field->setPropertyMapping($this->getFields(array_keys(json_decode($value, true))));
+            $field->setPropertyMapping($this->getFields(array_keys(json_decode((string) $value, true, 512, \JSON_THROW_ON_ERROR))));
         }
 
         return parent::decode($field, $value);

@@ -4,28 +4,28 @@ namespace Shopware\Core\Checkout\Cart\Facade;
 
 use Shopware\Core\Checkout\Cart\Facade\Traits\PriceFactoryTrait;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
+use Shopware\Core\Framework\Log\Package;
 
 /**
  * @package checkout
  */
-
 /**
  * The PriceFacade is a wrapper around a price.
  *
  * @script-service cart_manipulation
  */
+#[Package('checkout')]
 class PriceFacade
 {
     use PriceFactoryTrait;
 
-    private CalculatedPrice $price;
-
     /**
      * @internal
      */
-    public function __construct(CalculatedPrice $price, CartFacadeHelper $helper)
-    {
-        $this->price = $price;
+    public function __construct(
+        private readonly CalculatedPrice $price,
+        CartFacadeHelper $helper
+    ) {
         $this->helper = $helper;
     }
 

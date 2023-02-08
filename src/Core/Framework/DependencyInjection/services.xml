@@ -67,6 +67,7 @@ base-uri 'self';
         <!-- Database / Doctrine -->
         <service id="Doctrine\DBAL\Connection" public="true">
             <factory class="Shopware\Core\Kernel" method="getConnection"/>
+
         </service>
 
         <service id="Shopware\Core\Framework\Routing\QueryDataBagResolver">
@@ -80,10 +81,6 @@ base-uri 'self';
         <!-- Cache -->
         <service class="Cocur\Slugify\Slugify" public="false" id="slugify">
             <argument>%shopware.slug.config%</argument>
-        </service>
-
-        <service id="Shopware\Core\System\User\Service\UserProvisioner">
-            <argument type="service" id="Doctrine\DBAL\Connection"/>
         </service>
 
         <!-- Migration -->
@@ -220,6 +217,19 @@ base-uri 'self';
         <service id="Shopware\Core\Framework\Routing\RouteEventSubscriber">
             <tag name="kernel.event_subscriber"/>
             <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <!-- Custom Entity -->
+        <service id="Shopware\Core\System\CustomEntity\Xml\Config\CustomEntityEnrichmentService">
+            <argument type="service" id="Shopware\Core\System\CustomEntity\Xml\Config\AdminUi\AdminUiXmlSchemaValidator"/>
+        </service>
+
+        <service id="Shopware\Core\System\CustomEntity\CustomEntityLifecycleService">
+            <argument type="service" id="Shopware\Core\System\CustomEntity\Schema\CustomEntityPersister"/>
+            <argument type="service" id="Shopware\Core\System\CustomEntity\Schema\CustomEntitySchemaUpdater"/>
+            <argument type="service" id="Shopware\Core\System\CustomEntity\Xml\Config\CustomEntityEnrichmentService"/>
+            <argument type="service" id="Shopware\Core\System\CustomEntity\Xml\CustomEntityXmlSchemaValidator"/>
+            <argument>%kernel.project_dir%</argument>
         </service>
 
         <!-- Translation -->
@@ -360,6 +370,10 @@ base-uri 'self';
             <tag name="twig.extension"/>
         </service>
 
+        <service id="Shopware\Core\Framework\Adapter\Twig\Extension\PcreExtension">
+            <tag name="twig.extension"/>
+        </service>
+
         <service id="Shopware\Core\Framework\Adapter\Twig\Extension\InstanceOfExtension">
             <tag name="twig.extension"/>
         </service>
@@ -375,6 +389,11 @@ base-uri 'self';
         </service>
 
         <service id="Shopware\Core\Framework\Adapter\Twig\Filter\ReplaceRecursiveFilter">
+            <tag name="twig.extension"/>
+        </service>
+
+        <service id="Shopware\Core\Framework\Adapter\Twig\SecurityExtension">
+            <argument>%shopware.twig.allowed_php_functions%</argument>
             <tag name="twig.extension"/>
         </service>
 
@@ -670,6 +689,11 @@ base-uri 'self';
         <service id="Shopware\Core\Framework\Log\Monolog\ExcludeExceptionHandler" decorates="monolog.handler.main" decoration-on-invalid="ignore">
             <argument type="service" id="Shopware\Core\Framework\Log\Monolog\ExcludeExceptionHandler.inner"/>
             <argument>%shopware.logger.exclude_exception%</argument>
+        </service>
+
+        <service id="Shopware\Core\Framework\Log\Monolog\ExcludeFlowEventHandler" decorates="monolog.handler.main" decoration-on-invalid="ignore">
+            <argument type="service" id="Shopware\Core\Framework\Log\Monolog\ExcludeExceptionHandler.inner"/>
+            <argument>%shopware.logger.exclude_events%</argument>
         </service>
 
         <service id="Shopware\Core\Framework\Routing\RouteParamsCleanupListener">

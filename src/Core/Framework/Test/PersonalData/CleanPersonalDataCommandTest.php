@@ -10,8 +10,8 @@ use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\Dbal\EntityDefinitionQueryHelper;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Pricing\CashRoundingConfig;
 use Shopware\Core\Framework\Demodata\PersonalData\CleanPersonalDataCommand;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Util\Random;
@@ -30,15 +30,9 @@ class CleanPersonalDataCommandTest extends TestCase
 {
     use IntegrationTestBehaviour;
 
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Connection $connection;
 
-    /**
-     * @var EntityRepository
-     */
-    private $customerRepository;
+    private EntityRepository $customerRepository;
 
     protected function setUp(): void
     {
@@ -232,6 +226,8 @@ class CleanPersonalDataCommandTest extends TestCase
 
         $order = [
             'id' => $orderId,
+            'itemRounding' => json_decode(json_encode(new CashRoundingConfig(2, 0.01, true), \JSON_THROW_ON_ERROR), true, 512, \JSON_THROW_ON_ERROR),
+            'totalRounding' => json_decode(json_encode(new CashRoundingConfig(2, 0.01, true), \JSON_THROW_ON_ERROR), true, 512, \JSON_THROW_ON_ERROR),
             'orderDateTime' => (new \DateTimeImmutable())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
             'price' => new CartPrice(10, 10, 10, new CalculatedTaxCollection(), new TaxRuleCollection(), CartPrice::TAX_STATE_NET),
             'shippingCosts' => new CalculatedPrice(10, 10, new CalculatedTaxCollection(), new TaxRuleCollection()),
@@ -310,16 +306,9 @@ class CleanPersonalDataCommandTest extends TestCase
 
     private function createCartWithCreatedAtDateTime(\DateTime $dateTime): void
     {
-        // @deprecated tag:v6.6.0 - keep `$cartColumn = 'payload';`
-        $cartColumn = 'cart';
-        if (EntityDefinitionQueryHelper::columnExists($this->connection, 'cart', 'payload')) {
-            $cartColumn = 'payload';
-        }
-
         $cartData = [
             'token' => Uuid::randomHex(),
-            'name' => 'test',
-            $cartColumn => '',
+            'payload' => '',
             'price' => 0,
             'line_item_count' => '',
             'rule_ids' => json_encode([]),
@@ -334,11 +323,17 @@ class CleanPersonalDataCommandTest extends TestCase
         $this->connection->insert('cart', $cartData);
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     private function fetchAllCustomers(): array
     {
         return $this->connection->fetchAllAssociative('SELECT * FROM customer');
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     private function fetchAllCarts(): array
     {
         return $this->connection->fetchAllAssociative('SELECT * FROM cart');

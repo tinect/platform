@@ -14,14 +14,8 @@ use Shopware\Core\System\Tax\TaxEntity;
  */
 class EntityBusinessEvent implements FlowEventAware, BusinessEventEncoderTestInterface
 {
-    /**
-     * @var TaxEntity
-     */
-    private $tax;
-
-    public function __construct(TaxEntity $tax)
+    public function __construct(private readonly TaxEntity $tax)
     {
-        $this->tax = $tax;
     }
 
     public static function getAvailableData(): EventDataCollection
@@ -30,6 +24,9 @@ class EntityBusinessEvent implements FlowEventAware, BusinessEventEncoderTestInt
             ->add('tax', new EntityType(TaxDefinition::class));
     }
 
+    /**
+     * @return array<string, array<string, mixed>>
+     */
     public function getEncodeValues(string $shopwareVersion): array
     {
         return [
@@ -42,12 +39,12 @@ class EntityBusinessEvent implements FlowEventAware, BusinessEventEncoderTestInt
                 'position' => $this->tax->getPosition(),
                 'customFields' => null,
                 'translated' => [],
-                'createdAt' => $this->tax->getCreatedAt()->format(\DATE_RFC3339_EXTENDED),
+                'createdAt' => $this->tax->getCreatedAt() ? $this->tax->getCreatedAt()->format(\DATE_RFC3339_EXTENDED) : null,
                 'updatedAt' => null,
                 'extensions' => [
                     'foreignKeys' => [
                         'extensions' => [],
-                        'apiAlias' => null,
+                        'apiAlias' => 'tax_foreign_keys_extension',
                     ],
                 ],
                 'apiAlias' => 'tax',

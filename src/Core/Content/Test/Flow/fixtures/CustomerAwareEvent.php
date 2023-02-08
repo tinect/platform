@@ -5,22 +5,18 @@ namespace Shopware\Core\Content\Test\Flow\fixtures;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Event\CustomerAware;
 use Shopware\Core\Framework\Event\EventData\EventDataCollection;
+use Shopware\Core\Framework\Log\Package;
 
 /**
- * @package business-ops
- *
  * @internal
  */
+#[Package('business-ops')]
 class CustomerAwareEvent implements CustomerAware
 {
-    protected string $customerId;
-
-    protected ?Context $context;
-
-    public function __construct(string $customerId, ?Context $context = null)
-    {
-        $this->customerId = $customerId;
-        $this->context = $context;
+    public function __construct(
+        protected string $customerId,
+        protected ?Context $context = null
+    ) {
     }
 
     public static function getAvailableData(): EventDataCollection

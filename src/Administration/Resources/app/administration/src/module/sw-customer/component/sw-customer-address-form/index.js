@@ -1,5 +1,6 @@
 import template from './sw-customer-address-form.html.twig';
 import './sw-customer-address-form.scss';
+import CUSTOMER from '../../constant/sw-customer.constant';
 
 /**
  * @package customer-order
@@ -95,7 +96,8 @@ export default {
 
         countryCriteria() {
             const criteria = new Criteria(1, 25);
-            criteria.addSorting(Criteria.sort('position', 'ASC'));
+            criteria.addSorting(Criteria.sort('position', 'ASC'))
+                .addSorting(Criteria.sort('name', 'ASC'));
             return criteria;
         },
 
@@ -105,7 +107,8 @@ export default {
             }
 
             const criteria = new Criteria(1, 25);
-            criteria.addFilter(Criteria.equals('countryId', this.countryId));
+            criteria.addFilter(Criteria.equals('countryId', this.countryId))
+                .addSorting(Criteria.sort('name', 'ASC'));
             return criteria;
         },
 
@@ -124,7 +127,7 @@ export default {
         },
 
         isBusinessAccountType() {
-            return this.customer.company !== null;
+            return this.customer?.accountType === CUSTOMER.ACCOUNT_TYPE_BUSINESS;
         },
     },
 

@@ -9,16 +9,17 @@ use Shopware\Core\Checkout\Cart\Rule\CartRuleScope;
 use Shopware\Core\Checkout\Cart\Rule\LineItemScope;
 use Shopware\Core\Checkout\Cart\Rule\LineItemTaxationRule;
 use Shopware\Core\Checkout\Test\Cart\Rule\Helper\CartRuleHelperTrait;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Rule\Exception\UnsupportedOperatorException;
 use Shopware\Core\Framework\Rule\Rule;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 /**
- * @package business-ops
- *
  * @internal
+ *
  * @group rules
  */
+#[Package('business-ops')]
 class LineItemTaxationRuleTest extends TestCase
 {
     use CartRuleHelperTrait;
@@ -161,6 +162,6 @@ class LineItemTaxationRuleTest extends TestCase
 
     private function createLineItemWithTaxId(string $taxId): LineItem
     {
-        return ($this->createLineItem())->setPayloadValue('taxId', $taxId);
+        return $this->createLineItem()->setPayloadValue('taxId', $taxId);
     }
 }

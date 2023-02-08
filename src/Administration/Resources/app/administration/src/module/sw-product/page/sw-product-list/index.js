@@ -402,6 +402,10 @@ export default {
             return childCount !== null && childCount > 0;
         },
 
+        productIsDigital(productEntity) {
+            return productEntity.states && productEntity.states.includes('is-download');
+        },
+
         openVariantModal(item) {
             this.productEntityVariantModal = item;
         },
@@ -411,10 +415,15 @@ export default {
         },
 
         onBulkEditItems() {
+            const includesDigital = Object.values(this.selection).filter((product) => {
+                return product.states.includes('is-download');
+            }).length > 0;
+
             this.$router.push({
                 name: 'sw.bulk.edit.product',
                 params: {
                     parentId: 'null',
+                    includesDigital,
                 },
             });
         },

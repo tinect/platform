@@ -2,9 +2,9 @@
 
 namespace Shopware\Core;
 
-/**
- * @package core
- */
+use Shopware\Core\Framework\Log\Package;
+
+#[Package('core')]
 final class SalesChannelRequest
 {
     public const ATTRIBUTE_IS_SALES_CHANNEL_REQUEST = '_is_sales_channel';
@@ -30,11 +30,6 @@ final class SalesChannelRequest
     public const ATTRIBUTE_CANONICAL_LINK = 'sw-canonical-link';
 
     public const ATTRIBUTE_STOREFRONT_URL = 'sw-storefront-url';
-
-    /**
-     * @deprecated tag:v6.5.0 - will be removed as the csrf system will be removed in favor for the samesite approach
-     */
-    public const ATTRIBUTE_CSRF_PROTECTED = 'csrf_protected';
 
     private function __construct()
     {

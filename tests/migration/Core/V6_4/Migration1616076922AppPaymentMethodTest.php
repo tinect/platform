@@ -12,6 +12,7 @@ use Shopware\Core\Migration\V6_4\Migration1647511158AddRefundUrlToAppPaymentMeth
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\Migration\V6_4\Migration1616076922AppPaymentMethod
  */
 class Migration1616076922AppPaymentMethodTest extends TestCase
@@ -57,6 +58,6 @@ class Migration1616076922AppPaymentMethodTest extends TestCase
 
         $associationFields = $this->connection->fetchOne('SELECT `association_fields` FROM `media_default_folder` WHERE `entity` = ?', [PaymentMethodDefinition::ENTITY_NAME]);
 
-        static::assertSame(['paymentMethods'], json_decode($associationFields, true, \JSON_THROW_ON_ERROR));
+        static::assertSame(['paymentMethods'], json_decode((string) $associationFields, true, \JSON_THROW_ON_ERROR, \JSON_THROW_ON_ERROR));
     }
 }

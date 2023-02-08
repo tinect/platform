@@ -3,17 +3,18 @@
 namespace Shopware\Core\Checkout\Cart\Rule;
 
 use Shopware\Core\Checkout\CheckoutRuleScope;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Rule\Container\Container;
 use Shopware\Core\Framework\Rule\Rule;
 use Shopware\Core\Framework\Rule\RuleScope;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Type;
 
-/**
- * @package business-ops
- */
+#[Package('business-ops')]
 class LineItemWrapperRule extends Rule
 {
+    final public const RULE_NAME = 'cartLineItemWrapper';
+
     protected Container $container;
 
     public function match(RuleScope $scope): bool
@@ -45,10 +46,5 @@ class LineItemWrapperRule extends Rule
         return [
             'container' => [new NotBlank(), new Type(Container::class)],
         ];
-    }
-
-    public function getName(): string
-    {
-        return 'cartLineItemWrapper';
     }
 }

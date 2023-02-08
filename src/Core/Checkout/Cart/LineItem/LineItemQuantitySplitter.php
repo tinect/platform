@@ -6,21 +6,17 @@ use Shopware\Core\Checkout\Cart\CartException;
 use Shopware\Core\Checkout\Cart\Price\QuantityPriceCalculator;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Price\Struct\QuantityPriceDefinition;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-/**
- * @package checkout
- */
+#[Package('checkout')]
 class LineItemQuantitySplitter
 {
-    private QuantityPriceCalculator $quantityPriceCalculator;
-
     /**
      * @internal
      */
-    public function __construct(QuantityPriceCalculator $quantityPriceCalculator)
+    public function __construct(private readonly QuantityPriceCalculator $quantityPriceCalculator)
     {
-        $this->quantityPriceCalculator = $quantityPriceCalculator;
     }
 
     /**
@@ -52,6 +48,10 @@ class LineItemQuantitySplitter
         $definition = new QuantityPriceDefinition($unitPrice, $taxRules, $tmpItem->getQuantity());
 
         $price = $this->quantityPriceCalculator->calculate($definition, $context);
+
+        $price->assign([
+            'listPrice' => $lineItemPrice->getListPrice() ?? null,
+        ]);
 
         $tmpItem->setPrice($price);
 

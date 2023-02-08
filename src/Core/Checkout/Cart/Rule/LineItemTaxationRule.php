@@ -4,6 +4,7 @@ namespace Shopware\Core\Checkout\Cart\Rule;
 
 use Shopware\Core\Checkout\Cart\CartException;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Rule\Exception\UnsupportedOperatorException;
 use Shopware\Core\Framework\Rule\Rule;
 use Shopware\Core\Framework\Rule\RuleComparison;
@@ -12,34 +13,21 @@ use Shopware\Core\Framework\Rule\RuleConstraints;
 use Shopware\Core\Framework\Rule\RuleScope;
 use Shopware\Core\System\Tax\TaxDefinition;
 
-/**
- * @package business-ops
- */
+#[Package('business-ops')]
 class LineItemTaxationRule extends Rule
 {
-    /**
-     * @var array<string>
-     */
-    protected array $taxIds;
-
-    protected string $operator;
+    final public const RULE_NAME = 'cartLineItemTaxation';
 
     /**
      * @internal
      *
-     * @param array<string> $taxIds
+     * @param list<string> $taxIds
      */
-    public function __construct(string $operator = self::OPERATOR_EQ, array $taxIds = [])
-    {
+    public function __construct(
+        protected string $operator = self::OPERATOR_EQ,
+        protected array $taxIds = []
+    ) {
         parent::__construct();
-
-        $this->taxIds = $taxIds;
-        $this->operator = $operator;
-    }
-
-    public function getName(): string
-    {
-        return 'cartLineItemTaxation';
     }
 
     public function match(RuleScope $scope): bool

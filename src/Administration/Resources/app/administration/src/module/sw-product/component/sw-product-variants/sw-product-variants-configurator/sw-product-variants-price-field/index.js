@@ -34,13 +34,6 @@ export default {
             required: false,
             default: false,
         },
-
-        // @deprecated tag:v6.5.0 - Will be removed
-        onlyPositive: {
-            type: Boolean,
-            required: false,
-            default: false,
-        },
     },
 
     computed: {
@@ -139,7 +132,7 @@ export default {
 
             return new Promise((resolve) => {
                 if (!value || typeof value !== 'number' || !this.price[outputType] || !this.taxRate || !outputType) {
-                    return null;
+                    return;
                 }
 
                 this.calculatePriceApiService.calculatePrice({
@@ -151,7 +144,6 @@ export default {
                     resolve(data.calculatedTaxes[0].tax);
                     this.$emit('price-calculate', false);
                 });
-                return true;
             });
         },
     },

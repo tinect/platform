@@ -16,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
  * @internal
+ *
  * @group store-api
  */
 class LoadWishlistRouteTest extends TestCase
@@ -23,25 +24,13 @@ class LoadWishlistRouteTest extends TestCase
     use IntegrationTestBehaviour;
     use CustomerTestTrait;
 
-    /**
-     * @var KernelBrowser
-     */
-    private $browser;
+    private KernelBrowser $browser;
 
-    /**
-     * @var TestDataCollection
-     */
-    private $ids;
+    private TestDataCollection $ids;
 
-    /**
-     * @var Context
-     */
-    private $context;
+    private Context $context;
 
-    /**
-     * @var string
-     */
-    private $customerId;
+    private string $customerId;
 
     /**
      * @var SystemConfigService
@@ -93,7 +82,7 @@ class LoadWishlistRouteTest extends TestCase
                 'POST',
                 '/store-api/customer/wishlist'
             );
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         $wishlist = $response['wishlist'];
         $products = $response['products'];
 
@@ -112,7 +101,7 @@ class LoadWishlistRouteTest extends TestCase
                 'POST',
                 '/store-api/customer/wishlist'
             );
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         $errors = $response['errors'][0];
         static::assertSame(403, $this->browser->getResponse()->getStatusCode());
         static::assertEquals('CHECKOUT__WISHLIST_IS_NOT_ACTIVATED', $errors['code']);
@@ -129,7 +118,7 @@ class LoadWishlistRouteTest extends TestCase
                 'POST',
                 '/store-api/customer/wishlist'
             );
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         $errors = $response['errors'][0];
         static::assertSame(403, $this->browser->getResponse()->getStatusCode());
         static::assertEquals('CHECKOUT__CUSTOMER_NOT_LOGGED_IN', $errors['code']);
@@ -144,7 +133,7 @@ class LoadWishlistRouteTest extends TestCase
                 'POST',
                 '/store-api/customer/wishlist'
             );
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         $errors = $response['errors'][0];
         static::assertSame(404, $this->browser->getResponse()->getStatusCode());
         static::assertEquals('CHECKOUT__WISHLIST_NOT_FOUND', $errors['code']);
@@ -166,7 +155,7 @@ class LoadWishlistRouteTest extends TestCase
                 'POST',
                 '/store-api/customer/wishlist'
             );
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         $products = $response['products'];
 
         static::assertEquals(0, $products['total']);
@@ -186,7 +175,7 @@ class LoadWishlistRouteTest extends TestCase
                 'POST',
                 '/store-api/customer/wishlist'
             );
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         $products = $response['products'];
 
         static::assertEquals(1, $products['total']);
@@ -194,7 +183,7 @@ class LoadWishlistRouteTest extends TestCase
     }
 
     /**
-     * @param array<mixed> $attributes
+     * @param array<string, mixed> $attributes
      */
     private function createProduct(Context $context, array $attributes = []): string
     {

@@ -33,20 +33,11 @@ class CustomerGroupRegistrationActionControllerTest extends TestCase
 {
     private CustomerGroupRegistrationActionController $controllerMock;
 
-    /**
-     * @var EntityRepository|MockObject
-     */
-    private $customerRepositoryMock;
+    private MockObject&EntityRepository $customerRepositoryMock;
 
-    /**
-     * @var EntityRepository|MockObject
-     */
-    private $customerGroupRepositoryMock;
+    private MockObject&EntityRepository $customerGroupRepositoryMock;
 
-    /**
-     * @var MockObject|SalesChannelContextRestorer
-     */
-    private $contextRestorerMock;
+    private MockObject&SalesChannelContextRestorer $contextRestorerMock;
 
     public function setUp(): void
     {
@@ -65,6 +56,7 @@ class CustomerGroupRegistrationActionControllerTest extends TestCase
 
     /**
      * @param CustomerEntity[] $customers
+     *
      * @dataProvider getRegistrationValues
      *
      * @throws Exception
@@ -90,6 +82,7 @@ class CustomerGroupRegistrationActionControllerTest extends TestCase
 
     /**
      * @param CustomerEntity[] $customers
+     *
      * @dataProvider getRegistrationValues
      *
      * @throws Exception

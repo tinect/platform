@@ -9,14 +9,15 @@ use Shopware\Core\Checkout\Cart\Rule\CartRuleScope;
 use Shopware\Core\Checkout\Cart\Rule\LineItemClearanceSaleRule;
 use Shopware\Core\Checkout\Cart\Rule\LineItemScope;
 use Shopware\Core\Checkout\Test\Cart\Rule\Helper\CartRuleHelperTrait;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 /**
- * @package business-ops
- *
  * @internal
+ *
  * @group rules
  */
+#[Package('business-ops')]
 class LineItemClearanceSaleRuleTest extends TestCase
 {
     use CartRuleHelperTrait;
@@ -128,6 +129,6 @@ class LineItemClearanceSaleRuleTest extends TestCase
 
     private function createLineItemWithClearance(bool $clearanceSaleEnabled): LineItem
     {
-        return ($this->createLineItem())->setPayloadValue('isCloseout', $clearanceSaleEnabled);
+        return $this->createLineItem()->setPayloadValue('isCloseout', $clearanceSaleEnabled);
     }
 }

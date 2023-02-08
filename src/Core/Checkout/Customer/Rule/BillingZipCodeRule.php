@@ -3,15 +3,16 @@
 namespace Shopware\Core\Checkout\Customer\Rule;
 
 use Shopware\Core\Checkout\CheckoutRuleScope;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Rule\Container\ZipCodeRule;
 use Shopware\Core\Framework\Rule\RuleComparison;
 use Shopware\Core\Framework\Rule\RuleScope;
 
-/**
- * @package business-ops
- */
+#[Package('business-ops')]
 class BillingZipCodeRule extends ZipCodeRule
 {
+    final public const RULE_NAME = 'customerBillingZipCode';
+
     public function match(RuleScope $scope): bool
     {
         if (!$scope instanceof CheckoutRuleScope) {
@@ -27,10 +28,5 @@ class BillingZipCodeRule extends ZipCodeRule
         }
 
         return $this->matchZipCode($address);
-    }
-
-    public function getName(): string
-    {
-        return 'customerBillingZipCode';
     }
 }

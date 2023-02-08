@@ -3,17 +3,18 @@
 namespace Shopware\Core\Framework\DataAbstractionLayer\Search\AggregationResult\Bucket;
 
 use Shopware\Core\Framework\DataAbstractionLayer\Search\AggregationResult\AggregationResult;
+use Shopware\Core\Framework\Log\Package;
 
-/**
- * @package core
- */
+#[Package('core')]
 class BucketResult extends AggregationResult
 {
     /**
      * @param list<Bucket> $buckets
      */
-    public function __construct(string $name, protected array $buckets)
-    {
+    public function __construct(
+        string $name,
+        protected array $buckets
+    ) {
         parent::__construct($name);
     }
 

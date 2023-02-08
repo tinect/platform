@@ -28,14 +28,12 @@ use Shopware\Core\System\Tax\TaxCollection;
  * @internal
  *
  * @package content
+ *
  * @covers \Shopware\Core\Content\Category\Service\CategoryBreadcrumbBuilder
  */
 class CategoryBreadcrumbBuilderTest extends TestCase
 {
-    /**
-     * @var SalesChannelContext
-     */
-    protected $context;
+    protected SalesChannelContext $context;
 
     public function setUp(): void
     {

@@ -13,6 +13,7 @@ use Shopware\Tests\Migration\MigrationTestTrait;
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\Migration\V6_3\Migration1590408550AclResources
  */
 class Migration1590408550AclResourcesTest extends TestCase
@@ -53,7 +54,7 @@ class Migration1590408550AclResourcesTest extends TestCase
 
         try {
             $connection->executeStatement('ALTER TABLE acl_role DROP COLUMN `privileges`');
-        } catch (Exception $e) {
+        } catch (Exception) {
         }
 
         $sql = '

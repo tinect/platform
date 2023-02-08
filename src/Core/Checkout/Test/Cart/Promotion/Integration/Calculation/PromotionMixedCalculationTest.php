@@ -12,6 +12,7 @@ use Shopware\Core\Checkout\Test\Cart\Promotion\Helpers\Traits\PromotionIntegrati
 use Shopware\Core\Checkout\Test\Cart\Promotion\Helpers\Traits\PromotionSetGroupTestFixtureBehaviour;
 use Shopware\Core\Checkout\Test\Cart\Promotion\Helpers\Traits\PromotionTestFixtureBehaviour;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Util\Random;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -19,10 +20,9 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
 use Shopware\Core\Test\TestDefaults;
 
 /**
- * @package checkout
- *
  * @internal
  */
+#[Package('checkout')]
 class PromotionMixedCalculationTest extends TestCase
 {
     use IntegrationTestBehaviour;
@@ -50,7 +50,6 @@ class PromotionMixedCalculationTest extends TestCase
      * This test verifies that we get a correct 0,00 final price if we
      * add an absolute promotion of -10 and an additional 100% discount.
      *
-     * @test
      * @group promotions
      *
      * @throws CartException
@@ -87,7 +86,6 @@ class PromotionMixedCalculationTest extends TestCase
      * This test verifies that we can successfully remove an added
      * promotion by code and get the original price again.
      *
-     * @test
      * @group promotions
      *
      * @throws CartException
@@ -247,6 +245,7 @@ class PromotionMixedCalculationTest extends TestCase
      * and the type of picking (vertical or horizontal)
      *
      * @dataProvider setGroupPackageAndPickerTestData
+     *
      * @group promotions
      */
     public function testSetGroupPackageAndPickerCombinations(
@@ -617,6 +616,7 @@ class PromotionMixedCalculationTest extends TestCase
      * buy 3 t-shirts get first one free. Test vertical and horizontal picking
      *
      * @group promotions
+     *
      * @dataProvider getBuyThreeTshirtsGetFirstOneFreeTestData
      */
     public function testBuy3TshirtsGetFirstOneFree(float $expectedDiscount, string $pickingType): void
@@ -702,6 +702,7 @@ class PromotionMixedCalculationTest extends TestCase
      * buy 3 t-shirts get second one free. Test vertical and horizontal picking
      *
      * @group promotions
+     *
      * @dataProvider getBuyThreeTshirtsGetSecondOneFreeTestData
      */
     public function testBuy3TshirtsGetSecondOneFree(float $expectedDiscount, string $pickingType): void

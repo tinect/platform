@@ -7,16 +7,18 @@ use Shopware\Core\Content\Media\Aggregate\MediaThumbnail\MediaThumbnailEntity;
 use Shopware\Core\Content\Media\Exception\EmptyMediaFilenameException;
 use Shopware\Core\Content\Media\Exception\EmptyMediaIdException;
 use Shopware\Core\Content\Media\MediaEntity;
+use Shopware\Core\Framework\Log\Package;
 use Symfony\Contracts\Service\ResetInterface;
 
+#[Package('content')]
 class UrlGenerator implements UrlGeneratorInterface, ResetInterface
 {
     /**
      * @internal
      */
     public function __construct(
-        private AbstractPathGenerator $pathGenerator,
-        private FilesystemOperator $filesystem
+        private readonly AbstractPathGenerator $pathGenerator,
+        private readonly FilesystemOperator $filesystem
     ) {
     }
 

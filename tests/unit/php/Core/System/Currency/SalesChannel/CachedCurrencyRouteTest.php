@@ -33,19 +33,14 @@ use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\System\Currency\SalesChannel\CachedCurrencyRoute
  */
 class CachedCurrencyRouteTest extends TestCase
 {
-    /**
-     * @var AbstractCurrencyRoute&MockObject
-     */
-    private $decorated;
+    private MockObject&AbstractCurrencyRoute $decorated;
 
-    /**
-     * @var CacheInterface&MockObject
-     */
-    private $cache;
+    private MockObject&CacheInterface $cache;
 
     private EventDispatcher $eventDispatcher;
 

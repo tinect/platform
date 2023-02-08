@@ -33,21 +33,16 @@ use Shopware\Tests\Integration\Storefront\Theme\fixtures\SimpleTheme\SimpleTheme
 
 /**
  * @internal
+ *
  * @covers \Shopware\Storefront\Theme\ThemeLifecycleHandler
  */
 class ThemeLifecycleHandlerTest extends TestCase
 {
     use IntegrationTestBehaviour;
 
-    /**
-     * @var MockObject|ThemeService
-     */
-    private ThemeService $themeServiceMock;
+    private MockObject&ThemeService $themeServiceMock;
 
-    /**
-     * @var MockObject|StorefrontPluginRegistryInterface
-     */
-    private StorefrontPluginRegistryInterface $configurationRegistryMock;
+    private MockObject&StorefrontPluginRegistryInterface $configurationRegistryMock;
 
     private ThemeLifecycleHandler $themeLifecycleHandler;
 
@@ -83,10 +78,7 @@ class ThemeLifecycleHandlerTest extends TestCase
                 TestDefaults::SALES_CHANNEL,
                 static::isType('string'),
                 static::isInstanceOf(Context::class),
-                static::callback(function (StorefrontPluginConfigurationCollection $configs): bool {
-                    // assert installConfig is used when compiling the theme
-                    return $configs->count() === 2;
-                })
+                static::callback(fn (StorefrontPluginConfigurationCollection $configs): bool => $configs->count() === 2)
             );
 
         $configs = new StorefrontPluginConfigurationCollection([
@@ -130,10 +122,7 @@ class ThemeLifecycleHandlerTest extends TestCase
             ->with(
                 $themeId,
                 static::isInstanceOf(Context::class),
-                static::callback(function (StorefrontPluginConfigurationCollection $configs): bool {
-                    // assert installConfig is used when compiling the theme
-                    return $configs->count() === 2;
-                })
+                static::callback(fn (StorefrontPluginConfigurationCollection $configs): bool => $configs->count() === 2)
             );
 
         $configs = new StorefrontPluginConfigurationCollection([
@@ -154,16 +143,13 @@ class ThemeLifecycleHandlerTest extends TestCase
                 TestDefaults::SALES_CHANNEL,
                 static::isType('string'),
                 static::isInstanceOf(Context::class),
-                static::callback(function (StorefrontPluginConfigurationCollection $configs): bool {
-                    // assert uninstalledConfig is not used when compiling the theme
-                    return $configs->count() === 1 && (
-                        (
-                            $configs->first()
-                            ? $configs->first()->getTechnicalName()
-                            : ''
-                        ) === 'Storefront'
-                    );
-                })
+                static::callback(fn (StorefrontPluginConfigurationCollection $configs): bool => $configs->count() === 1 && (
+                    (
+                        $configs->first()
+                        ? $configs->first()->getTechnicalName()
+                        : ''
+                    ) === 'Storefront'
+                ))
             );
 
         $configs = new StorefrontPluginConfigurationCollection([

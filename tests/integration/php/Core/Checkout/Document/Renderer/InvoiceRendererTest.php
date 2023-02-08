@@ -5,7 +5,10 @@ namespace Shopware\Tests\Integration\Core\Checkout\Document\Renderer;
 use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Cart\LineItemFactoryHandler\ProductLineItemFactory;
+use Shopware\Core\Checkout\Cart\PriceDefinitionFactory;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Document\Event\DocumentTemplateRendererParameterEvent;
 use Shopware\Core\Checkout\Document\Event\InvoiceOrdersEvent;
 use Shopware\Core\Checkout\Document\Renderer\DocumentRendererConfig;
@@ -17,7 +20,6 @@ use Shopware\Core\Checkout\Document\Struct\DocumentGenerateOperation;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Test\Document\DocumentTrait;
-use Shopware\Core\Content\Product\Cart\ProductLineItemFactory;
 use Shopware\Core\Content\Test\Product\ProductBuilder;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
@@ -91,6 +93,8 @@ class InvoiceRendererTest extends TestCase
         );
 
         static::assertInstanceOf(InvoiceOrdersEvent::class, $caughtEvent);
+        static::assertCount(1, $caughtEvent->getOperations());
+        static::assertSame($operationInvoice, $caughtEvent->getOperations()[$orderId] ?? null);
         static::assertCount(1, $caughtEvent->getOrders());
         $order = $caughtEvent->getOrders()->get($orderId);
         static::assertNotNull($order);
@@ -314,6 +318,160 @@ class InvoiceRendererTest extends TestCase
             },
         ];
 
+        yield 'render customer VAT-ID with displayCustomerVatId is checked' => [
+            [7],
+            function (DocumentGenerateOperation $operation): void {
+                $orderId = $operation->getOrderId();
+                $criteria = OrderDocumentCriteriaFactory::create([$orderId]);
+
+                /** @var OrderEntity $order */
+                $order = $this->getContainer()->get('order.repository')
+                    ->search($criteria, $this->context)->get($orderId);
+
+                static::assertNotNull($order->getOrderCustomer());
+                $this->getContainer()->get('customer.repository')->update([[
+                    'id' => $order->getOrderCustomer()->getCustomerId(),
+                    'vatIds' => ['VAT-123123'],
+                ]], $this->context);
+
+                static::assertNotNull($order->getAddresses());
+                static::assertNotNull($order->getAddresses()->get($order->getBillingAddressId()));
+                static::assertNotNull($order->getAddresses()->get($order->getBillingAddressId())->getCountry());
+                $this->getContainer()->get('country.repository')->upsert([[
+                    'id' => $order->getAddresses()->get($order->getBillingAddressId())->getCountry()->getId(),
+                    'companyTax' => ['amount' => 0, 'enabled' => true, 'currencyId' => $this->context->getCurrencyId()],
+                ]], $this->context);
+
+                $operation->assign([
+                    'config' => [
+                        'displayLineItems' => true,
+                        'displayHeader' => true,
+                        'displayCustomerVatId' => true,
+                        'displayAdditionalNoteDelivery' => false,
+                    ],
+                ]);
+            },
+            function (RenderedDocument $rendered, OrderEntity $order): void {
+                static::assertInstanceOf(RenderedDocument::class, $rendered);
+
+                static::assertNotNull($order->getAddresses());
+                static::assertNotNull($order->getOrderCustomer());
+
+                /** @var CustomerEntity $customer */
+                $customer = $order->getOrderCustomer()->getCustomer();
+                $rendered = $rendered->getHtml();
+
+                static::assertNotNull($customer);
+                static::assertNotNull($customer->getVatIds());
+
+                $vatId = $customer->getVatIds()[0];
+
+                static::assertStringContainsString("VAT Reg.No: $vatId", $rendered);
+            },
+        ];
+
+        yield 'render customer VAT-ID with displayCustomerVatId unchecked' => [
+            [7],
+            function (DocumentGenerateOperation $operation): void {
+                $orderId = $operation->getOrderId();
+                $criteria = OrderDocumentCriteriaFactory::create([$orderId]);
+
+                /** @var OrderEntity $order */
+                $order = $this->getContainer()->get('order.repository')
+                    ->search($criteria, $this->context)->get($orderId);
+
+                static::assertNotNull($order->getOrderCustomer());
+                $this->getContainer()->get('customer.repository')->update([[
+                    'id' => $order->getOrderCustomer()->getCustomerId(),
+                    'vatIds' => ['VAT-123123'],
+                ]], $this->context);
+
+                static::assertNotNull($order->getAddresses());
+                static::assertNotNull($order->getAddresses()->get($order->getBillingAddressId()));
+                static::assertNotNull($order->getAddresses()->get($order->getBillingAddressId())->getCountry());
+                $this->getContainer()->get('country.repository')->upsert([[
+                    'id' => $order->getAddresses()->get($order->getBillingAddressId())->getCountry()->getId(),
+                    'companyTax' => ['amount' => 0, 'enabled' => true, 'currencyId' => $this->context->getCurrencyId()],
+                ]], $this->context);
+
+                $operation->assign([
+                    'config' => [
+                        'displayLineItems' => true,
+                        'displayHeader' => true,
+                        'displayFooter' => false,
+                        'displayCustomerVatId' => false,
+                        'displayAdditionalNoteDelivery' => false,
+                    ],
+                ]);
+            },
+            function (RenderedDocument $rendered, OrderEntity $order): void {
+                static::assertInstanceOf(RenderedDocument::class, $rendered);
+
+                static::assertNotNull($order->getAddresses());
+                static::assertNotNull($order->getOrderCustomer());
+
+                /** @var CustomerEntity $customer */
+                $customer = $order->getOrderCustomer()->getCustomer();
+                $rendered = $rendered->getHtml();
+
+                static::assertNotNull($customer);
+                static::assertNotNull($customer->getVatIds());
+
+                static::assertStringNotContainsString('VAT Reg.No:', $rendered);
+            },
+        ];
+
+        yield 'render with customer VAT-ID is null' => [
+            [7],
+            function (DocumentGenerateOperation $operation): void {
+                $orderId = $operation->getOrderId();
+                $criteria = OrderDocumentCriteriaFactory::create([$orderId]);
+
+                /** @var OrderEntity $order */
+                $order = $this->getContainer()->get('order.repository')
+                    ->search($criteria, $this->context)->get($orderId);
+
+                static::assertNotNull($order->getOrderCustomer());
+                $this->getContainer()->get('customer.repository')->update([[
+                    'id' => $order->getOrderCustomer()->getCustomerId(),
+                    'vatIds' => [],
+                ]], $this->context);
+
+                static::assertNotNull($order->getAddresses());
+                static::assertNotNull($order->getAddresses()->get($order->getBillingAddressId()));
+                static::assertNotNull($order->getAddresses()->get($order->getBillingAddressId())->getCountry());
+                $this->getContainer()->get('country.repository')->upsert([[
+                    'id' => $order->getAddresses()->get($order->getBillingAddressId())->getCountry()->getId(),
+                    'companyTax' => ['amount' => 0, 'enabled' => true, 'currencyId' => $this->context->getCurrencyId()],
+                ]], $this->context);
+
+                $operation->assign([
+                    'config' => [
+                        'displayLineItems' => true,
+                        'displayFooter' => false,
+                        'displayHeader' => true,
+                        'displayCustomerVatId' => true,
+                        'displayAdditionalNoteDelivery' => true,
+                    ],
+                ]);
+            },
+            function (RenderedDocument $rendered, OrderEntity $order): void {
+                static::assertInstanceOf(RenderedDocument::class, $rendered);
+
+                static::assertNotNull($order->getAddresses());
+                static::assertNotNull($order->getOrderCustomer());
+
+                /** @var CustomerEntity $customer */
+                $customer = $order->getOrderCustomer()->getCustomer();
+                $rendered = $rendered->getHtml();
+
+                static::assertNotNull($customer);
+                static::assertEmpty($customer->getVatIds());
+
+                static::assertStringNotContainsString('VAT Reg.No:', $rendered);
+            },
+        ];
+
         $this->getContainer()->get(Connection::class)->executeStatement('DELETE FROM customer');
     }
 
@@ -364,13 +522,13 @@ class InvoiceRendererTest extends TestCase
      */
     private function generateDemoCart(array $taxes): Cart
     {
-        $cart = $this->cartService->createNew('a-b-c', 'A');
+        $cart = $this->cartService->createNew('A');
 
         $keywords = ['awesome', 'epic', 'high quality'];
 
         $products = [];
 
-        $factory = new ProductLineItemFactory();
+        $factory = new ProductLineItemFactory(new PriceDefinitionFactory());
 
         $ids = new IdsCollection();
 
@@ -394,7 +552,7 @@ class InvoiceRendererTest extends TestCase
 
             $products[] = $product;
 
-            $lineItems[] = $factory->create($ids->get($number));
+            $lineItems[] = $factory->create(['id' => $ids->get($number), 'referencedId' => $ids->get($number)], $this->salesChannelContext);
             $this->addTaxDataToSalesChannel($this->salesChannelContext, $product['tax']);
         }
 

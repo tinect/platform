@@ -44,66 +44,33 @@ use Shopware\Core\Framework\DataAbstractionLayer\Write\EntityWriteGatewayInterfa
 use Shopware\Core\Framework\DataAbstractionLayer\Write\EntityWriterInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\WriteContext;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\WriteResult;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * @package core
- *
  * @internal
  */
+#[Package('core')]
 class VersionManager
 {
-    public const DISABLE_AUDIT_LOG = 'disable-audit-log';
-
-    private EntityWriterInterface $entityWriter;
-
-    private EntityReaderInterface $entityReader;
-
-    private EntitySearcherInterface $entitySearcher;
-
-    private EntityWriteGatewayInterface $entityWriteGateway;
-
-    private EventDispatcherInterface $eventDispatcher;
-
-    private SerializerInterface $serializer;
-
-    private VersionCommitDefinition $versionCommitDefinition;
-
-    private VersionCommitDataDefinition $versionCommitDataDefinition;
-
-    private VersionDefinition $versionDefinition;
-
-    private DefinitionInstanceRegistry $registry;
-
-    private LockFactory $lockFactory;
+    final public const DISABLE_AUDIT_LOG = 'disable-audit-log';
 
     public function __construct(
-        EntityWriterInterface $entityWriter,
-        EntityReaderInterface $entityReader,
-        EntitySearcherInterface $entitySearcher,
-        EntityWriteGatewayInterface $entityWriteGateway,
-        EventDispatcherInterface $eventDispatcher,
-        SerializerInterface $serializer,
-        DefinitionInstanceRegistry $registry,
-        VersionCommitDefinition $versionCommitDefinition,
-        VersionCommitDataDefinition $versionCommitDataDefinition,
-        VersionDefinition $versionDefinition,
-        LockFactory $lockFactory
+        private readonly EntityWriterInterface $entityWriter,
+        private readonly EntityReaderInterface $entityReader,
+        private readonly EntitySearcherInterface $entitySearcher,
+        private readonly EntityWriteGatewayInterface $entityWriteGateway,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly SerializerInterface $serializer,
+        private readonly DefinitionInstanceRegistry $registry,
+        private readonly VersionCommitDefinition $versionCommitDefinition,
+        private readonly VersionCommitDataDefinition $versionCommitDataDefinition,
+        private readonly VersionDefinition $versionDefinition,
+        private readonly LockFactory $lockFactory
     ) {
-        $this->entityWriter = $entityWriter;
-        $this->entityReader = $entityReader;
-        $this->entitySearcher = $entitySearcher;
-        $this->entityWriteGateway = $entityWriteGateway;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->serializer = $serializer;
-        $this->versionCommitDefinition = $versionCommitDefinition;
-        $this->versionCommitDataDefinition = $versionCommitDataDefinition;
-        $this->versionDefinition = $versionDefinition;
-        $this->registry = $registry;
-        $this->lockFactory = $lockFactory;
     }
 
     /**
@@ -164,11 +131,6 @@ class VersionManager
 
     public function createVersion(EntityDefinition $definition, string $id, WriteContext $context, ?string $name = null, ?string $versionId = null): string
     {
-        $primaryKey = [
-            'id' => $id,
-            'versionId' => Defaults::LIVE_VERSION,
-        ];
-
         $versionId = $versionId ?? Uuid::randomHex();
         $versionData = ['id' => $versionId];
 
@@ -180,7 +142,7 @@ class VersionManager
             $this->entityWriter->upsert($this->versionDefinition, [$versionData], $context);
         });
 
-        $affected = $this->cloneEntity($definition, $primaryKey['id'], $primaryKey['id'], $versionId, $context, new CloneBehavior(), false);
+        $affected = $this->cloneEntity($definition, $id, $id, $versionId, $context, new CloneBehavior());
 
         $versionContext = $context->createWithVersionId($versionId);
 
@@ -214,7 +176,7 @@ class VersionManager
 
         $readCriteria
             ->getAssociation('data')
-            ->addSorting(new FieldSorting('autoIncrement'));
+            ->addSorting(new FieldSorting('autoIncrement', FieldSorting::DESCENDING));
 
         /** @var VersionCommitCollection $commits */
         $commits = $this->entityReader->read($this->versionCommitDefinition, $readCriteria, $writeContext->getContext());
@@ -239,7 +201,7 @@ class VersionManager
                 }
 
                 $entity = [
-                    'definition' => $dataDefinition,
+                    'definition' => $dataDefinition->getEntityName(),
                     'primary' => $data->getEntityId(),
                 ];
 
@@ -322,9 +284,11 @@ class VersionManager
         $this->entityWriter->delete($this->versionDefinition, [['id' => $versionId]], $writeContext);
 
         $versionContext->addState('merge-scope');
+
         foreach ($entities as $entity) {
             /** @var EntityDefinition $definition */
-            $definition = $entity['definition'];
+            $definition = $this->registry->getByEntityName($entity['definition']);
+
             $primary = $entity['primary'];
             $primary = $this->addVersionToPayload($primary, $definition, $versionId);
 
@@ -378,7 +342,7 @@ class VersionManager
             throw new \RuntimeException(sprintf('Cannot create new version. %s by id (%s) not found.', $definition->getEntityName(), $id));
         }
 
-        $data = json_decode($this->serializer->serialize($detail, 'json'), true);
+        $data = json_decode($this->serializer->serialize($detail, 'json'), true, 512, \JSON_THROW_ON_ERROR);
 
         $keepIds = $newId === $id;
 
@@ -567,7 +531,7 @@ class VersionManager
             return;
         }
 
-        $versionId = $versionId ?? $writeContext->getContext()->getVersionId();
+        $versionId ??= $writeContext->getContext()->getVersionId();
         if ($versionId === Defaults::LIVE_VERSION) {
             return;
         }
@@ -673,9 +637,7 @@ class VersionManager
      */
     private function addVersionToPayload(array $payload, EntityDefinition $definition, string $versionId): array
     {
-        $fields = $definition->getFields()->filter(function (Field $field) {
-            return $field instanceof VersionField || $field instanceof ReferenceVersionField;
-        });
+        $fields = $definition->getFields()->filter(fn (Field $field) => $field instanceof VersionField || $field instanceof ReferenceVersionField);
 
         foreach ($fields as $field) {
             $payload[$field->getPropertyName()] = $versionId;

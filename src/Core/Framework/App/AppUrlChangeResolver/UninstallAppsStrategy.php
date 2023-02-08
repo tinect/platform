@@ -8,6 +8,7 @@ use Shopware\Core\Framework\App\ShopId\ShopIdProvider;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Shopware\Storefront\Theme\ThemeAppLifecycleHandler;
@@ -19,24 +20,16 @@ use Shopware\Storefront\Theme\ThemeAppLifecycleHandler;
  * and the shopId should be regenerated, meaning the old shops and old apps work like before
  * apps in the current installation will be uninstalled without informing them about that (as they still run on the old installation)
  */
+#[Package('core')]
 class UninstallAppsStrategy extends AbstractAppUrlChangeStrategy
 {
-    public const STRATEGY_NAME = 'uninstall-apps';
-
-    private SystemConfigService $systemConfigService;
-
-    private EntityRepository $appRepository;
-
-    private ?ThemeAppLifecycleHandler $themeLifecycleHandler;
+    final public const STRATEGY_NAME = 'uninstall-apps';
 
     public function __construct(
-        EntityRepository $appRepository,
-        SystemConfigService $systemConfigService,
-        ?ThemeAppLifecycleHandler $themeLifecycleHandler
+        private readonly EntityRepository $appRepository,
+        private readonly SystemConfigService $systemConfigService,
+        private readonly ?ThemeAppLifecycleHandler $themeLifecycleHandler
     ) {
-        $this->systemConfigService = $systemConfigService;
-        $this->appRepository = $appRepository;
-        $this->themeLifecycleHandler = $themeLifecycleHandler;
     }
 
     public function getDecorated(): AbstractAppUrlChangeStrategy

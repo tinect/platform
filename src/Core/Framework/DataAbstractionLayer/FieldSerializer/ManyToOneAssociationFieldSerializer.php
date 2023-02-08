@@ -12,17 +12,19 @@ use Shopware\Core\Framework\DataAbstractionLayer\Write\EntityExistence;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\FieldException\ExpectedArrayException;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\WriteCommandExtractor;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\WriteParameterBag;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Uuid\Uuid;
 
 /**
  * @internal
  */
+#[Package('core')]
 class ManyToOneAssociationFieldSerializer implements FieldSerializerInterface
 {
     /**
      * @internal
      */
-    public function __construct(private WriteCommandExtractor $writeExtractor)
+    public function __construct(private readonly WriteCommandExtractor $writeExtractor)
     {
     }
 
@@ -38,7 +40,7 @@ class ManyToOneAssociationFieldSerializer implements FieldSerializerInterface
                 sprintf(
                     'Could not find reference field "%s" from definition "%s"',
                     $field->getReferenceField(),
-                    \get_class($field->getReferenceDefinition())
+                    $field->getReferenceDefinition()::class
                 )
             );
         }
@@ -58,7 +60,7 @@ class ManyToOneAssociationFieldSerializer implements FieldSerializerInterface
                 sprintf(
                     'Could not find FK field "%s" from field "%s"',
                     $field->getStorageName(),
-                    \get_class($parameters->getDefinition())
+                    $parameters->getDefinition()::class
                 )
             );
         }
@@ -69,7 +71,7 @@ class ManyToOneAssociationFieldSerializer implements FieldSerializerInterface
             $id = $value[$referenceField->getPropertyName()];
 
         // plugins can add a ManyToOne where they define that the local/storage column is the primary and the reference is the foreign key
-            // in this case we have a reversed many to one association configuration
+        // in this case we have a reversed many to one association configuration
         } elseif ($isPrimary) {
             $id = $parameters->getContext()->get($parameters->getDefinition()->getEntityName(), $fkField->getPropertyName());
         } else {

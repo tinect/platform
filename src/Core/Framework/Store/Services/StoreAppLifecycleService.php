@@ -14,7 +14,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Aggregation\Bucket\Terms
 use Shopware\Core\Framework\DataAbstractionLayer\Search\AggregationResult\Bucket\TermsResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\Framework\Feature;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\Framework\Store\Exception\ExtensionInstallException;
 use Shopware\Core\Framework\Store\Exception\ExtensionNotFoundException;
@@ -22,49 +22,21 @@ use Shopware\Core\Framework\Store\Exception\ExtensionThemeStillInUseException;
 use Shopware\Core\Framework\Store\Exception\ExtensionUpdateRequiresConsentAffirmationException;
 
 /**
- * @package merchant-services
- *
- * @deprecated tag:v6.5.0 - reason:becomes-internal - This class will be marked as "internal - only for use by the app-system"
+ * @internal - only for use by the app-system
  */
+#[Package('merchant-services')]
 class StoreAppLifecycleService extends AbstractStoreAppLifecycleService
 {
-    private StoreClient $storeClient;
-
-    private AbstractAppLifecycle $appLifecycle;
-
-    private EntityRepository $appRepository;
-
-    private EntityRepository $salesChannelRepository;
-
-    private ?EntityRepository $themeRepository;
-
-    private AppStateService $appStateService;
-
-    private AbstractAppLoader $appLoader;
-
-    private AppConfirmationDeltaProvider $appDeltaService;
-
-    /**
-     * @internal
-     */
     public function __construct(
-        StoreClient $storeClient,
-        AbstractAppLoader $appLoader,
-        AbstractAppLifecycle $appLifecycle,
-        EntityRepository $appRepository,
-        EntityRepository $salesChannelRepository,
-        ?EntityRepository $themeRepository,
-        AppStateService $appStateService,
-        AppConfirmationDeltaProvider $appDeltaService
+        private readonly StoreClient $storeClient,
+        private readonly AbstractAppLoader $appLoader,
+        private readonly AbstractAppLifecycle $appLifecycle,
+        private readonly EntityRepository $appRepository,
+        private readonly EntityRepository $salesChannelRepository,
+        private readonly ?EntityRepository $themeRepository,
+        private readonly AppStateService $appStateService,
+        private readonly AppConfirmationDeltaProvider $appDeltaService
     ) {
-        $this->storeClient = $storeClient;
-        $this->appLifecycle = $appLifecycle;
-        $this->appRepository = $appRepository;
-        $this->salesChannelRepository = $salesChannelRepository;
-        $this->themeRepository = $themeRepository;
-        $this->appStateService = $appStateService;
-        $this->appLoader = $appLoader;
-        $this->appDeltaService = $appDeltaService;
     }
 
     public function installExtension(string $technicalName, Context $context): void
@@ -82,7 +54,7 @@ class StoreAppLifecycleService extends AbstractStoreAppLifecycleService
     {
         try {
             $app = $this->getAppByName($technicalName, $context);
-        } catch (ExtensionNotFoundException $e) {
+        } catch (ExtensionNotFoundException) {
             return;
         }
 
@@ -148,26 +120,6 @@ class StoreAppLifecycleService extends AbstractStoreAppLifecycleService
             ],
             $context
         );
-    }
-
-    /**
-     * @deprecated tag:v6.5.0 - Will be removed
-     */
-    public function getAppIdByName(string $technicalName, Context $context): string
-    {
-        Feature::triggerDeprecationOrThrow(
-            'v6.5.0.0',
-            Feature::deprecatedMethodMessage(__CLASS__, __METHOD__, 'v6.5.0.0')
-        );
-
-        $criteria = (new Criteria())->addFilter(new EqualsFilter('name', $technicalName));
-        $app = $this->appRepository->searchIds($criteria, $context)->firstId();
-
-        if ($app === null) {
-            throw ExtensionNotFoundException::fromTechnicalName($technicalName);
-        }
-
-        return $app;
     }
 
     /**

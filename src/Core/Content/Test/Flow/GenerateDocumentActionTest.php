@@ -33,7 +33,9 @@ use Shopware\Core\Content\Flow\Dispatching\FlowFactory;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Pricing\CashRoundingConfig;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\Framework\Test\TestCaseBase\AdminApiTestBehaviour;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
@@ -47,10 +49,9 @@ use Shopware\Core\Test\TestDefaults;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @package business-ops
- *
  * @internal
  */
+#[Package('business-ops')]
 class GenerateDocumentActionTest extends TestCase
 {
     use IntegrationTestBehaviour;
@@ -314,7 +315,7 @@ class GenerateDocumentActionTest extends TestCase
             [
                 'HTTP_' . PlatformRequest::HEADER_VERSION_ID => $versionId,
             ],
-            json_encode($data) ?: ''
+            json_encode($data, \JSON_THROW_ON_ERROR) ?: ''
         );
         $response = $this->getBrowser()->getResponse();
 
@@ -341,7 +342,7 @@ class GenerateDocumentActionTest extends TestCase
         $response = $this->getBrowser()->getResponse();
 
         static::assertEquals(Response::HTTP_OK, $response->getStatusCode());
-        $content = json_decode($response->getContent() ?: '', true);
+        $content = json_decode($response->getContent() ?: '', true, 512, \JSON_THROW_ON_ERROR);
         $versionId = $content['versionId'];
         static::assertEquals($orderId, $content['id']);
         static::assertEquals('order', $content['entity']);
@@ -358,6 +359,8 @@ class GenerateDocumentActionTest extends TestCase
 
         $order = [
             'id' => $orderId,
+            'itemRounding' => json_decode(json_encode(new CashRoundingConfig(2, 0.01, true), \JSON_THROW_ON_ERROR), true, 512, \JSON_THROW_ON_ERROR),
+            'totalRounding' => json_decode(json_encode(new CashRoundingConfig(2, 0.01, true), \JSON_THROW_ON_ERROR), true, 512, \JSON_THROW_ON_ERROR),
             'orderNumber' => Uuid::randomHex(),
             'orderDateTime' => (new \DateTimeImmutable())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
             'price' => new CartPrice(10, 10, 10, new CalculatedTaxCollection(), new TaxRuleCollection(), CartPrice::TAX_STATE_NET),
@@ -521,13 +524,12 @@ class GenerateDocumentActionTest extends TestCase
 }
 
 /**
- * @package business-ops
- *
  * @internal
  */
+#[Package('business-ops')]
 class CustomDocRenderer extends AbstractDocumentRenderer
 {
-    public const TYPE = 'customDoc';
+    final public const TYPE = 'customDoc';
 
     public function supports(): string
     {

@@ -75,6 +75,7 @@
       "messageDeleteSuccess": "Flow deleted.",
       "messageDeleteError": "Flow could not be deleted.",
       "messageSaveError": "Flow could not be saved.",
+      "messageWarningSave": "Flow templates cannot be edited.",
       "messageError": "An error occurred.",
       "messageRequiredEventName": "Please choose a trigger event before saving.",
       "messageRequiredEmptyFields": "Please enter a rule or action name before saving.",
@@ -83,6 +84,7 @@
       "messageDownloadSuccess": "Flow has been downloaded.",
       "messageDownloadError": "The flow could not be downloaded.",
       "messageCreateSuccess": "Flow created.",
+      "messageUpdateTemplateSuccess": "Flow template updated.",
       "messageCreateError": "Flow could not be created."
     },
     "actions": {
@@ -90,6 +92,7 @@
       "generateDocument": "Generate documents",
       "removeTag": "Remove tag",
       "mailSend": "Send email",
+      "grantDownloadAccess": "Set download access",
       "setOrderState": "Assign status",
       "stopFlow": "Stop flow",
       "changeCustomerGroup": "Assign customer group",
@@ -179,6 +182,15 @@
         "labelDocumentType": "Documents",
         "placeholderDocumentType": "Select documents..."
       },
+      "downloadAccess": {
+        "titleSetDownloadAccess": "Set download access",
+        "labelValueField": "Access",
+        "placeholderValueField": "Select operation...",
+        "options": {
+          "grant": "Grant",
+          "revoke": "Revoke"
+        }
+      },
       "customerGroup": {
         "titleChangeCustomerGroup": "Assign customer group",
         "labelCustomerGroup": "Customer group",
@@ -220,7 +232,7 @@
         "labelCustomer": "Customer",
         "labelAdmin": "Admin",
         "labelCustom": "Custom recipient",
-        "labelContactFormMail": "Contact form confirmation",
+        "labelContactFormMail": "Inquirer",
         "labelRecipient": "Recipient",
         "placeholderRecipient": "Select email recipient...",
         "useDifferentReplyToLabel": "Use different reply-to address",
@@ -283,6 +295,7 @@
       "order": "Order",
       "paymentMethod": "Payment method",
       "contactForm": "Contact form",
+      "reviewForm": "Product review",
       "group": "Group",
       "recovery": "Recovery",
       "registration": "Registration",
@@ -335,7 +348,8 @@
       "reminded": "Reminded",
       "unconfirmed": "Unconfirmed",
       "pending": "Pending",
-      "changed": "Changed"
+      "changed": "Changed",
+      "update": "Update"
     }
   },
   "sw-privileges": {

@@ -27,6 +27,7 @@ use Symfony\Component\Messenger\TraceableMessageBus;
 
 /**
  * @internal
+ *
  * @group slow
  */
 class ProductExportGenerateTaskHandlerTest extends TestCase
@@ -70,7 +71,7 @@ class ProductExportGenerateTaskHandlerTest extends TestCase
 
         static::assertSame(200, $client->getResponse()->getStatusCode());
 
-        $response = json_decode((string) $client->getResponse()->getContent(), true);
+        $response = json_decode((string) $client->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         static::assertArrayHasKey('handledMessages', $response);
         static::assertIsInt($response['handledMessages']);
         static::assertEquals(1, $response['handledMessages']);
@@ -105,7 +106,7 @@ class ProductExportGenerateTaskHandlerTest extends TestCase
         $client->request('POST', $url, ['receiver' => 'async']);
 
         static::assertSame(200, $client->getResponse()->getStatusCode());
-        $response = json_decode((string) $client->getResponse()->getContent(), true);
+        $response = json_decode((string) $client->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         static::assertArrayHasKey('handledMessages', $response);
         static::assertIsInt($response['handledMessages']);
         static::assertEquals(0, $response['handledMessages']);
@@ -218,9 +219,7 @@ class ProductExportGenerateTaskHandlerTest extends TestCase
         /** @var LanguageCollection $originalSalesChannelLanguages */
         $originalSalesChannelLanguages = $originalSalesChannel->getLanguages();
         $originalSalesChannelArray = $originalSalesChannelLanguages->jsonSerialize();
-        $languages = array_map(static function ($language) {
-            return ['id' => $language->getId()];
-        }, $originalSalesChannelArray);
+        $languages = array_map(static fn ($language) => ['id' => $language->getId()], $originalSalesChannelArray);
 
         $id = '000000009276457086da48d5b5628f3c';
         $data = [
@@ -367,9 +366,7 @@ class ProductExportGenerateTaskHandlerTest extends TestCase
         /** @var list<string> $ids */
         $ids = $this->productExportRepository->searchIds(new Criteria(), $this->context)->getIds();
 
-        $ids = array_map(function ($id) {
-            return ['id' => $id];
-        }, $ids);
+        $ids = array_map(fn ($id) => ['id' => $id], $ids);
 
         $this->productExportRepository->delete($ids, $this->context);
     }

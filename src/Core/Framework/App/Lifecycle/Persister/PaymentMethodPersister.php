@@ -15,26 +15,18 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
+use Shopware\Core\Framework\Log\Package;
 
 /**
  * @internal
  */
+#[Package('core')]
 class PaymentMethodPersister
 {
-    /**
-     * @var EntityRepository
-     */
-    private $paymentMethodRepository;
-
-    /**
-     * @var MediaService
-     */
-    private $mediaService;
-
-    public function __construct(EntityRepository $paymentMethodRepository, MediaService $mediaService)
-    {
-        $this->paymentMethodRepository = $paymentMethodRepository;
-        $this->mediaService = $mediaService;
+    public function __construct(
+        private readonly EntityRepository $paymentMethodRepository,
+        private readonly MediaService $mediaService
+    ) {
     }
 
     public function updatePaymentMethods(Manifest $manifest, string $appId, string $defaultLocale, Context $context): void

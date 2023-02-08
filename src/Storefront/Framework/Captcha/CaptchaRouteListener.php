@@ -2,46 +2,33 @@
 
 namespace Shopware\Storefront\Framework\Captcha;
 
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Routing\KernelListenerPriorities;
 use Shopware\Core\PlatformRequest;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Shopware\Storefront\Controller\ErrorController;
-use Shopware\Storefront\Framework\Captcha\Annotation\Captcha as CaptchaAnnotation;
 use Shopware\Storefront\Framework\Captcha\Exception\CaptchaInvalidException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * @package storefront
- *
- * @deprecated tag:v6.5.0 - reason:becomes-internal - EventSubscribers will become internal in v6.5.0
+ * @internal
  */
+#[Package('storefront')]
 class CaptchaRouteListener implements EventSubscriberInterface
 {
-    /**
-     * @var iterable<AbstractCaptcha>
-     */
-    private iterable $captchas;
-
-    private ErrorController $errorController;
-
-    private SystemConfigService $systemConfigService;
-
     /**
      * @internal
      *
      * @param iterable<AbstractCaptcha> $captchas
      */
     public function __construct(
-        iterable $captchas,
-        ErrorController $errorController,
-        SystemConfigService $systemConfigService
+        private readonly iterable $captchas,
+        private readonly ErrorController $errorController,
+        private readonly SystemConfigService $systemConfigService
     ) {
-        $this->captchas = $captchas;
-        $this->errorController = $errorController;
-        $this->systemConfigService = $systemConfigService;
     }
 
     /**
@@ -58,7 +45,7 @@ class CaptchaRouteListener implements EventSubscriberInterface
 
     public function validateCaptcha(ControllerEvent $event): void
     {
-        /** @var CaptchaAnnotation|bool $captchaAnnotation */
+        /** @var bool $captchaAnnotation */
         $captchaAnnotation = $event->getRequest()->attributes->get(PlatformRequest::ATTRIBUTE_CAPTCHA, false);
 
         if ($captchaAnnotation === false) {
@@ -84,12 +71,7 @@ class CaptchaRouteListener implements EventSubscriberInterface
 
                 $violations = $captcha->getViolations();
 
-                $event->setController(function () use (
-                    $violations,
-                    $request
-                ) {
-                    return $this->errorController->onCaptchaFailure($violations, $request);
-                });
+                $event->setController(fn () => $this->errorController->onCaptchaFailure($violations, $request));
 
                 // Return on first invalid captcha
                 return;

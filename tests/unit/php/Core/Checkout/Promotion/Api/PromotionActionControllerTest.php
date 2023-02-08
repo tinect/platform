@@ -12,9 +12,10 @@ use Shopware\Core\Checkout\Promotion\Api\PromotionActionController;
  * @internal
  *
  * @package checkout
+ *
  * @covers \Shopware\Core\Checkout\Promotion\Api\PromotionActionController
  */
-class PromotionLineItemRuleTest extends TestCase
+class PromotionActionControllerTest extends TestCase
 {
     private PromotionActionController $promotionActionController;
 
@@ -43,7 +44,7 @@ class PromotionLineItemRuleTest extends TestCase
         $content = $response->getContent();
         static::assertNotFalse($content);
 
-        $json = \json_decode($content);
+        $json = \json_decode($content, null, 512, \JSON_THROW_ON_ERROR);
         static::assertIsArray($json);
 
         static::assertCount(1, $json);
@@ -57,7 +58,7 @@ class PromotionLineItemRuleTest extends TestCase
         $content = $response->getContent();
         static::assertNotFalse($content);
 
-        $json = \json_decode($content);
+        $json = \json_decode($content, null, 512, \JSON_THROW_ON_ERROR);
         static::assertIsArray($json);
 
         static::assertCount(1, $json);

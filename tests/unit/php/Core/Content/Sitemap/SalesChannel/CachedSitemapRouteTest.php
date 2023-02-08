@@ -33,19 +33,14 @@ use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\Content\Sitemap\SalesChannel\CachedSitemapRoute
  */
 class CachedSitemapRouteTest extends TestCase
 {
-    /**
-     * @var AbstractSitemapRoute&MockObject
-     */
-    private $decorated;
+    private MockObject&AbstractSitemapRoute $decorated;
 
-    /**
-     * @var CacheInterface&MockObject
-     */
-    private $cache;
+    private MockObject&CacheInterface $cache;
 
     private EventDispatcher $eventDispatcher;
 

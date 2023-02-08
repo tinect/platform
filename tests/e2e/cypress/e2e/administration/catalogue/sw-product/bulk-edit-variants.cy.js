@@ -5,85 +5,61 @@ import bulkEditVariants from '../../../../fixtures/bulk-edit-variants-list.json'
 
 describe('Product: Bulk edit variants', () => {
     beforeEach(() => {
-        cy.loginViaApi()
-            .then(() => {
-                cy.createProductFixture({
-                    name: 'Variant Product',
-                    productNumber: 'Variant-1234',
-                    price: [{
-                        currencyId: 'b7d2554b0ce847cd82f3ac9bd1c0dfca',
-                        linked: true,
-                        gross: 60
-                    }]
-                });
-            })
+        cy.createProductFixture({
+            name: 'Variant Product',
+            productNumber: 'Variant-1234',
+            price: [{
+                currencyId: 'b7d2554b0ce847cd82f3ac9bd1c0dfca',
+                linked: true,
+                gross: 60,
+            }],
+        })
             .then(() => {
                 return cy.createPropertyFixture({
-                    options: [{name: 'Red'}, {name: 'Yellow'}, {name: 'Green'}]
+                    options: [{name: 'Red'}, {name: 'Yellow'}, {name: 'Green'}],
                 });
             })
             .then(() => {
                 return cy.createPropertyFixture({
                     name: 'Size',
-                    options: [{name: 'S'}, {name: 'M'}, {name: 'L'}]
+                    options: [{name: 'S'}, {name: 'M'}, {name: 'L'}],
                 });
             })
             .then(() => {
-                cy.openInitialPage(`${Cypress.env('admin')}#/sw/dashboard/index`);
+                cy.openInitialPage(`${Cypress.env('admin')}#/sw/settings/custom/field/create`);
             });
     });
 
     it('@package @bulk-edit: should modify variant products with the bulk edit functionality', { tags: ['pa-system-settings'] }, () => {
         cy.intercept({
             url: `**/${Cypress.env('apiPath')}/search/product`,
-            method: 'POST'
+            method: 'POST',
         }).as('getProduct');
 
         cy.intercept({
             url: `**/${Cypress.env('apiPath')}/search/sales-channel`,
-            method: 'POST'
+            method: 'POST',
         }).as('getSalesChannel');
 
         cy.intercept({
             url: `**/${Cypress.env('apiPath')}/search/user-config`,
-            method: 'POST'
+            method: 'POST',
         }).as('getUserConfig');
 
         cy.intercept({
             url: `**/${Cypress.env('apiPath')}/_action/sync`,
-            method: 'POST'
+            method: 'POST',
         }).as('saveData');
 
         cy.intercept({
             url: `**/${Cypress.env('apiPath')}/custom-field-set`,
-            method: 'POST'
+            method: 'POST',
         }).as('saveCustomField');
 
         cy.intercept({
             url: `**/${Cypress.env('apiPath')}/_action/media/**/upload?extension=png&fileName=sw-login-background`,
-            method: 'POST'
+            method: 'POST',
         }).as('saveDataFileUpload');
-
-        // Open settings
-        cy.get('.navigation-list-item__sw-settings a').should('be.visible');
-        cy.get('.navigation-list-item__sw-settings a').click();
-
-        // Open system settings
-        cy.get('.sw-settings__tabs').should('be.visible');
-        cy.get('.sw-settings__tab-system').should('be.visible');
-        cy.get('.sw-settings__tab-system').click();
-
-        // Open custom field list
-        cy.get('#sw-settings-custom-field').should('be.visible');
-        cy.get('#sw-settings-custom-field').click();
-
-        // Open create page
-        cy.get('.sw-settings-custom-field-set-list').should('be.visible');
-        cy.get('.sw-skeleton').should('not.exist');
-        cy.get('.sw-settings-custom-field-set-list__button-create').should('be.visible');
-        cy.get('.sw-settings-custom-field-set-list__button-create').click();
-        cy.get('.sw-settings-custom-field-set-detail-base').should('be.visible');
-        cy.get('.sw-skeleton').should('not.exist');
 
         const page = new ProductPageObject();
         const mediaPage = new MediaPageObject();
@@ -123,7 +99,7 @@ describe('Product: Bulk edit variants', () => {
 
         cy.get('.sw-product-detail__tab-variants').click();
         cy.get('.sw-empty-state.sw-product-detail-variants__generated-variants-empty-state').should('be.visible');
-        cy.contains('.sw-button--ghost', 'Start variant generator').click();
+        cy.contains('.sw-button--ghost', 'Generate variants').should('be.visible').click();
         cy.get('.sw-product-modal-variant-generation').should('be.visible');
         page.generateVariants('Color', [0, 1], 2);
         cy.get('.sw-product-variants__generate-action').should('be.visible');

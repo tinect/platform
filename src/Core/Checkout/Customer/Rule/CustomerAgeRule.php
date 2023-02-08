@@ -3,6 +3,7 @@
 namespace Shopware\Core\Checkout\Customer\Rule;
 
 use Shopware\Core\Checkout\CheckoutRuleScope;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Rule\Exception\UnsupportedValueException;
 use Shopware\Core\Framework\Rule\Rule;
 use Shopware\Core\Framework\Rule\RuleComparison;
@@ -10,29 +11,19 @@ use Shopware\Core\Framework\Rule\RuleConfig;
 use Shopware\Core\Framework\Rule\RuleConstraints;
 use Shopware\Core\Framework\Rule\RuleScope;
 
-/**
- * @package business-ops
- */
+#[Package('business-ops')]
 class CustomerAgeRule extends Rule
 {
-    protected string $operator;
-
-    protected ?float $age = null;
+    final public const RULE_NAME = 'customerAge';
 
     /**
      * @internal
      */
-    public function __construct(string $operator = self::OPERATOR_EQ, ?float $age = null)
-    {
+    public function __construct(
+        protected string $operator = self::OPERATOR_EQ,
+        protected ?float $age = null
+    ) {
         parent::__construct();
-
-        $this->operator = $operator;
-        $this->age = $age;
-    }
-
-    public function getName(): string
-    {
-        return 'customerAge';
     }
 
     public function match(RuleScope $scope): bool
@@ -80,6 +71,6 @@ class CustomerAgeRule extends Rule
     {
         return (new RuleConfig())
             ->operatorSet(RuleConfig::OPERATOR_SET_NUMBER, true)
-            ->intField('age');
+            ->intField('age', ['unit' => RuleConfig::UNIT_AGE]);
     }
 }

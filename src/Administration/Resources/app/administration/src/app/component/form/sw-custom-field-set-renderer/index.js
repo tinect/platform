@@ -152,6 +152,7 @@ Component.register('sw-custom-field-set-renderer', {
 
         customFields: {
             handler(customFields) {
+                // eslint-disable-next-line vue/no-mutating-props
                 this.entity.customFields = customFields;
             },
             deep: true,
@@ -170,6 +171,11 @@ Component.register('sw-custom-field-set-renderer', {
 
         initializeCustomFields() {
             if (!this.entity.customFields && !this.entity.translated?.customFields) {
+                return;
+            }
+
+            // Check if translated custom fields are available
+            if (this.entity.translated?.customFields && Object.keys(this.entity.translated?.customFields).length <= 0) {
                 return;
             }
 
@@ -361,6 +367,14 @@ Component.register('sw-custom-field-set-renderer', {
             });
         },
 
+        getTabLabel(set) {
+            if (set.config && this.getInlineSnippet(set.config.label)) {
+                return this.getInlineSnippet(set.config.label);
+            }
+
+            return set.name;
+        },
+
         onChangeCustomFieldSets(value, updateFn) {
             if (!this.$refs.tabComponent && (this.visibleCustomFieldSets.length > 0 || value)) {
                 // when rendered initially we wait for the tabcomponent to load so we can activate the first item
@@ -381,6 +395,7 @@ Component.register('sw-custom-field-set-renderer', {
                     this.initializeCustomFields();
                     return;
                 }
+                // eslint-disable-next-line vue/no-mutating-props
                 this.entity.customFieldSets = this.entity.customFieldSets.filter(() => {
                     return false;
                 });

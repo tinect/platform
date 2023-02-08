@@ -2,13 +2,13 @@
 
 namespace Shopware\Core\Profiling;
 
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Profiling\Integration\ProfilerInterface;
 
 /**
- * @package core
- *
  * @internal experimental atm
  */
+#[Package('core')]
 class Profiler
 {
     /**
@@ -35,8 +35,10 @@ class Profiler
     /**
      * @param array<string> $activeProfilers
      */
-    public function __construct(\Traversable $profilers, array $activeProfilers)
-    {
+    public function __construct(
+        \Traversable $profilers,
+        array $activeProfilers
+    ) {
         $profilers = iterator_to_array($profilers);
         self::$profilers = array_intersect_key($profilers, array_flip($activeProfilers));
         self::$tags = [];

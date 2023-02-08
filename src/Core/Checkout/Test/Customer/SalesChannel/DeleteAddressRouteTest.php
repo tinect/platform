@@ -3,6 +3,7 @@
 namespace Shopware\Core\Checkout\Test\Customer\SalesChannel;
 
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Test\TestDataCollection;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -10,11 +11,11 @@ use Shopware\Core\PlatformRequest;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
- * @package customer-order
- *
  * @internal
+ *
  * @group store-api
  */
+#[Package('customer-order')]
 class DeleteAddressRouteTest extends TestCase
 {
     use IntegrationTestBehaviour;
@@ -74,7 +75,7 @@ class DeleteAddressRouteTest extends TestCase
                 $data
             );
 
-        $addressId = json_decode((string) $this->browser->getResponse()->getContent(), true)['id'];
+        $addressId = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR)['id'];
 
         // Check is listed
         $this->browser
@@ -85,7 +86,7 @@ class DeleteAddressRouteTest extends TestCase
                 ]
             );
 
-        static::assertSame(2, json_decode((string) $this->browser->getResponse()->getContent(), true)['total']);
+        static::assertSame(2, json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR)['total']);
 
         // Delete
         $this->browser
@@ -104,7 +105,7 @@ class DeleteAddressRouteTest extends TestCase
                 ]
             );
 
-        static::assertSame(1, json_decode((string) $this->browser->getResponse()->getContent(), true)['total']);
+        static::assertSame(1, json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR)['total']);
     }
 
     public function testDeleteDefaultAddress(): void
@@ -116,7 +117,7 @@ class DeleteAddressRouteTest extends TestCase
                 []
             );
 
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         $billingAddressId = $response['defaultBillingAddressId'];
         $shippingAddressId = $response['defaultShippingAddressId'];
 
@@ -127,7 +128,7 @@ class DeleteAddressRouteTest extends TestCase
             );
 
         static::assertNotSame(204, $this->browser->getResponse()->getStatusCode());
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertSame('CHECKOUT__CUSTOMER_ADDRESS_IS_DEFAULT', $response['errors'][0]['code']);
 
@@ -138,7 +139,7 @@ class DeleteAddressRouteTest extends TestCase
             );
 
         static::assertNotSame(204, $this->browser->getResponse()->getStatusCode());
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertSame('CHECKOUT__CUSTOMER_ADDRESS_IS_DEFAULT', $response['errors'][0]['code']);
     }
@@ -165,10 +166,10 @@ class DeleteAddressRouteTest extends TestCase
                 [],
                 [],
                 ['CONTENT_TYPE' => 'application/json'],
-                (string) \json_encode($data)
+                (string) \json_encode($data, \JSON_THROW_ON_ERROR)
             );
 
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         $addressId = $response['id'];
 
         $contextData = [
@@ -183,7 +184,7 @@ class DeleteAddressRouteTest extends TestCase
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],
-            (string) \json_encode($contextData)
+            (string) \json_encode($contextData, \JSON_THROW_ON_ERROR)
         );
 
         $this->browser
@@ -193,7 +194,7 @@ class DeleteAddressRouteTest extends TestCase
             );
 
         static::assertNotSame(204, $this->browser->getResponse()->getStatusCode());
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertSame('CHECKOUT__CUSTOMER_ADDRESS_IS_ACTIVE', $response['errors'][0]['code']);
     }
@@ -222,7 +223,7 @@ class DeleteAddressRouteTest extends TestCase
                 $data
             );
 
-        $addressId = json_decode((string) $this->browser->getResponse()->getContent(), true)['id'];
+        $addressId = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR)['id'];
 
         // Check is listed
         $this->browser
@@ -233,7 +234,7 @@ class DeleteAddressRouteTest extends TestCase
                 ]
             );
 
-        static::assertSame(2, json_decode((string) $this->browser->getResponse()->getContent(), true)['total']);
+        static::assertSame(2, json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR)['total']);
 
         // Delete
         $this->browser
@@ -252,6 +253,6 @@ class DeleteAddressRouteTest extends TestCase
                 ]
             );
 
-        static::assertSame(1, json_decode((string) $this->browser->getResponse()->getContent(), true)['total']);
+        static::assertSame(1, json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR)['total']);
     }
 }

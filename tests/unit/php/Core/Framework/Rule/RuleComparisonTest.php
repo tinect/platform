@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Shopware\Tests\Unit\Core\Framework\Rule\Container;
+namespace Shopware\Tests\Unit\Core\Framework\Rule;
 
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Rule\Exception\UnsupportedOperatorException;
@@ -11,6 +11,7 @@ use Shopware\Core\Framework\Rule\RuleComparison;
  * @package business-ops
  *
  * @internal
+ *
  * @covers \Shopware\Core\Framework\Rule\RuleComparison
  */
 class RuleComparisonTest extends TestCase

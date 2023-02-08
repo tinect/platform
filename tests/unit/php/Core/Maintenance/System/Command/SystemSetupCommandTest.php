@@ -11,6 +11,7 @@ use Symfony\Component\Dotenv\Dotenv;
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\Maintenance\System\Command\SystemSetupCommand
  */
 class SystemSetupCommandTest extends TestCase
@@ -36,6 +37,10 @@ class SystemSetupCommandTest extends TestCase
             '--es-enabled' => '1',
             '--es-indexing-enabled' => '1',
             '--es-index-prefix' => 'shopware',
+            '--admin-es-hosts' => 'localhost:9200',
+            '--admin-es-index-prefix' => 'shopware-admin',
+            '--admin-es-enabled' => '1',
+            '--admin-es-refresh-indices' => '1',
             '--http-cache-enabled' => '1',
             '--http-cache-ttl' => '7200',
             '--cdn-strategy' => 'id',
@@ -68,11 +73,15 @@ class SystemSetupCommandTest extends TestCase
             'SHOPWARE_ES_ENABLED' => '1',
             'SHOPWARE_ES_INDEXING_ENABLED' => '1',
             'SHOPWARE_ES_INDEX_PREFIX' => 'shopware',
+            'ADMIN_OPENSEARCH_URL' => 'localhost:9200',
+            'SHOPWARE_ADMIN_ES_INDEX_PREFIX' => 'shopware-admin',
+            'SHOPWARE_ADMIN_ES_ENABLED' => '1',
+            'SHOPWARE_ADMIN_ES_REFRESH_INDICES' => '1',
             'SHOPWARE_HTTP_CACHE_ENABLED' => '1',
             'SHOPWARE_HTTP_DEFAULT_TTL' => '7200',
             'SHOPWARE_CDN_STRATEGY_DEFAULT' => 'id',
             'BLUE_GREEN_DEPLOYMENT' => '1',
-            'MAILER_URL' => 'smtp://localhost:25',
+            'MAILER_DSN' => 'smtp://localhost:25',
             'COMPOSER_HOME' => __DIR__,
         ], $env);
     }
@@ -87,6 +96,10 @@ class SystemSetupCommandTest extends TestCase
             '--es-enabled' => '1',
             '--es-indexing-enabled' => '1',
             '--es-index-prefix' => 'shopware',
+            '--admin-es-hosts' => 'localhost:9200',
+            '--admin-es-index-prefix' => 'shopware-admin',
+            '--admin-es-enabled' => '1',
+            '--admin-es-refresh-indices' => '1',
             '--http-cache-enabled' => '1',
             '--http-cache-ttl' => '7200',
             '--cdn-strategy' => 'id',

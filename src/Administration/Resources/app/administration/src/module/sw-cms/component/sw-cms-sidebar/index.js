@@ -21,6 +21,7 @@ export default {
         'repositoryFactory',
         'feature',
         'cmsBlockFavorites',
+        'cmsPageTypeService',
     ],
 
     mixins: [
@@ -64,6 +65,10 @@ export default {
     },
 
     computed: {
+        pageTypes() {
+            return this.cmsPageTypeService.getTypes();
+        },
+
         blockRepository() {
             return this.repositoryFactory.create('cms_block');
         },
@@ -153,7 +158,7 @@ export default {
                 return true;
             }
 
-            if (this.page.type === 'product_detail' && this.feature.isActive('v6.5.0.0')) {
+            if (this.page.type === 'product_detail' && this.feature.isActive('v6.6.0.0')) {
                 return true;
             }
 
@@ -195,6 +200,18 @@ export default {
         onCloseBlockConfig() {
             Shopware.State.commit('cmsPageState/removeSelectedBlock');
             Shopware.State.commit('cmsPageState/removeSelectedSection');
+        },
+
+        isDisabledPageType(pageType) {
+            if (this.page.type === 'product_detail') {
+                return true;
+            }
+
+            if (this.page.type.includes('custom_entity_')) {
+                return !pageType.name.includes('custom_entity_');
+            }
+
+            return pageType.name === 'product_detail' || pageType.name.includes('custom_entity_');
         },
 
         openSectionSettings(sectionIndex) {
@@ -410,7 +427,7 @@ export default {
 
                 const slotDefaultData = slotConfig.default?.data;
                 if ([slotDefaultData?.media?.source, slotDefaultData?.sliderItems?.source].includes('default')) {
-                    element.config = Object.assign({}, element.config, slotDefaultData);
+                    element.config = { ...element.config, ...slotDefaultData };
                 }
 
                 newBlock.slots.add(element);

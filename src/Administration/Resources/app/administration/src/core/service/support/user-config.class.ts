@@ -9,15 +9,6 @@ enum USER_CONFIG_PERMISSIONS {
     UPDATE = 'user_config:update'
 }
 
-interface CurrentUserObject {
-    id: string;
-    [index: string]: unknown;
-}
-
-interface UserConfigEntity extends Entity {
-    value?: string[] | null;
-}
-
 abstract class UserConfigClass {
     private userConfigRepository = Service('repositoryFactory').create('user_config');
 
@@ -51,7 +42,7 @@ abstract class UserConfigClass {
         void this.readUserConfig();
     }
 
-    protected async getUserConfig(): Promise<UserConfigEntity> {
+    protected async getUserConfig(): Promise<Entity<'user_config'>> {
         if (!this.aclService.can(USER_CONFIG_PERMISSIONS.READ)) {
             return this.userConfig;
         }
@@ -74,7 +65,7 @@ abstract class UserConfigClass {
         await this.readUserConfig();
     }
 
-    private createUserConfigEntity(configKey: string): UserConfigEntity {
+    private createUserConfigEntity(configKey: string): Entity<'user_config'> {
         const entity = this.userConfigRepository.create(Context.api);
 
         if (!entity) {
@@ -90,7 +81,7 @@ abstract class UserConfigClass {
         return entity;
     }
 
-    private handleEmptyUserConfig(userConfig: UserConfigEntity): UserConfigEntity {
+    private handleEmptyUserConfig(userConfig: Entity<'user_config'>): Entity<'user_config'> {
         if (!Array.isArray(userConfig?.value)) {
             userConfig.value = [];
         }
@@ -108,7 +99,7 @@ abstract class UserConfigClass {
     }
 
     private getCurrentUserId(): string {
-        return (State.get('session').currentUser as CurrentUserObject).id;
+        return State.get('session').currentUser.id;
     }
 }
 

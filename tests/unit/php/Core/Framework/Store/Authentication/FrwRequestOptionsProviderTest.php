@@ -14,12 +14,12 @@ use Shopware\Core\Framework\Store\Authentication\FrwRequestOptionsProvider;
 use Shopware\Core\System\User\Aggregate\UserConfig\UserConfigCollection;
 use Shopware\Core\System\User\Aggregate\UserConfig\UserConfigDefinition;
 use Shopware\Core\System\User\Aggregate\UserConfig\UserConfigEntity;
-use Shopware\Core\Test\Annotation\DisabledFeatures;
 
 /**
  * @package merchant-services
  *
  * @internal
+ *
  * @covers \Shopware\Core\Framework\Store\Authentication\FrwRequestOptionsProvider
  */
 class FrwRequestOptionsProviderTest extends TestCase
@@ -137,36 +137,6 @@ class FrwRequestOptionsProviderTest extends TestCase
 
         static::expectException(InvalidContextSourceException::class);
         $frwRequestOptionsProvider->getAuthenticationHeader($context);
-    }
-
-    /**
-     * @DisabledFeatures(features={"v6.5.0.0"})
-     */
-    public function testGetDefaultQueryParametersTakesContextAndLanguageBefore65(): void
-    {
-        $context = Context::createDefaultContext();
-        $language = 'en-GB';
-
-        $userConfigRepositoryMock = static::createMock(EntityRepository::class);
-
-        $innerOptionsProvider = static::createMock(AbstractStoreRequestOptionsProvider::class);
-        $innerOptionsProvider->expects(static::once())
-            ->method('getDefaultQueryParameters')
-            ->with($context, $language)
-            ->willReturn([
-                'queries' => 'some-queries',
-            ]);
-
-        $frwRequestOptionsProvider = new FrwRequestOptionsProvider(
-            $innerOptionsProvider,
-            $userConfigRepositoryMock
-        );
-
-        $queries = $frwRequestOptionsProvider->getDefaultQueryParameters($context, $language);
-
-        static::assertEquals([
-            'queries' => 'some-queries',
-        ], $queries);
     }
 
     public function testGetDefaultQueryParametersDelegatesToInnerProvider(): void

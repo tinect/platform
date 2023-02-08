@@ -17,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
  * @internal
+ *
  * @group store-api
  */
 class AddWishlistProductRouteTest extends TestCase
@@ -85,7 +86,7 @@ class AddWishlistProductRouteTest extends TestCase
                 'POST',
                 '/store-api/customer/wishlist/add/' . $productData[0]
             );
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         static::assertSame(200, $this->browser->getResponse()->getStatusCode());
         static::assertTrue($response['success']);
         static::assertTrue($eventWasThrown);
@@ -103,7 +104,7 @@ class AddWishlistProductRouteTest extends TestCase
                 'POST',
                 '/store-api/customer/wishlist/add/' . $productData[0]
             );
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         $errors = $response['errors'][0];
         static::assertSame(403, $this->browser->getResponse()->getStatusCode());
         static::assertEquals('CHECKOUT__WISHLIST_IS_NOT_ACTIVATED', $errors['code']);
@@ -121,7 +122,7 @@ class AddWishlistProductRouteTest extends TestCase
                 'POST',
                 '/store-api/customer/wishlist/add/' . $productId
             );
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         $errors = $response['errors'][0];
         static::assertSame(403, $this->browser->getResponse()->getStatusCode());
         static::assertEquals('CHECKOUT__CUSTOMER_NOT_LOGGED_IN', $errors['code']);
@@ -139,7 +140,7 @@ class AddWishlistProductRouteTest extends TestCase
                 '/store-api/customer/wishlist/add/' . $productData[0]
             );
 
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         $errors = $response['errors'][0];
         unset($errors['meta']);
@@ -156,7 +157,7 @@ class AddWishlistProductRouteTest extends TestCase
                 'POST',
                 '/store-api/customer/wishlist/add/' . $productId
             );
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         $errors = $response['errors'][0];
         static::assertSame(404, $this->browser->getResponse()->getStatusCode());
         static::assertEquals('CONTENT__PRODUCT_NOT_FOUND', $errors['code']);
@@ -165,7 +166,7 @@ class AddWishlistProductRouteTest extends TestCase
     }
 
     /**
-     * @return array<mixed>
+     * @return array<int, string>
      */
     private function createProduct(Context $context): array
     {

@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @internal
+ *
  * @group slow
  */
 class TranslationTest extends TestCase
@@ -145,7 +146,7 @@ class TranslationTest extends TestCase
         $response = $this->getBrowser()->getResponse();
         static::assertEquals(412, $response->getStatusCode(), $response->getContent());
 
-        $data = json_decode($response->getContent(), true);
+        $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         static::assertEquals(LanguageNotFoundException::LANGUAGE_NOT_FOUND_ERROR, $data['errors'][0]['code']);
     }
 
@@ -159,7 +160,7 @@ class TranslationTest extends TestCase
         $response = $this->getBrowser()->getResponse();
         static::assertEquals(412, $response->getStatusCode());
 
-        $data = json_decode($response->getContent(), true);
+        $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         static::assertEquals(LanguageNotFoundException::LANGUAGE_NOT_FOUND_ERROR, $data['errors'][0]['code']);
 
         $langId = sprintf('id=%s', 'foobar');
@@ -167,7 +168,7 @@ class TranslationTest extends TestCase
         $response = $this->getBrowser()->getResponse();
         static::assertEquals(412, $response->getStatusCode());
 
-        $data = json_decode($response->getContent(), true);
+        $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         static::assertEquals(LanguageNotFoundException::LANGUAGE_NOT_FOUND_ERROR, $data['errors'][0]['code']);
     }
 
@@ -181,7 +182,7 @@ class TranslationTest extends TestCase
         $response = $this->getBrowser()->getResponse();
         static::assertEquals(412, $response->getStatusCode());
 
-        $data = json_decode($response->getContent(), true);
+        $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         static::assertEquals(LanguageNotFoundException::LANGUAGE_NOT_FOUND_ERROR, $data['errors'][0]['code']);
 
         $langId = sprintf('id=%s', Uuid::randomHex());
@@ -189,7 +190,7 @@ class TranslationTest extends TestCase
         $response = $this->getBrowser()->getResponse();
         static::assertEquals(412, $response->getStatusCode());
 
-        $data = json_decode($response->getContent(), true);
+        $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         static::assertEquals(LanguageNotFoundException::LANGUAGE_NOT_FOUND_ERROR, $data['errors'][0]['code']);
     }
 
@@ -348,7 +349,7 @@ class TranslationTest extends TestCase
 
         $this->getBrowser()->request('GET', $baseResource . '/' . $id, [], [], [$headerName => $langId]);
         $response = $this->getBrowser()->getResponse();
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertEquals($translated['name'], $responseData['data']['attributes']['name']);
         static::assertNull($responseData['data']['attributes']['territory']);
@@ -384,12 +385,12 @@ class TranslationTest extends TestCase
 
         $this->getBrowser()->request('GET', $baseResource . '/' . $id, [], [], [$headerName => Defaults::LANGUAGE_SYSTEM]);
         $response = $this->getBrowser()->getResponse();
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         static::assertEquals($name, $responseData['data']['attributes']['name']);
 
         $this->getBrowser()->request('GET', $baseResource . '/' . $id, [], [], [$headerName => $langId]);
         $response = $this->getBrowser()->getResponse();
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         static::assertEquals($translatedName, $responseData['data']['attributes']['name']);
 
         $this->getBrowser()->request('DELETE', $baseResource . '/' . $id . '/translations/' . $langId);
@@ -398,7 +399,7 @@ class TranslationTest extends TestCase
 
         $this->getBrowser()->request('GET', $baseResource . '/' . $id, [], [], [$headerName => $langId]);
         $response = $this->getBrowser()->getResponse();
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         static::assertNull($responseData['data']['attributes']['name']);
     }
 
@@ -423,7 +424,7 @@ class TranslationTest extends TestCase
         $response = $this->getBrowser()->getResponse();
         static::assertEquals(400, $response->getStatusCode(), $response->getContent());
 
-        $data = json_decode($response->getContent(), true);
+        $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         static::assertEquals(TranslationValidator::VIOLATION_DELETE_SYSTEM_TRANSLATION, $data['errors'][0]['code']);
         static::assertEquals('/' . $id . '/translations/' . Defaults::LANGUAGE_SYSTEM, $data['errors'][0]['source']['pointer']);
     }
@@ -447,7 +448,7 @@ class TranslationTest extends TestCase
             ],
         ];
 
-        $this->getBrowser()->request('POST', $baseResource, [], [], [], json_encode($categoryData));
+        $this->getBrowser()->request('POST', $baseResource, [], [], [], json_encode($categoryData, \JSON_THROW_ON_ERROR));
         $response = $this->getBrowser()->getResponse();
 
         static::assertEquals(204, $response->getStatusCode());
@@ -472,7 +473,7 @@ class TranslationTest extends TestCase
                 $rootDelete => ['name' => 'root delete'],
             ],
         ];
-        $this->getBrowser()->request('POST', $baseResource, [], [], [], json_encode($categoryData));
+        $this->getBrowser()->request('POST', $baseResource, [], [], [], json_encode($categoryData, \JSON_THROW_ON_ERROR));
         $response = $this->getBrowser()->getResponse();
 
         static::assertEquals(204, $response->getStatusCode());
@@ -500,7 +501,7 @@ class TranslationTest extends TestCase
                 $childId => ['name' => 'child'],
             ],
         ];
-        $this->getBrowser()->request('POST', $baseResource, [], [], [], json_encode($categoryData));
+        $this->getBrowser()->request('POST', $baseResource, [], [], [], json_encode($categoryData, \JSON_THROW_ON_ERROR));
         $response = $this->getBrowser()->getResponse();
 
         static::assertEquals(204, $response->getStatusCode());
@@ -523,7 +524,7 @@ class TranslationTest extends TestCase
             'id' => $idSystem,
             'name' => '1. system',
         ];
-        $this->getBrowser()->request('POST', $baseResource, [], [], [], json_encode($system));
+        $this->getBrowser()->request('POST', $baseResource, [], [], [], json_encode($system, \JSON_THROW_ON_ERROR));
         $this->assertEntityExists($this->getBrowser(), 'category', $idSystem);
 
         $idRoot = Uuid::randomHex();
@@ -534,7 +535,7 @@ class TranslationTest extends TestCase
                 $rootLangId => ['name' => '2. root'],
             ],
         ];
-        $this->getBrowser()->request('POST', $baseResource, [], [], [], json_encode($root));
+        $this->getBrowser()->request('POST', $baseResource, [], [], [], json_encode($root, \JSON_THROW_ON_ERROR));
         $this->assertEntityExists($this->getBrowser(), 'category', $idRoot);
 
         $idChild = Uuid::randomHex();
@@ -546,7 +547,7 @@ class TranslationTest extends TestCase
                 $childLangId => ['name' => '3. child'],
             ],
         ];
-        $this->getBrowser()->request('POST', $baseResource, [], [], [], json_encode($childAndRoot));
+        $this->getBrowser()->request('POST', $baseResource, [], [], [], json_encode($childAndRoot, \JSON_THROW_ON_ERROR));
         $this->assertEntityExists($this->getBrowser(), 'category', $idChild);
 
         $headers = [
@@ -557,7 +558,7 @@ class TranslationTest extends TestCase
         $response = $this->getBrowser()->getResponse();
         static::assertEquals(200, $response->getStatusCode());
 
-        $data = json_decode($response->getContent(), true)['data'];
+        $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR)['data'];
 
         static::assertNull($data[0]['name']);
         static::assertNull($data[1]['name']);
@@ -582,12 +583,12 @@ class TranslationTest extends TestCase
         ];
         $categoryData = array_merge_recursive($categoryData, $data);
 
-        $this->getBrowser()->request('POST', $baseResource, [], [], [], json_encode($categoryData));
+        $this->getBrowser()->request('POST', $baseResource, [], [], [], json_encode($categoryData, \JSON_THROW_ON_ERROR));
         $response = $this->getBrowser()->getResponse();
 
         static::assertEquals(400, $response->getStatusCode(), $response->getContent());
 
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         static::assertCount(\count($errors), $responseData['errors']);
 
         $actualErrors = array_map(function ($error) {
@@ -614,7 +615,7 @@ class TranslationTest extends TestCase
             $requestData['id'] = Uuid::randomHex();
         }
 
-        $this->getBrowser()->request('POST', $baseResource, [], [], [], json_encode($requestData));
+        $this->getBrowser()->request('POST', $baseResource, [], [], [], json_encode($requestData, \JSON_THROW_ON_ERROR));
         $response = $this->getBrowser()->getResponse();
 
         static::assertEquals(204, $response->getStatusCode(), $response->getContent());
@@ -630,7 +631,7 @@ class TranslationTest extends TestCase
 
         $response = $this->getBrowser()->getResponse();
         static::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertArrayHasKey('data', $responseData, $response->getContent());
         static::assertArraySubset($expectedTranslations, $responseData['data']);
@@ -653,7 +654,7 @@ class TranslationTest extends TestCase
                 ],
                 'translationCodeId' => $fallbackLocaleId,
             ];
-            $this->getBrowser()->request('POST', $baseUrl . '/language', [], [], [], json_encode($parentLanguageData));
+            $this->getBrowser()->request('POST', $baseUrl . '/language', [], [], [], json_encode($parentLanguageData, \JSON_THROW_ON_ERROR));
             static::assertEquals(204, $this->getBrowser()->getResponse()->getStatusCode());
         }
 
@@ -671,7 +672,7 @@ class TranslationTest extends TestCase
             'translationCodeId' => $localeId,
         ];
 
-        $this->getBrowser()->request('POST', $baseUrl . '/language', [], [], [], json_encode($languageData));
+        $this->getBrowser()->request('POST', $baseUrl . '/language', [], [], [], json_encode($languageData, \JSON_THROW_ON_ERROR));
         static::assertEquals(204, $this->getBrowser()->getResponse()->getStatusCode(), $this->getBrowser()->getResponse()->getContent());
 
         $this->getBrowser()->request('GET', $baseUrl . '/language/' . $langId);

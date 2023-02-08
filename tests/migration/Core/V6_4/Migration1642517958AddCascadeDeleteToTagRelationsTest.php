@@ -12,6 +12,7 @@ use Shopware\Core\Migration\V6_4\Migration1642517958AddCascadeDeleteToTagRelatio
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\Migration\V6_4\Migration1642517958AddCascadeDeleteToTagRelations
  */
 class Migration1642517958AddCascadeDeleteToTagRelationsTest extends TestCase
@@ -67,7 +68,7 @@ class Migration1642517958AddCascadeDeleteToTagRelationsTest extends TestCase
                 continue;
             }
 
-            if ($foreignKey->getForeignTableName() === 'tag' && $foreignKey->getColumns() === ['tag_id']) {
+            if ($foreignKey->getForeignTableName() === 'tag' && $foreignKey->getLocalColumns() === ['tag_id']) {
                 return $foreignKey;
             }
         }

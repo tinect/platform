@@ -18,6 +18,7 @@ use Shopware\Storefront\Framework\Seo\SeoUrlRoute\NavigationPageSeoUrlRoute;
 
 /**
  * @internal
+ *
  * @group slow
  * @group skip-paratest
  */
@@ -26,20 +27,11 @@ class NavigationPageSeoUrlTest extends TestCase
     use IntegrationTestBehaviour;
     use QueueTestBehaviour;
 
-    /**
-     * @var EntityRepository
-     */
-    private $salesChannelRepository;
+    private EntityRepository $salesChannelRepository;
 
-    /**
-     * @var EntityRepository
-     */
-    private $categoryRepository;
+    private EntityRepository $categoryRepository;
 
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Connection $connection;
 
     protected function setUp(): void
     {

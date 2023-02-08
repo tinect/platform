@@ -16,6 +16,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
  * @package business-ops
  *
  * @internal
+ *
  * @covers \Shopware\Core\System\Currency\Rule\CurrencyRule
  */
 class CurrencyRuleTest extends TestCase
@@ -182,7 +183,7 @@ class CurrencyRuleTest extends TestCase
             ->method('getContext')
             ->willReturn($context);
 
-        $cart = new Cart('foo', 'bar');
+        $cart = new Cart('bar');
 
         return new CartRuleScope($cart, $salesChannelContext);
     }

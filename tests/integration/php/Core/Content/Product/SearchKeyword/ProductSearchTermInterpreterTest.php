@@ -19,6 +19,7 @@ use Shopware\Core\Framework\Uuid\Uuid;
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\Content\Product\SearchKeyword\ProductSearchTermInterpreter
  */
 class ProductSearchTermInterpreterTest extends TestCase
@@ -55,9 +56,7 @@ class ProductSearchTermInterpreterTest extends TestCase
 
         $matches = $this->interpreter->interpret($term, $context);
 
-        $keywords = array_map(function (SearchTerm $term) {
-            return $term->getTerm();
-        }, $matches->getTerms());
+        $keywords = array_map(fn (SearchTerm $term) => $term->getTerm(), $matches->getTerms());
 
         sort($expected);
         sort($keywords);
@@ -75,9 +74,7 @@ class ProductSearchTermInterpreterTest extends TestCase
 
         $matches = $this->interpreter->interpret($term, $context);
 
-        $keywords = array_map(function (SearchTerm $term) {
-            return $term->getTerm();
-        }, $matches->getTerms());
+        $keywords = array_map(fn (SearchTerm $term) => $term->getTerm(), $matches->getTerms());
 
         sort($expected);
         sort($keywords);
@@ -134,9 +131,7 @@ class ProductSearchTermInterpreterTest extends TestCase
         ], $context);
 
         $matches = $this->interpreter->interpret($words, $context);
-        $terms = array_map(function (SearchTerm $term) {
-            return $term->getTerm();
-        }, $matches->getTerms());
+        $terms = array_map(fn (SearchTerm $term) => $term->getTerm(), $matches->getTerms());
 
         if (!$andLogic) {
             $flatterTerms = ArrayNormalizer::flatten($matches->getTokenTerms());
@@ -367,31 +362,6 @@ class ProductSearchTermInterpreterTest extends TestCase
                 'again 2',
             ],
         ];
-    }
-
-    /**
-     * @deprecated tag:v6.5.0 - Testcase can be removed, as php min version will be higher
-     */
-    public function testLevenshteinCharacterLimit(): void
-    {
-        if (\PHP_VERSION_ID >= 80000) {
-            static::markTestSkipped();
-        }
-
-        // 256 characters
-        $word = 'Kk5zWGZaYUnONSFzLplcuNyRUtDJl6DfrgYsFK30zo7iN9aTVdJx91OXa4mbZy7fQkCwvGbeCueNCNcveTg5'
-            . 'Du9Bm2CaZdlOB4ZQG1OTzgZpFjyGaqMb4WRFU9NamzBPMZBN0b0RF32uDCvZXAiFnYJboSn6dwDgbTUE6Ibyyt'
-            . 'OJZqtIF8bWn6GFzczaW5DzBqyjFriqCel3VqVMcLEOx6fWYfcQqn6sG8yAf4svUkeHc1iw8sIajbRjRCyeOF8w';
-
-        $this->connection->insert('product_keyword_dictionary', [
-            'id' => Uuid::randomBytes(),
-            'keyword' => $word,
-            'language_id' => Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM),
-        ]);
-
-        $pattern = $this->interpreter->interpret($word, Context::createDefaultContext());
-
-        static::assertNotEmpty($pattern->getAllTerms());
     }
 
     private function setupKeywords(): void

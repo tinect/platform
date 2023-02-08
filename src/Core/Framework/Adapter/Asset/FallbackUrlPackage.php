@@ -3,20 +3,21 @@
 namespace Shopware\Core\Framework\Adapter\Asset;
 
 use Shopware\Core\DevOps\Environment\EnvironmentHelper;
+use Shopware\Core\Framework\Log\Package;
 use Symfony\Component\Asset\UrlPackage;
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * @package core
- */
+#[Package('core')]
 class FallbackUrlPackage extends UrlPackage
 {
     /**
      * @internal
      */
-    public function __construct($baseUrls, VersionStrategyInterface $versionStrategy)
-    {
+    public function __construct(
+        $baseUrls,
+        VersionStrategyInterface $versionStrategy
+    ) {
         $baseUrls = iterator_to_array($this->applyFallback($baseUrls), false);
         parent::__construct($baseUrls, $versionStrategy);
     }

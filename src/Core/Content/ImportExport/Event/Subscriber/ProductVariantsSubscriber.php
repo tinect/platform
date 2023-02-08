@@ -15,25 +15,19 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * @deprecated tag:v6.5.0 - reason:becomes-internal - EventSubscribers will become internal in v6.5.0
+ * @internal
  *
- * @package system-settings
+ * @phpstan-type CombinationPayload list<array{id: string, parentId: string, productNumber: string, stock: int, options: list<array{id: string, name: string, group: array{id: string, name: string}}>}>
  */
+#[Package('system-settings')]
 class ProductVariantsSubscriber implements EventSubscriberInterface, ResetInterface
 {
-    private SyncServiceInterface $syncService;
-
-    private Connection $connection;
-
-    private EntityRepository $groupRepository;
-
-    private EntityRepository $optionRepository;
-
     /**
      * @var array<string, string>
      */
@@ -48,21 +42,17 @@ class ProductVariantsSubscriber implements EventSubscriberInterface, ResetInterf
      * @internal
      */
     public function __construct(
-        SyncServiceInterface $syncService,
-        Connection $connection,
-        EntityRepository $groupRepository,
-        EntityRepository $optionRepository
+        private readonly SyncServiceInterface $syncService,
+        private readonly Connection $connection,
+        private readonly EntityRepository $groupRepository,
+        private readonly EntityRepository $optionRepository
     ) {
-        $this->syncService = $syncService;
-        $this->connection = $connection;
-        $this->groupRepository = $groupRepository;
-        $this->optionRepository = $optionRepository;
     }
 
     /**
      * @return array<string, string|array{0: string, 1: int}|list<array{0: string, 1?: int}>>
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ImportExportAfterImportRecordEvent::class => 'onAfterImportRecord',
@@ -81,9 +71,7 @@ class ProductVariantsSubscriber implements EventSubscriberInterface, ResetInterf
 
         $variants = $this->parseVariantString($row['variants']);
 
-        $entityWrittenEvent = $entityWrittenEvents->filter(function ($event) {
-            return $event instanceof EntityWrittenEvent && $event->getEntityName() === ProductDefinition::ENTITY_NAME;
-        })->first();
+        $entityWrittenEvent = $entityWrittenEvents->filter(fn ($event) => $event instanceof EntityWrittenEvent && $event->getEntityName() === ProductDefinition::ENTITY_NAME)->first();
 
         if (!$entityWrittenEvent instanceof EntityWrittenEvent) {
             return;
@@ -144,7 +132,7 @@ class ProductVariantsSubscriber implements EventSubscriberInterface, ResetInterf
     /**
      * convert "size: m, l, xl" to ["size|m", "size|l", "size|xl"]
      *
-     * @return list<list<string>>
+     * @return list<array<string>>
      */
     private function parseVariantString(string $variantsString): array
     {
@@ -166,9 +154,7 @@ class ProductVariantsSubscriber implements EventSubscriberInterface, ResetInterf
                 $this->throwExceptionFailedParsingVariants($variantsString);
             }
 
-            $options = array_map(function ($option) use ($groupName) {
-                return sprintf('%s|%s', $groupName, $option);
-            }, $options);
+            $options = array_map(fn ($option) => sprintf('%s|%s', $groupName, $option), $options);
 
             $result[] = $options;
         }
@@ -185,9 +171,9 @@ class ProductVariantsSubscriber implements EventSubscriberInterface, ResetInterf
     }
 
     /**
-     * @param list<list<string>> $variants
+     * @param list<array<string>> $variants
      *
-     * @return list<array<string, mixed>>
+     * @return CombinationPayload
      */
     private function getCombinationsPayload(array $variants, string $parentId, string $productNumber): array
     {
@@ -202,7 +188,7 @@ class ProductVariantsSubscriber implements EventSubscriberInterface, ResetInterf
             }
 
             foreach ($combination as $option) {
-                list($group, $option) = explode('|', $option);
+                [$group, $option] = explode('|', $option);
 
                 $optionId = $this->getOptionId($group, $option);
                 $groupId = $this->getGroupId($group);
@@ -236,9 +222,9 @@ class ProductVariantsSubscriber implements EventSubscriberInterface, ResetInterf
      * convert [["size|m", "size|l"], ["color|blue", "color|red"]]
      * to [["size|m", "color|blue"], ["size|l", "color|blue"], ["size|m", "color|red"], ["size|l", "color|red"]]
      *
-     * @param list<list<string>> $variants
+     * @param list<array<string>> $variants
      *
-     * @return list<list<string>>|list<string>
+     * @return list<array<string>>|array<string>
      */
     private function getCombinations(array $variants, int $currentIndex = 0): array
     {
@@ -258,7 +244,7 @@ class ProductVariantsSubscriber implements EventSubscriberInterface, ResetInterf
         // concat each array from tmp with each element from $variants[$i]
         foreach ($variants[$currentIndex] as $variant) {
             foreach ($combinations as $combination) {
-                $result[] = \is_array($combination) ? array_merge([$variant], $combination) : [$variant, $combination];
+                $result[] = \is_array($combination) ? [...[$variant], ...$combination] : [$variant, $combination];
             }
         }
 
@@ -266,9 +252,9 @@ class ProductVariantsSubscriber implements EventSubscriberInterface, ResetInterf
     }
 
     /**
-     * @param list<array<string, mixed>> $variantsPayload
+     * @param CombinationPayload $variantsPayload
      *
-     * @return list<array<string, mixed>>
+     * @return list<array{id: string, optionId: string, productId: string}>
      */
     private function getProductConfiguratorSettingPayload(array $variantsPayload, string $parentId): array
     {

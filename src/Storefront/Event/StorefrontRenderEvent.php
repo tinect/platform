@@ -5,12 +5,11 @@ namespace Shopware\Storefront\Event;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Event\NestedEvent;
 use Shopware\Core\Framework\Event\ShopwareSalesChannelEvent;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * @package storefront
- */
+#[Package('storefront')]
 class StorefrontRenderEvent extends NestedEvent implements ShopwareSalesChannelEvent
 {
     /**
@@ -33,8 +32,12 @@ class StorefrontRenderEvent extends NestedEvent implements ShopwareSalesChannelE
      */
     protected $context;
 
-    public function __construct(string $view, array $parameters, Request $request, SalesChannelContext $context)
-    {
+    public function __construct(
+        string $view,
+        array $parameters,
+        Request $request,
+        SalesChannelContext $context
+    ) {
         $this->view = $view;
         $this->parameters = array_merge(['context' => $context], $parameters);
         $this->request = $request;

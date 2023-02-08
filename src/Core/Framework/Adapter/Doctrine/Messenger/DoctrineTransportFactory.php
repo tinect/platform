@@ -3,6 +3,7 @@
 namespace Shopware\Core\Framework\Adapter\Doctrine\Messenger;
 
 use Doctrine\DBAL\Connection as DBALConnection;
+use Shopware\Core\Framework\Log\Package;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
@@ -10,13 +11,11 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
+#[Package('core')]
 class DoctrineTransportFactory implements TransportFactoryInterface
 {
-    private DBALConnection $connection;
-
-    public function __construct(DBALConnection $connection)
+    public function __construct(private readonly DBALConnection $connection)
     {
-        $this->connection = $connection;
     }
 
     /**
@@ -39,6 +38,6 @@ class DoctrineTransportFactory implements TransportFactoryInterface
      */
     public function supports(string $dsn, array $options): bool
     {
-        return strpos($dsn, 'doctrine://') === 0;
+        return str_starts_with($dsn, 'doctrine://');
     }
 }

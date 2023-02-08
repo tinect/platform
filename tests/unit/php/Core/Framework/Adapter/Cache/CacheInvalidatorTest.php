@@ -13,6 +13,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * @internal
+ *
  * @group cache
  *
  * @covers \Shopware\Core\Framework\Adapter\Cache\CacheInvalidator
@@ -174,7 +175,7 @@ class TracedCacheAdapter extends ArrayAdapter implements TagAwareAdapterInterfac
      */
     public function invalidateTags(array $tags): bool
     {
-        $this->invalidated = array_merge($this->invalidated, $tags);
+        $this->invalidated = [...$this->invalidated, ...$tags];
 
         return true;
     }

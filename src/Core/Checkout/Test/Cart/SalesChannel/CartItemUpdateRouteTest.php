@@ -9,6 +9,7 @@ use Shopware\Core\Content\Product\Cart\ProductCartProcessor;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Rule\Container\AndRule;
 use Shopware\Core\Framework\Rule\Rule;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
@@ -19,12 +20,12 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
- * @package checkout
- *
  * @internal
+ *
  * @group store-api
  * @group cart
  */
+#[Package('checkout')]
 class CartItemUpdateRouteTest extends TestCase
 {
     use IntegrationTestBehaviour;
@@ -72,7 +73,7 @@ class CartItemUpdateRouteTest extends TestCase
 
         static::assertSame(200, $this->browser->getResponse()->getStatusCode());
 
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertSame('cart', $response['apiAlias']);
         static::assertSame(10, $response['price']['totalPrice']);
@@ -98,7 +99,7 @@ class CartItemUpdateRouteTest extends TestCase
 
         static::assertSame(200, $this->browser->getResponse()->getStatusCode(), (string) $this->browser->getResponse()->getContent());
 
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertSame(2, $response['lineItems'][0]['quantity']);
         static::assertSame(20, $response['price']['totalPrice']);
@@ -126,7 +127,7 @@ class CartItemUpdateRouteTest extends TestCase
 
         static::assertSame(200, $this->browser->getResponse()->getStatusCode());
 
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertSame('cart', $response['apiAlias']);
         static::assertSame(10, $response['price']['totalPrice']);
@@ -154,7 +155,7 @@ class CartItemUpdateRouteTest extends TestCase
 
         static::assertSame(200, $this->browser->getResponse()->getStatusCode());
 
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertArrayHasKey('test', $response['lineItems'][0]['payload']);
 
@@ -197,8 +198,8 @@ class CartItemUpdateRouteTest extends TestCase
                 ])
             );
 
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
-        static::assertSame(200, $this->browser->getResponse()->getStatusCode(), (string) json_encode($response));
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        static::assertSame(200, $this->browser->getResponse()->getStatusCode(), (string) json_encode($response, \JSON_THROW_ON_ERROR));
 
         static::assertSame('cart', $response['apiAlias']);
         static::assertSame(105, $response['price']['totalPrice']);
@@ -224,7 +225,7 @@ class CartItemUpdateRouteTest extends TestCase
 
         static::assertSame(400, $this->browser->getResponse()->getStatusCode());
 
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertSame('CHECKOUT__CART_LINE_ITEM_NOT_STACKABLE', $response['errors'][0]['code']);
     }
@@ -277,7 +278,7 @@ class CartItemUpdateRouteTest extends TestCase
                 ])
             );
 
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertSame(200, $this->browser->getResponse()->getStatusCode());
         static::assertSame('item update', $response['lineItems'][0]['label']);
@@ -352,7 +353,7 @@ class CartItemUpdateRouteTest extends TestCase
                 ])
             );
 
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertSame(200, $this->browser->getResponse()->getStatusCode());
         static::assertSame(750, $response['lineItems'][0]['price']['unitPrice']);
@@ -460,7 +461,7 @@ class CartItemUpdateRouteTest extends TestCase
                 ])
             );
 
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         static::assertSame(200, $this->browser->getResponse()->getStatusCode());
         static::assertSame(2222, $response['lineItems'][0]['price']['unitPrice']);
     }

@@ -2,6 +2,7 @@
 
 namespace Shopware\Storefront\Theme\Command;
 
+use Shopware\Core\Framework\Log\Package;
 use SVG\Nodes\Structures\SVGDefs;
 use SVG\Nodes\Structures\SVGUse;
 use SVG\Nodes\SVGNode;
@@ -20,6 +21,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     name: 'theme:prepare-icons',
     description: 'Prepare the theme icons',
 )]
+#[Package('storefront')]
 class ThemePrepareIconsCommand extends Command
 {
     private SymfonyStyle $io;
@@ -36,7 +38,7 @@ class ThemePrepareIconsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
-        $path = rtrim($input->getArgument('path'), '/') . '/';
+        $path = rtrim((string) $input->getArgument('path'), '/') . '/';
         $package = $input->getArgument('package');
 
         $fillcolor = $input->getOption('fillcolor');
@@ -112,7 +114,7 @@ class ThemePrepareIconsCommand extends Command
             $child = $defs->getChild(0);
 
             if ($child->getAttribute('id') === null || $cleanup) {
-                $id = 'icons-' . $package . '-' . $this->toKebabCase(basename($file, '.svg'));
+                $id = 'icons-' . $package . '-' . self::toKebabCase(basename($file, '.svg'));
                 $child->setAttribute('id', $id);
             } else {
                 $id = $child->getAttribute('id');

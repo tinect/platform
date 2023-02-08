@@ -17,6 +17,7 @@ use Shopware\Core\System\SystemConfig\Event\BeforeSystemConfigChangedEvent;
  * @internal
  *
  * @package content
+ *
  * @covers \Shopware\Core\Content\Cms\Subscriber\CmsPageDefaultChangeSubscriber
  */
 class CmsPageDefaultChangeSubscriberTest extends TestCase
@@ -221,12 +222,9 @@ class CmsPageDefaultChangeSubscriberTest extends TestCase
         return $event;
     }
 
-    /**
-     * @param mixed $value
-     */
-    private function getBeforeSystemConfigChangedEvent(string $key, $value, ?string $salesChannelId = null): BeforeSystemConfigChangedEvent
+    private function getBeforeSystemConfigChangedEvent(string $key, mixed $value): BeforeSystemConfigChangedEvent
     {
-        return new BeforeSystemConfigChangedEvent($key, $value, $salesChannelId);
+        return new BeforeSystemConfigChangedEvent($key, $value, null);
     }
 
     /**

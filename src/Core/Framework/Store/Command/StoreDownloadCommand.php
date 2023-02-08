@@ -8,6 +8,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Plugin\Exception\PluginNotFoundException;
 use Shopware\Core\Framework\Plugin\PluginEntity;
 use Shopware\Core\Framework\Plugin\PluginLifecycleService;
@@ -23,57 +24,22 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * @package merchant-services
- *
- * @deprecated tag:v6.5.0 - reason:becomes-internal
+ * @internal
  */
 #[AsCommand(
     name: 'store:download',
     description: 'Downloads a plugin from the store',
 )]
+#[Package('merchant-services')]
 class StoreDownloadCommand extends Command
 {
-    /**
-     * @var StoreClient
-     */
-    private $storeClient;
-
-    /**
-     * @var EntityRepository
-     */
-    private $pluginRepo;
-
-    /**
-     * @var PluginManagementService
-     */
-    private $pluginManagementService;
-
-    /**
-     * @var PluginLifecycleService
-     */
-    private $pluginLifecycleService;
-
-    /**
-     * @var EntityRepository
-     */
-    private $userRepository;
-
-    /**
-     * @internal
-     */
     public function __construct(
-        StoreClient $storeClient,
-        EntityRepository $pluginRepo,
-        PluginManagementService $pluginManagementService,
-        PluginLifecycleService $pluginLifecycleService,
-        EntityRepository $userRepository
+        private readonly StoreClient $storeClient,
+        private readonly EntityRepository $pluginRepo,
+        private readonly PluginManagementService $pluginManagementService,
+        private readonly PluginLifecycleService $pluginLifecycleService,
+        private readonly EntityRepository $userRepository,
     ) {
-        $this->storeClient = $storeClient;
-        $this->pluginRepo = $pluginRepo;
-        $this->pluginManagementService = $pluginManagementService;
-        $this->pluginLifecycleService = $pluginLifecycleService;
-        $this->userRepository = $userRepository;
-
         parent::__construct();
     }
 
@@ -110,7 +76,7 @@ class StoreDownloadCommand extends Command
             if ($plugin->getUpgradeVersion()) {
                 $this->pluginLifecycleService->updatePlugin($plugin, $context);
             }
-        } catch (PluginNotFoundException $e) {
+        } catch (PluginNotFoundException) {
             // don't update plugins that are not installed
         }
 
@@ -140,7 +106,7 @@ class StoreDownloadCommand extends Command
     {
         try {
             $plugin = $this->getPluginFromInput($pluginName, $context);
-        } catch (PluginNotFoundException $e) {
+        } catch (PluginNotFoundException) {
             // plugins no installed can still be downloaded
             return;
         }

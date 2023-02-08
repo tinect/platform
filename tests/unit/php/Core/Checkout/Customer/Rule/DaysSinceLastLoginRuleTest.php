@@ -14,12 +14,15 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
  * @package business-ops
  *
  * @internal
+ *
  * @group rules
+ *
  * @covers \Shopware\Core\Checkout\Customer\Rule\DaysSinceLastLoginRule
+ * @covers \Shopware\Core\Framework\Rule\Container\DaysSinceRule
  */
 class DaysSinceLastLoginRuleTest extends TestCase
 {
-    private DaysSinceLastLoginRule $rule;
+    protected DaysSinceLastLoginRule $rule;
 
     protected function setUp(): void
     {
@@ -88,9 +91,6 @@ class DaysSinceLastLoginRuleTest extends TestCase
     public function getCaseTestMatchValues(): \Traversable
     {
         $datetime = self::getTestTimestamp();
-        if (!$datetime instanceof \DateTimeImmutable) {
-            throw new \Error();
-        }
 
         $dayTest = $datetime->modify('-30 minutes');
 

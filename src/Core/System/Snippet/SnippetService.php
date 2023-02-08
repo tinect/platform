@@ -10,13 +10,13 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Aggregation\Bucket\Terms
 use Shopware\Core\Framework\DataAbstractionLayer\Search\AggregationResult\Bucket\TermsResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\SalesChannelRequest;
 use Shopware\Core\System\SalesChannel\Aggregate\SalesChannelDomain\SalesChannelDomainEntity;
 use Shopware\Core\System\Snippet\Aggregate\SnippetSet\SnippetSetEntity;
 use Shopware\Core\System\Snippet\Files\AbstractSnippetFile;
 use Shopware\Core\System\Snippet\Files\SnippetFileCollection;
-use Shopware\Core\System\Snippet\Files\SnippetFileInterface;
 use Shopware\Core\System\Snippet\Filter\SnippetFilterFactory;
 use Shopware\Storefront\Theme\StorefrontPluginConfiguration\StorefrontPluginConfiguration;
 use Shopware\Storefront\Theme\StorefrontPluginRegistry;
@@ -24,52 +24,26 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\MessageCatalogueInterface;
 
-/**
- * @package system-settings
- */
+#[Package('system-settings')]
 class SnippetService
 {
-    private Connection $connection;
-
-    private SnippetFileCollection $snippetFileCollection;
-
-    private EntityRepository $snippetRepository;
-
-    private EntityRepository $snippetSetRepository;
-
-    private SnippetFilterFactory $snippetFilterFactory;
-
-    private EntityRepository $salesChannelDomain;
-
-    private RequestStack $requestStack;
-
-    /**
-     * The "kernel" service is synthetic, it needs to be set at boot time before it can be used.
-     * We need to get StorefrontPluginRegistry service from service_container lazily because it depends on kernel service.
-     */
-    private ContainerInterface $container;
-
     /**
      * @internal
      */
     public function __construct(
-        Connection $connection,
-        SnippetFileCollection $snippetFileCollection,
-        EntityRepository $snippetRepository,
-        EntityRepository $snippetSetRepository,
-        EntityRepository $salesChannelDomain,
-        SnippetFilterFactory $snippetFilterFactory,
-        RequestStack $requestStack,
-        ContainerInterface $container
+        private readonly Connection $connection,
+        private readonly SnippetFileCollection $snippetFileCollection,
+        private readonly EntityRepository $snippetRepository,
+        private readonly EntityRepository $snippetSetRepository,
+        private readonly EntityRepository $salesChannelDomain,
+        private readonly SnippetFilterFactory $snippetFilterFactory,
+        private readonly RequestStack $requestStack,
+        /**
+         * The "kernel" service is synthetic, it needs to be set at boot time before it can be used.
+         * We need to get StorefrontPluginRegistry service from service_container lazily because it depends on kernel service.
+         */
+        private readonly ContainerInterface $container
     ) {
-        $this->connection = $connection;
-        $this->snippetFileCollection = $snippetFileCollection;
-        $this->snippetRepository = $snippetRepository;
-        $this->snippetSetRepository = $snippetSetRepository;
-        $this->snippetFilterFactory = $snippetFilterFactory;
-        $this->salesChannelDomain = $salesChannelDomain;
-        $this->requestStack = $requestStack;
-        $this->container = $container;
     }
 
     /**
@@ -139,9 +113,7 @@ class SnippetService
 
         $unusedThemes = $this->getUnusedThemes();
 
-        $snippetCollection = $snippetFileCollection->filter(function (AbstractSnippetFile $snippetFile) use ($unusedThemes) {
-            return !\in_array($snippetFile->getTechnicalName(), $unusedThemes, true);
-        });
+        $snippetCollection = $snippetFileCollection->filter(fn (AbstractSnippetFile $snippetFile) => !\in_array($snippetFile->getTechnicalName(), $unusedThemes, true));
 
         if ($fallbackLocale !== null) {
             // fallback has to be the base
@@ -280,11 +252,7 @@ class SnippetService
             StorefrontPluginRegistry::BASE_THEME_NAME, // Storefront snippets should always be loaded
         ]));
 
-        $unusedThemes = $themeRegistry->getConfigurations()->getThemes()->filter(function (StorefrontPluginConfiguration $theme) use ($usingThemes) {
-            return !\in_array($theme->getTechnicalName(), $usingThemes, true);
-        })->map(function (StorefrontPluginConfiguration $theme) {
-            return $theme->getTechnicalName();
-        });
+        $unusedThemes = $themeRegistry->getConfigurations()->getThemes()->filter(fn (StorefrontPluginConfiguration $theme) => !\in_array($theme->getTechnicalName(), $usingThemes, true))->map(fn (StorefrontPluginConfiguration $theme) => $theme->getTechnicalName());
 
         return array_values($unusedThemes);
     }
@@ -332,7 +300,7 @@ class SnippetService
     /**
      * @param array<string, string> $isoList
      *
-     * @return array<string, array<int, AbstractSnippetFile|SnippetFileInterface>>
+     * @return array<string, array<int, AbstractSnippetFile>>
      */
     private function getSnippetFilesByIso(array $isoList): array
     {
@@ -345,7 +313,7 @@ class SnippetService
     }
 
     /**
-     * @param array<int, AbstractSnippetFile|SnippetFileInterface> $languageFiles
+     * @param array<int, AbstractSnippetFile> $languageFiles
      *
      * @return array<string, array<string, string|null>>
      */
@@ -441,7 +409,7 @@ class SnippetService
     }
 
     /**
-     * @param array<string, array<int, SnippetFileInterface|AbstractSnippetFile>> $languageFiles
+     * @param array<string, array<int, AbstractSnippetFile>> $languageFiles
      * @param array<string, string> $isoList
      *
      * @return array<string, array<string, array<string, array<string, string|null>>>>
@@ -597,7 +565,7 @@ class SnippetService
             $newIndex = $prefix . (empty($prefix) ? '' : '.') . $index;
 
             if (\is_array($value)) {
-                $result = array_merge($result, $this->flatten($value, $newIndex, $additionalParameters));
+                $result = [...$result, ...$this->flatten($value, $newIndex, $additionalParameters)];
             } else {
                 if (!empty($additionalParameters)) {
                     $result[$newIndex] = array_merge([

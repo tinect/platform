@@ -11,15 +11,14 @@ use Shopware\Core\Framework\Api\Acl\Role\AclRoleCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCustomFieldsTrait;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineHistory\StateMachineHistoryCollection;
 use Shopware\Core\System\User\Aggregate\UserAccessKey\UserAccessKeyCollection;
 use Shopware\Core\System\User\Aggregate\UserConfig\UserConfigCollection;
 use Shopware\Core\System\User\Aggregate\UserRecovery\UserRecoveryEntity;
 
-/**
- * @package system-settings
- */
+#[Package('system-settings')]
 class UserEntity extends Entity
 {
     use EntityIdTrait;
@@ -41,7 +40,7 @@ class UserEntity extends Entity
     protected $username;
 
     /**
-     * @deprecated tag:v6.5.0 - Will be internal from 6.5.0 onward
+     * @internal
      *
      * @var string
      */
@@ -123,7 +122,7 @@ class UserEntity extends Entity
     protected $recoveryUser;
 
     /**
-     * @deprecated tag:v6.5.0 - Will be internal from 6.5.0 onward
+     * @internal
      *
      * @var string|null
      */
@@ -207,7 +206,7 @@ class UserEntity extends Entity
     }
 
     /**
-     * @deprecated tag:v6.5.0 - reason:becomes-internal - Will be internal from 6.5.0 onward
+     * @internal
      */
     public function getPassword(): string
     {
@@ -217,7 +216,7 @@ class UserEntity extends Entity
     }
 
     /**
-     * @deprecated tag:v6.5.0 - reason:becomes-internal - Will be internal from 6.5.0 onward
+     * @internal
      */
     public function setPassword(string $password): void
     {
@@ -325,7 +324,7 @@ class UserEntity extends Entity
     }
 
     /**
-     * @deprecated tag:v6.5.0 - reason:becomes-internal - Will be internal from 6.5.0 onward
+     * @internal
      */
     public function getStoreToken(): ?string
     {
@@ -335,7 +334,7 @@ class UserEntity extends Entity
     }
 
     /**
-     * @deprecated tag:v6.5.0 - reason:becomes-internal - Will be internal from 6.5.0 onward
+     * @internal
      */
     public function setStoreToken(?string $storeToken): void
     {

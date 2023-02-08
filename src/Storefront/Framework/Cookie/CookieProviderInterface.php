@@ -2,10 +2,13 @@
 
 namespace Shopware\Storefront\Framework\Cookie;
 
-/**
- * @package storefront
- */
+use Shopware\Core\Framework\Log\Package;
+
+#[Package('storefront')]
 interface CookieProviderInterface
 {
+    /**
+     * @return array<string|int, mixed>
+     */
     public function getCookieGroups(): array;
 }

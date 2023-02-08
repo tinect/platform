@@ -9,7 +9,7 @@ function uploadImageUsingFileUpload(path, name) {
         .attachFile({
             filePath: path,
             fileName: name,
-            mimeType: 'image/png'
+            mimeType: 'image/png',
         });
 
     const altValue = name.substr(0, name.lastIndexOf('.'));
@@ -22,13 +22,9 @@ function uploadImageUsingFileUpload(path, name) {
 
 describe('CMS: Check usage and editing of buy box elements', () => {
     beforeEach(() => {
-        cy.loginViaApi()
-            .then(() => {
-                return cy.createCmsFixture();
-            })
-            .then(() => {
-                return cy.createProductFixture(variantProduct);
-            })
+        cy.createCmsFixture().then(() => {
+            return cy.createProductFixture(variantProduct);
+        })
             .then(() => {
                 cy.viewport(1920, 1080);
                 cy.openInitialPage(`${Cypress.env('admin')}#/sw/cms/index`);
@@ -40,12 +36,12 @@ describe('CMS: Check usage and editing of buy box elements', () => {
     it('@base @content: use simple buy box element', { tags: ['pa-content-management'] }, () => {
         cy.intercept({
             url: `${Cypress.env('apiPath')}/cms-page/*`,
-            method: 'PATCH'
+            method: 'PATCH',
         }).as('saveData');
 
         cy.intercept({
             url: `${Cypress.env('apiPath')}/category/*`,
-            method: 'PATCH'
+            method: 'PATCH',
         }).as('saveCategory');
 
         cy.intercept('GET', '/widgets/cms/buybox/**').as('loadData');
@@ -105,45 +101,37 @@ describe('CMS: Check usage and editing of buy box elements', () => {
         // Verify layout in Storefront
         cy.visit('/');
 
-        cy.window().then((win) => {
-            /** @deprecated tag:v6.5.0 - Use `CheckoutPageObject.elements.lineItem` instead */
-            const lineItemSelector = win.features['v6.5.0.0'] ? '.line-item' : '.cart-item';
+        cy.contains('.product-detail-price', '€111');
+        cy.contains('.product-detail-ordernumber', 'TEST.2');
+        cy.get('.product-detail-configurator-option-label[title="red"]').click();
 
-            /** @deprecated tag:v6.5.0 - Use `${CheckoutPageObject.elements.lineItem}-details-characteristics` instead */
-            const variantCharacteristicsSelector = win.features['v6.5.0.0'] ? '.line-item-details-characteristics' : '.cart-item-characteristics';
+        // Wait for reloading product variant
+        cy.wait('@loadData').its('response.statusCode').should('equal', 200);
+        cy.contains('.product-detail-ordernumber', 'TEST.1');
 
-            cy.contains('.product-detail-price', '€111');
-            cy.contains('.product-detail-ordernumber', 'TEST.2');
-            cy.get('.product-detail-configurator-option-label[title="red"]').click();
-
-            // Wait for reloading product variant
-            cy.wait('@loadData').its('response.statusCode').should('equal', 200);
-            cy.contains('.product-detail-ordernumber', 'TEST.1');
-
-            // Off canvas
-            cy.get('.btn-buy').click();
-            cy.get('.offcanvas').should('be.visible');
-            cy.contains(`${lineItemSelector}-price`, '€111');
-            cy.contains(`${variantCharacteristicsSelector}`, 'color');
-            cy.contains(`${variantCharacteristicsSelector}-option`, 'red');
-            cy.get(`${lineItemSelector}-label[title="Variant product"]`).should('be.visible');
-        });
+        // Off canvas
+        cy.get('.btn-buy').click();
+        cy.get('.offcanvas').should('be.visible');
+        cy.contains('.line-item-price', '€111');
+        cy.contains('.line-item-details-characteristics', 'color');
+        cy.contains('.line-item-details-characteristics-option', 'red');
+        cy.get('.line-item-label[title="Variant product"]').should('be.visible');
     });
 
     it('@base @content: use simple gallery buy box block', { tags: ['pa-content-management'] }, () => {
         cy.intercept({
             url: `${Cypress.env('apiPath')}/cms-page/*`,
-            method: 'PATCH'
+            method: 'PATCH',
         }).as('saveData');
 
         cy.intercept({
             url: `${Cypress.env('apiPath')}/category/*`,
-            method: 'PATCH'
+            method: 'PATCH',
         }).as('saveCategory');
 
         cy.intercept({
             url: `${Cypress.env('apiPath')}/_action/media/**/upload?extension=png&fileName=sw-login-background`,
-            method: 'POST'
+            method: 'POST',
         }).as('saveDataFileUpload');
 
         cy.get('.sw-cms-list-item--0').click();

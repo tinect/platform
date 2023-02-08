@@ -13,6 +13,7 @@ use Shopware\Tests\Migration\MigrationTestTrait;
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\Migration\V6_3\Migration1600778848AddOrderMails
  *
  * @phpstan-type Mail array{id-key: string, type: string, language: string, content: string, system_default: int, updated_at: ?\DateTimeInterface, translations: array<string, array<string, mixed>>}
@@ -47,8 +48,8 @@ class Migration1600778848AddOrderMailsTest extends TestCase
 
             $mail = $mails[$key];
 
-            static::assertTrue(strpos($mail['content_html'], $updated) !== false);
-            static::assertTrue(strpos($mail['content_plain'], $updated) !== false);
+            static::assertStringContainsString($updated, $mail['content_html']);
+            static::assertStringContainsString($updated, $mail['content_plain']);
         }
     }
 
@@ -82,8 +83,8 @@ class Migration1600778848AddOrderMailsTest extends TestCase
 
             $mail = $mails[$key];
 
-            static::assertTrue(strpos($mail['content_html'], $updated) !== false);
-            static::assertTrue(strpos($mail['content_plain'], $updated) !== false);
+            static::assertStringContainsString($updated, $mail['content_html']);
+            static::assertStringContainsString($updated, $mail['content_plain']);
         }
     }
 
@@ -117,8 +118,8 @@ class Migration1600778848AddOrderMailsTest extends TestCase
 
             $mail = $mails[$key];
 
-            static::assertTrue(strpos($mail['content_html'], $updated) !== false);
-            static::assertTrue(strpos($mail['content_plain'], $updated) !== false);
+            static::assertStringContainsString($updated, $mail['content_html']);
+            static::assertStringContainsString($updated, $mail['content_plain']);
         }
     }
 
@@ -150,8 +151,8 @@ class Migration1600778848AddOrderMailsTest extends TestCase
 
             $mail = $mails[$key];
 
-            static::assertTrue(strpos($mail['content_html'], $updated) !== false);
-            static::assertTrue(strpos($mail['content_plain'], $updated) !== false);
+            static::assertStringContainsString($updated, $mail['content_html']);
+            static::assertStringContainsString($updated, $mail['content_plain']);
         }
     }
 

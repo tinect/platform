@@ -23,9 +23,12 @@ use Shopware\Core\Content\MailTemplate\Service\Event\MailSentEvent;
 use Shopware\Core\Content\Newsletter\Event\NewsletterConfirmEvent;
 use Shopware\Core\Content\Newsletter\Event\NewsletterRegisterEvent;
 use Shopware\Core\Content\Newsletter\Event\NewsletterUnsubscribeEvent;
+use Shopware\Core\Content\Product\SalesChannel\Review\Event\ReviewFormEvent;
 use Shopware\Core\Content\ProductExport\Event\ProductExportLoggingEvent;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\System\User\Recovery\UserRecoveryRequestEvent;
 
+#[Package('business-ops')]
 final class BusinessEvents
 {
     /**
@@ -107,6 +110,11 @@ final class BusinessEvents
      * @Event("Shopware\Core\Content\ContactForm\Event\ContactFormEvent")
      */
     public const CONTACT_FORM = ContactFormEvent::EVENT_NAME;
+
+    /**
+     * @Event("Shopware\Core\Content\Product\SalesChannel\Review\Event\ReviewFormEvent")
+     */
+    public const REVIEW_FORM = ReviewFormEvent::EVENT_NAME;
 
     /**
      * @Event("Shopware\Core\Content\MailTemplate\Service\Event\MailBeforeSentEvent")

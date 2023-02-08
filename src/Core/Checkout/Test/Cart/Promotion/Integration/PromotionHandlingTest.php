@@ -6,16 +6,16 @@ use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Test\Cart\Promotion\Helpers\Traits\PromotionIntegrationTestBehaviour;
 use Shopware\Core\Checkout\Test\Cart\Promotion\Helpers\Traits\PromotionTestFixtureBehaviour;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
 use Shopware\Core\Test\TestDefaults;
 
 /**
- * @package checkout
- *
  * @internal
  */
+#[Package('checkout')]
 class PromotionHandlingTest extends TestCase
 {
     use IntegrationTestBehaviour;
@@ -37,7 +37,6 @@ class PromotionHandlingTest extends TestCase
      * This test verifies that our promotions are not added
      * if our cart is empty and has no products yet.
      *
-     * @test
      * @group promotions
      */
     public function testPromotionNotAddedWithoutProduct(): void
@@ -60,7 +59,6 @@ class PromotionHandlingTest extends TestCase
      * This test verifies that our promotions are correctly
      * removed when also removing the last product
      *
-     * @test
      * @group promotions
      */
     public function testPromotionsRemovedWithProduct(): void

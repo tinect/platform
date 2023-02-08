@@ -12,6 +12,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Write\Command\UpdateCommand;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\Command\WriteCommand;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\Validation\PostWriteValidationEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\Validation\PreWriteValidationEvent;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\Framework\Validation\WriteConstraintViolationException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -20,33 +21,24 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 
 /**
- * @package core
- *
- * @deprecated tag:v6.5.0 - reason:becomes-internal - EventSubscribers will become internal in v6.5.0
+ * @internal
  */
+#[Package('core')]
 class LanguageValidator implements EventSubscriberInterface
 {
-    public const VIOLATION_PARENT_HAS_PARENT = 'parent_has_parent_violation';
+    final public const VIOLATION_PARENT_HAS_PARENT = 'parent_has_parent_violation';
 
-    public const VIOLATION_CODE_REQUIRED_FOR_ROOT_LANGUAGE = 'code_required_for_root_language';
+    final public const VIOLATION_CODE_REQUIRED_FOR_ROOT_LANGUAGE = 'code_required_for_root_language';
 
-    public const VIOLATION_DELETE_DEFAULT_LANGUAGE = 'delete_default_language_violation';
+    final public const VIOLATION_DELETE_DEFAULT_LANGUAGE = 'delete_default_language_violation';
 
-    public const VIOLATION_DEFAULT_LANGUAGE_PARENT = 'default_language_parent_violation';
-
-    /**
-     * @deprecated tag:v6.5.0 - const will be removed in v6.5.0
-     */
-    public const DEFAULT_LANGUAGES = [Defaults::LANGUAGE_SYSTEM];
-
-    private Connection $connection;
+    final public const VIOLATION_DEFAULT_LANGUAGE_PARENT = 'default_language_parent_violation';
 
     /**
      * @internal
      */
-    public function __construct(Connection $connection)
+    public function __construct(private readonly Connection $connection)
     {
-        $this->connection = $connection;
     }
 
     public static function getSubscribedEvents(): array

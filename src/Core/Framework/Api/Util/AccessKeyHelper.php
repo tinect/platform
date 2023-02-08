@@ -2,11 +2,10 @@
 
 namespace Shopware\Core\Framework\Api\Util;
 
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Util\Random;
 
-/**
- * @package core
- */
+#[Package('core')]
 class AccessKeyHelper
 {
     private const USER_IDENTIFIER = 'SWUA';
@@ -15,7 +14,7 @@ class AccessKeyHelper
     private const PRODUCT_EXPORT_IDENTIFIER = 'SWPE';
 
     /**
-     * @var array<string,string>
+     * @var array<string, string>
      */
     public static $mapping = [
         self::USER_IDENTIFIER => 'user',

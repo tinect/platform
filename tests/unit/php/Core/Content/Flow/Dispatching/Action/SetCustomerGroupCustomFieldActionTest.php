@@ -17,31 +17,20 @@ use Shopware\Core\Framework\Uuid\Uuid;
  * @package business-ops
  *
  * @internal
+ *
  * @covers \Shopware\Core\Content\Flow\Dispatching\Action\SetCustomerGroupCustomFieldAction
  */
 class SetCustomerGroupCustomFieldActionTest extends TestCase
 {
-    /**
-     * @var MockObject|Connection
-     */
-    private $connection;
+    private Connection&MockObject $connection;
 
-    /**
-     * @var MockObject|EntityRepository
-     */
-    private $repository;
+    private MockObject&EntityRepository $repository;
 
-    /**
-     * @var MockObject|EntitySearchResult
-     */
-    private $entitySearchResult;
+    private MockObject&EntitySearchResult $entitySearchResult;
 
     private SetCustomerGroupCustomFieldAction $action;
 
-    /**
-     * @var MockObject|StorableFlow
-     */
-    private $flow;
+    private MockObject&StorableFlow $flow;
 
     public function setUp(): void
     {

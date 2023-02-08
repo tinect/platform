@@ -19,6 +19,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\ReferenceVersionField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StorageAware;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\VersionField;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Uuid\Exception\InvalidUuidException;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Language\LanguageDefinition;
@@ -29,13 +30,16 @@ use Shopware\Core\System\Language\LanguageDefinition;
  *
  * @internal
  */
+#[Package('core')]
 class EntityForeignKeyResolver
 {
     /**
      * @internal
      */
-    public function __construct(private Connection $connection, private EntityDefinitionQueryHelper $queryHelper)
-    {
+    public function __construct(
+        private readonly Connection $connection,
+        private readonly EntityDefinitionQueryHelper $queryHelper
+    ) {
     }
 
     /**
@@ -142,9 +146,7 @@ class EntityForeignKeyResolver
             return [];
         }
 
-        $cascades = $definition->getFields()->filter(static function (Field $field) use ($class): bool {
-            return $field->is($class);
-        });
+        $cascades = $definition->getFields()->filter(static fn (Field $field): bool => $field->is($class));
 
         if ($cascades->count() === 0) {
             return [];

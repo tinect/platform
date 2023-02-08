@@ -20,24 +20,16 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
  * @package business-ops
  *
  * @internal
+ *
  * @covers \Shopware\Core\Content\Flow\Rule\FlowRuleScopeBuilder
  */
 class FlowRuleScopeBuilderTest extends TestCase
 {
-    /**
-     * @var MockObject|OrderConverter
-     */
-    private $orderConverter;
+    private MockObject&OrderConverter $orderConverter;
 
-    /**
-     * @var MockObject|DeliveryBuilder
-     */
-    private $deliveryBuilder;
+    private MockObject&DeliveryBuilder $deliveryBuilder;
 
-    /**
-     * @var MockObject|CartDataCollectorInterface
-     */
-    private $cartDataCollector;
+    private MockObject&CartDataCollectorInterface $cartDataCollector;
 
     private FlowRuleScopeBuilder $scopeBuilder;
 
@@ -52,7 +44,7 @@ class FlowRuleScopeBuilderTest extends TestCase
     public function testBuild(): void
     {
         $mockContext = $this->createMock(SalesChannelContext::class);
-        $cart = new Cart('test', 'test');
+        $cart = new Cart('test');
         $this->orderConverter->method('assembleSalesChannelContext')->willReturn($mockContext);
         $this->orderConverter->method('convertToCart')->willReturn($cart);
         $this->deliveryBuilder->method('build')->willReturn(new DeliveryCollection());

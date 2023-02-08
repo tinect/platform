@@ -15,6 +15,7 @@ use Shopware\Core\Framework\Uuid\Uuid;
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\Content\Product\DataAbstractionLayer\ProductCategoryDenormalizer
  */
 class ProductCategoryDenormalizerTest extends TestCase
@@ -23,15 +24,9 @@ class ProductCategoryDenormalizerTest extends TestCase
 
     private ProductCategoryDenormalizer $productCategoryDenormalizer;
 
-    /**
-     * @var Connection&MockObject
-     */
-    private $connection;
+    private Connection&MockObject $connection;
 
-    /**
-     * @var QueryBuilder&MockObject
-     */
-    private $queryBuilder;
+    private MockObject&QueryBuilder $queryBuilder;
 
     public function setUp(): void
     {
@@ -202,7 +197,7 @@ class ProductCategoryDenormalizerTest extends TestCase
     public function testUpdateWithProductIdsWithCategoryAssignmentWillWriteCategoryTreeWithValidJSON(): void
     {
         $validJson = function ($bindings) {
-            json_decode($bindings['tree'], true);
+            json_decode((string) $bindings['tree'], true);
 
             return json_last_error() === \JSON_ERROR_NONE;
         };

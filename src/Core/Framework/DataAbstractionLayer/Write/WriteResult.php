@@ -3,10 +3,12 @@
 namespace Shopware\Core\Framework\DataAbstractionLayer\Write;
 
 use Shopware\Core\Framework\DataAbstractionLayer\EntityWriteResult;
+use Shopware\Core\Framework\Log\Package;
 
 /**
  * @final
  */
+#[Package('core')]
 class WriteResult
 {
     /**
@@ -14,8 +16,11 @@ class WriteResult
      * @param array<string, list<EntityWriteResult>> $notFound
      * @param array<string, list<EntityWriteResult>> $written
      */
-    public function __construct(protected array $deleted, protected array $notFound = [], protected array $written = [])
-    {
+    public function __construct(
+        protected array $deleted,
+        protected array $notFound = [],
+        protected array $written = []
+    ) {
     }
 
     /**

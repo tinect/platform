@@ -13,6 +13,8 @@ use Shopware\Core\Content\Product\Aggregate\ProductVisibility\ProductVisibilityD
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Pricing\CashRoundingConfig;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Test\TestCaseBase\CountryAddToSalesChannelTestBehaviour;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Test\TestCaseBase\SalesChannelApiTestBehaviour;
@@ -23,9 +25,7 @@ use Shopware\Core\System\CustomField\CustomFieldTypes;
 use Shopware\Core\Test\TestDefaults;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
-/**
- * @package business-ops
- */
+#[Package('business-ops')]
 trait OrderActionTrait
 {
     use IntegrationTestBehaviour;
@@ -36,12 +36,12 @@ trait OrderActionTrait
 
     private TestDataCollection $ids;
 
-    private ?EntityRepository $customerRepository;
+    private ?EntityRepository $customerRepository = null;
 
     private function createCustomerAndLogin(?string $email = null, ?string $password = null): void
     {
-        $email = $email ?? (Uuid::randomHex() . '@example.com');
-        $password = $password ?? 'shopware';
+        $email ??= Uuid::randomHex() . '@example.com';
+        $password ??= 'shopware';
         $this->prepareCustomer($password, $email);
 
         $this->login($email, $password);
@@ -170,6 +170,8 @@ trait OrderActionTrait
         $this->getContainer()->get('order.repository')->create([
             array_merge([
                 'id' => $this->ids->create('order'),
+                'itemRounding' => json_decode(json_encode(new CashRoundingConfig(2, 0.01, true), \JSON_THROW_ON_ERROR), true, 512, \JSON_THROW_ON_ERROR),
+                'totalRounding' => json_decode(json_encode(new CashRoundingConfig(2, 0.01, true), \JSON_THROW_ON_ERROR), true, 512, \JSON_THROW_ON_ERROR),
                 'orderDateTime' => (new \DateTimeImmutable())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
                 'price' => new CartPrice(10, 10, 10, new CalculatedTaxCollection(), new TaxRuleCollection(), CartPrice::TAX_STATE_NET),
                 'shippingCosts' => new CalculatedPrice(10, 10, new CalculatedTaxCollection(), new TaxRuleCollection()),

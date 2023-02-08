@@ -12,7 +12,8 @@
       "INVALID_MAIL": "Please enter a valid email address.",
       "FRAMEWORK__RATE_LIMIT_EXCEEDED": "Too many requests. Please wait {seconds} seconds before trying again.",
       "DUPLICATED_URL": "This URL is already in use. Please choose another URL.",
-      "CONTENT__MEDIA_EMPTY_FILE": "A valid filename must be provided."
+      "CONTENT__MEDIA_EMPTY_FILE": "A valid filename must be provided.",
+      "CONTENT__INVALID_CUSTOM_ENTITY_FIELD_TYPE": "Field type cannot be rendered. Please contact your administrator."
     },
     "default": {
       "add": "Add",
@@ -563,6 +564,7 @@
       "placeholderTypeSearchField": "Search \"{entity}\"...",
       "placeholderShortcutInfo": "Hint: Press the \"f\" key to get to the search bar faster.",
       "placeholderSearchShortcutInfo": "<strong>Tip:</strong> Press <span>f</span> to open the search from anywhere.",
+      "placeholderESSearchShortcutInfo": "<strong>Tip:</strong> You can use Elasticsearch's <a href=\"https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html#simple-query-string-syntax\" target=\"_blank\">simple query string</a> to get a more precise result.",
       "moduleFiltersHeadline": "Module filters",
       "placeholderFilterShortcutInfo": "Type <span>#products</span> in the search to set the module filter.",
       "searchTypeAll": "All",
@@ -669,12 +671,14 @@
         "customerLoggedInRule": "Customer logged in",
         "customerAgeRule": "Customer age",
         "customerDaysSinceLastLogin": "Days since last login",
+        "customerDaysSinceFirstLogin": "Days since first login",
         "customerAffiliateCodeRule": "Affiliate code",
         "customerCampaignCodeRule": "Campaign code",
         "cartAmountRule": "Grand total",
         "cartPositionPrice": "Total",
         "goodsCountRule": "Total quantity of distinct products",
         "goodsPriceRule": "Subtotal of all items",
+        "cartTotalPurchasePrice": "Total of all purchase prices",
         "lineItemOfTypeRule": {
           "label": "Item of type",
           "product": "Product",
@@ -687,6 +691,7 @@
         "lineItemTotalPriceRule": "Item subtotal",
         "lineItemWithQuantityRule": "Item quantity",
         "orderTagRule": "Order with tag",
+        "orderDeliveryStatusRule": "Delivery status",
         "yes": "Yes",
         "no": "No",
         "withTime": "Including timestamp",
@@ -742,6 +747,7 @@
         "lineItemListPriceRatioRule": "Item with price/list price percentage ratio",
         "lineItemStockRule": "Item available",
         "lineItemActualStockRule": "Item in stock",
+        "lineItemProductStates": "Item with product state",
         "paymentMethodRule": "Applied payment method",
         "shippingMethodRule": "Applied shipping method",
         "lineItemGoodsTotalRule": "Total quantity of all products",
@@ -767,7 +773,8 @@
         "customerCustomFieldRule": "Customer with custom field",
         "zipCodeWildcardPlaceholder": "Use \"*\" as a wildcard character...",
         "customerBirthdayRule": "Customer date of birth",
-        "customerCreatedByAdminRule": "Customer created by admin"
+        "customerCreatedByAdminRule": "Customer created by admin",
+        "customerSalutationRule": "Customer salutation"
       }
     },
     "sw-condition-generic": {
@@ -829,10 +836,28 @@
           }
         }
       },
+      "cartLineItemProductStates": {
+        "productState": {
+          "options": {
+            "is-physical": "Physical",
+            "is-download": "Digital"
+          }
+        }
+      },
+      "cartTotalPurchasePrice": {
+        "type": {
+          "options": {
+            "gross": "Gross",
+            "net": "Net"
+          },
+          "placeholder": "Select operator..."
+        }
+      },
       "units": {
         "dimension": "mm",
         "weight": "kg",
-        "volume": "mm³"
+        "volume": "mm³",
+        "age": "Years"
       }
     },
     "sw-product-image": {
@@ -944,6 +969,7 @@
       "checkout_order_placed": "Order placed",
       "checkout_order_payment_method_changed": "Order payment method changed",
       "contact_form_send": "Contact form sent",
+      "review_form_send": "Review form sent",
       "customer_group_registration_accepted": "Customer group registration request accepted",
       "customer_group_registration_declined": "Customer group registration request declined",
       "customer_recovery_request": "Customer requests new password",

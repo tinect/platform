@@ -161,6 +161,7 @@ export default {
             });
 
             this.userPromise = this.getUserData();
+            this.timezoneOptions = Shopware.Service('timezoneService').getTimezoneOptions();
 
             const promises = [
                 languagePromise,
@@ -179,7 +180,6 @@ export default {
 
             Promise.all(promises).then(() => {
                 this.loadLanguages();
-                this.loadTimezones();
             }).then(() => {
                 this.isUserLoading = false;
             });
@@ -227,21 +227,8 @@ export default {
             });
         },
 
+        // @deprecated tag:v6.6.0 - Unused
         loadTimezones() {
-            return Shopware.Service('timezoneService').loadTimezones()
-                .then((result) => {
-                    this.timezoneOptions.push({
-                        label: 'UTC',
-                        value: 'UTC',
-                    });
-
-                    const loadedTimezoneOptions = result.map(timezone => ({
-                        label: timezone,
-                        value: timezone,
-                    }));
-
-                    this.timezoneOptions.push(...loadedTimezoneOptions);
-                });
         },
 
         async getUserData() {
@@ -327,6 +314,16 @@ export default {
                     this.isSaveSuccessful = true;
 
                     Shopware.Service('localeHelper').setLocaleWithId(this.user.localeId);
+                }).catch((error) => {
+                    State.dispatch('error/addApiError', {
+                        expression: `user.${this.user?.id}.password`,
+                        error: new Shopware.Classes.ShopwareError(error.response.data.errors[0]),
+                    });
+                    this.createNotificationError({
+                        message: this.$tc('sw-profile.index.notificationSaveErrorMessage'),
+                    });
+                    this.isLoading = false;
+                    this.isSaveSuccessful = false;
                 });
 
                 return;
@@ -336,11 +333,6 @@ export default {
             context.authToken.access = authToken;
 
             this.userRepository.save(this.user, context).then(async () => {
-                // @deprecated tag:v6.5.0 - Will be removed
-                if (this.$refs.mediaSidebarItem) {
-                    this.$refs.mediaSidebarItem.getList();
-                }
-
                 await this.updateCurrentUser();
                 Shopware.Service('localeHelper').setLocaleWithId(this.user.localeId);
 
@@ -363,6 +355,8 @@ export default {
                 this.newPasswordConfirm = '';
             }).catch(() => {
                 this.handleUserSaveError();
+                this.isLoading = false;
+                this.isSaveSuccessful = false;
             });
         },
 
@@ -418,20 +412,9 @@ export default {
             this.confirmPasswordModal = false;
         },
 
-        /* @deprecated tag:v6.5.0 - Will be removed */
-        setMediaFromSidebar(mediaEntity) {
-            this.avatarMediaItem = mediaEntity;
-            this.user.avatarId = mediaEntity.id;
-        },
-
         onUnlinkAvatar() {
             this.avatarMediaItem = null;
             this.user.avatarId = null;
-        },
-
-        /* @deprecated tag:v6.5.0 - Will be removed */
-        openMediaSidebar() {
-            this.$refs.mediaSidebarItem.openContent();
         },
 
         openMediaModal() {
@@ -439,9 +422,11 @@ export default {
         },
 
         handleUserSaveError() {
-            this.createNotificationError({
-                message: this.$tc('sw-profile.index.notificationSaveErrorMessage'),
-            });
+            if (this.$route.name.includes('sw.profile.index')) {
+                this.createNotificationError({
+                    message: this.$tc('sw-profile.index.notificationSaveErrorMessage'),
+                });
+            }
             this.isLoading = false;
         },
 

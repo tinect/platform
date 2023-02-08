@@ -14,22 +14,21 @@ use Shopware\Core\Content\Product\Aggregate\ProductReview\ProductReviewCollectio
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCustomFieldsTrait;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\System\Language\LanguageEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\System\Salutation\SalutationEntity;
 use Shopware\Core\System\Tag\TagCollection;
 use Shopware\Core\System\User\UserEntity;
 
-/**
- * @package customer-order
- */
-class CustomerEntity extends Entity
+#[Package('customer-order')]
+class CustomerEntity extends Entity implements \Stringable
 {
     use EntityIdTrait;
     use EntityCustomFieldsTrait;
 
-    public const ACCOUNT_TYPE_PRIVATE = 'private';
-    public const ACCOUNT_TYPE_BUSINESS = 'business';
+    final public const ACCOUNT_TYPE_PRIVATE = 'private';
+    final public const ACCOUNT_TYPE_BUSINESS = 'business';
 
     protected string $groupId;
 
@@ -153,7 +152,7 @@ class CustomerEntity extends Entity
     protected ?TagCollection $tags = null;
 
     /**
-     * @var array<string>|null
+     * @var list<string>|null
      */
     protected ?array $tagIds = null;
 
@@ -183,7 +182,7 @@ class CustomerEntity extends Entity
 
     protected ?UserEntity $updatedBy = null;
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getFirstName() . ' ' . $this->getLastName();
     }
@@ -694,7 +693,7 @@ class CustomerEntity extends Entity
     }
 
     /**
-     * @return array<string>|null
+     * @return list<string>|null
      */
     public function getTagIds(): ?array
     {
@@ -702,7 +701,7 @@ class CustomerEntity extends Entity
     }
 
     /**
-     * @param array<string> $tagIds
+     * @param list<string> $tagIds
      */
     public function setTagIds(array $tagIds): void
     {

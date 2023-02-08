@@ -2,17 +2,20 @@
 
 namespace Shopware\Tests\Unit\Core\Content\Mail\Service;
 
+use Doctrine\DBAL\Exception\DriverException;
 use League\Flysystem\FilesystemOperator;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Content\Mail\Service\MailAttachmentsBuilder;
 use Shopware\Core\Content\Mail\Service\MailerTransportDecorator;
 use Shopware\Core\Content\Mail\Service\MailerTransportLoader;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Test\TestCaseHelper\ReflectionHelper;
-use Shopware\Tests\Unit\Common\Stubs\SystemConfigService\ConfigService;
+use Shopware\Core\System\SystemConfig\SystemConfigService;
+use Shopware\Tests\Unit\Common\Stubs\SystemConfigService\StaticSystemConfigService;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
+use Symfony\Component\Mailer\Transport\NullTransport;
+use Symfony\Component\Mailer\Transport\NullTransportFactory;
 use Symfony\Component\Mailer\Transport\SendmailTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
@@ -30,7 +33,7 @@ class MailerTransportLoaderTest extends TestCase
 
         $loader = new MailerTransportLoader(
             $transport,
-            new ConfigService([
+            new StaticSystemConfigService([
                 'core.mailerSettings.emailAgent' => '',
             ]),
             $this->createMock(MailAttachmentsBuilder::class),
@@ -51,7 +54,7 @@ class MailerTransportLoaderTest extends TestCase
     {
         $factory = new MailerTransportLoader(
             $this->getTransportFactory(),
-            new ConfigService([
+            new StaticSystemConfigService([
                 'core.mailerSettings.emailAgent' => 'local',
                 'core.mailerSettings.sendMailOptions' => null,
             ]),
@@ -78,7 +81,7 @@ class MailerTransportLoaderTest extends TestCase
 
         $loader = new MailerTransportLoader(
             $transport,
-            new ConfigService([
+            new StaticSystemConfigService([
                 'core.mailerSettings.emailAgent' => 'smtp',
                 'core.mailerSettings.host' => 'localhost',
                 'core.mailerSettings.port' => '225',
@@ -115,7 +118,7 @@ class MailerTransportLoaderTest extends TestCase
     {
         $loader = new MailerTransportLoader(
             $this->getTransportFactory(),
-            new ConfigService([
+            new StaticSystemConfigService([
                 'core.mailerSettings.emailAgent' => 'local',
                 'core.mailerSettings.sendMailOptions' => '-t && echo bla',
             ]),
@@ -134,7 +137,7 @@ class MailerTransportLoaderTest extends TestCase
     {
         $loader = new MailerTransportLoader(
             $this->getTransportFactory(),
-            new ConfigService([
+            new StaticSystemConfigService([
                 'core.mailerSettings.emailAgent' => 'test',
             ]),
             $this->createMock(MailAttachmentsBuilder::class),
@@ -148,6 +151,68 @@ class MailerTransportLoaderTest extends TestCase
         $loader->fromString('null://null');
     }
 
+    public function testFactoryNoConnection(): void
+    {
+        $config = $this->createMock(SystemConfigService::class);
+        $config->method('get')->willThrowException(DriverException::typeExists('no connection'));
+
+        $loader = new MailerTransportLoader(
+            $this->getTransportFactory(),
+            $config,
+            $this->createMock(MailAttachmentsBuilder::class),
+            $this->createMock(FilesystemOperator::class),
+            $this->createMock(EntityRepository::class)
+        );
+
+        $mailer = $loader->fromString('null://null');
+
+        static::assertInstanceOf(MailerTransportDecorator::class, $mailer);
+
+        $decorated = ReflectionHelper::getPropertyValue($mailer, 'decorated');
+
+        static::assertInstanceOf(NullTransport::class, $decorated);
+    }
+
+    public function testLoadMultipleMailers(): void
+    {
+        $loader = new MailerTransportLoader(
+            $this->getTransportFactory(),
+            new StaticSystemConfigService([
+                'core.mailerSettings.emailAgent' => 'smtp',
+                'core.mailerSettings.host' => 'localhost',
+                'core.mailerSettings.port' => '225',
+                'core.mailerSettings.username' => 'root',
+                'core.mailerSettings.password' => 'root',
+                'core.mailerSettings.encryption' => 'foo',
+                'core.mailerSettings.authenticationMethod' => 'cram-md5',
+            ]),
+            $this->createMock(MailAttachmentsBuilder::class),
+            $this->createMock(FilesystemOperator::class),
+            $this->createMock(EntityRepository::class)
+        );
+
+        $dsns = [
+            'main' => 'null://localhost:25',
+            'fallback' => 'null://localhost:25',
+        ];
+
+        $transports = ReflectionHelper::getPropertyValue($loader->fromStrings($dsns), 'transports');
+        static::assertArrayHasKey('main', $transports);
+        static::assertArrayHasKey('fallback', $transports);
+
+        $mainMailer = $transports['main'];
+        static::assertInstanceOf(MailerTransportDecorator::class, $mainMailer);
+
+        $decorated = ReflectionHelper::getPropertyValue($mainMailer, 'decorated');
+        static::assertInstanceOf(EsmtpTransport::class, $decorated);
+
+        $fallbackMailer = $transports['fallback'];
+        static::assertInstanceOf(MailerTransportDecorator::class, $fallbackMailer);
+
+        $decorated = ReflectionHelper::getPropertyValue($fallbackMailer, 'decorated');
+        static::assertInstanceOf(NullTransport::class, $decorated);
+    }
+
     /**
      * @return array<string, AbstractTransportFactory>
      */
@@ -155,13 +220,11 @@ class MailerTransportLoaderTest extends TestCase
     {
         return [
             'smtp' => new EsmtpTransportFactory(),
+            'null' => new NullTransportFactory(),
         ];
     }
 
-    /**
-     * @return mixed can't annotate more specific as phpstan does not allow to annotate as MockObject&Transport as Transport is final
-     */
-    private function getTransportFactory(): mixed
+    private function getTransportFactory(): Transport
     {
         return new Transport($this->getFactories());
     }

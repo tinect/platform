@@ -22,8 +22,6 @@ export default {
 
     mixins: [
         Mixin.getByName('notification'),
-        /** @deprecated tag:v6.5.0 - the 'discard-detail-page-changes' mixin will be removed */
-        Mixin.getByName('discard-detail-page-changes')('rule'),
     ],
 
     shortcuts: {
@@ -73,10 +71,6 @@ export default {
         ruleCriteria() {
             const criteria = new Criteria(1, 25);
             criteria.addAssociation('tags');
-
-            if (!this.feature.isActive('FEATURE_NEXT_18215')) {
-                return criteria;
-            }
 
             criteria.addAssociation('personaPromotions');
             criteria.addAssociation('orderPromotions');
@@ -183,10 +177,6 @@ export default {
         },
 
         $route(newRoute, oldRoute) {
-            if (!this.feature.isActive('v6.5.0.0')) {
-                return;
-            }
-
             // Reload the rule data when switching from assignments to base tab because changes to the assignments
             // can affect the conditions that are selectable - rule awareness
             if (newRoute.name === 'sw.settings.rule.detail.base' &&
@@ -237,11 +227,6 @@ export default {
         },
 
         unsavedDataLeaveHandler(to, from, next) {
-            if (!this.feature.isActive('v6.5.0.0')) {
-                next();
-                return;
-            }
-
             if (this.forceDiscardChanges) {
                 this.forceDiscardChanges = false;
                 next();

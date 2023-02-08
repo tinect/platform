@@ -376,9 +376,7 @@ export default {
         },
 
         getVariantFromOrderState(order) {
-            const style = this.stateStyleDataProviderService.getStyle(
-                'order.state', order.stateMachineState.technicalName,
-            );
+            const style = this.stateStyleDataProviderService.getStyle('order.state', order.stateMachineState.technicalName);
 
             return style.colorCode;
         },
@@ -393,16 +391,15 @@ export default {
                 }
             }
 
-            const style = this.stateStyleDataProviderService.getStyle(
-                'order_transaction.state', technicalName,
-            );
+            const style = this.stateStyleDataProviderService.getStyle('order_transaction.state', technicalName);
 
             return style.colorCode;
         },
 
         getVariantFromDeliveryState(order) {
             const style = this.stateStyleDataProviderService.getStyle(
-                'order_delivery.state', order.deliveries[0].stateMachineState.technicalName,
+                'order_delivery.state',
+                order.deliveries[0].stateMachineState.technicalName,
             );
 
             return style.colorCode;
@@ -455,7 +452,17 @@ export default {
 
         async onBulkEditItems() {
             await this.$nextTick();
-            this.$router.push({ name: 'sw.bulk.edit.order' });
+
+            const excludeDelivery = Object.values(this.$refs.orderGrid.selection).filter((order) => {
+                return !order.deliveries[0];
+            }).length > 0;
+
+            this.$router.push({
+                name: 'sw.bulk.edit.order',
+                params: {
+                    excludeDelivery,
+                },
+            });
         },
 
         transaction(item) {

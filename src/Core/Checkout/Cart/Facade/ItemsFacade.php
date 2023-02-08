@@ -10,12 +10,12 @@ use Shopware\Core\Checkout\Cart\Facade\Traits\ItemsIteratorTrait;
 use Shopware\Core\Checkout\Cart\Facade\Traits\ItemsRemoveTrait;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 /**
  * @package checkout
  */
-
 /**
  * The ItemsFacade is a wrapper around a collection of line-items.
  *
@@ -23,6 +23,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
  *
  * @implements \IteratorAggregate<array-key, LineItem>
  */
+#[Package('checkout')]
 class ItemsFacade implements \IteratorAggregate
 {
     use ItemsAddTrait;
@@ -35,8 +36,11 @@ class ItemsFacade implements \IteratorAggregate
     /**
      * @internal
      */
-    public function __construct(LineItemCollection $items, CartFacadeHelper $helper, SalesChannelContext $context)
-    {
+    public function __construct(
+        LineItemCollection $items,
+        CartFacadeHelper $helper,
+        SalesChannelContext $context
+    ) {
         $this->items = $items;
         $this->helper = $helper;
         $this->context = $context;

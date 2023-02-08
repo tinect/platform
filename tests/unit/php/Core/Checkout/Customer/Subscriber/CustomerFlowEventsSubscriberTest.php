@@ -23,19 +23,14 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  * @package business-ops
  *
  * @internal
+ *
  * @covers \Shopware\Core\Checkout\Customer\Subscriber\CustomerFlowEventsSubscriber
  */
 class CustomerFlowEventsSubscriberTest extends TestCase
 {
-    /**
-     * @var MockObject|EventDispatcherInterface
-     */
-    private $dispatcher;
+    private MockObject&EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var MockObject|SalesChannelContextRestorer
-     */
-    private $restorer;
+    private MockObject&SalesChannelContextRestorer $restorer;
 
     private TestDataCollection $ids;
 

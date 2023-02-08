@@ -11,6 +11,7 @@ use Shopware\Core\Checkout\Test\Cart\Promotion\Helpers\Traits\PromotionTestFixtu
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Util\Random;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -19,10 +20,9 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\Test\TestDefaults;
 
 /**
- * @package checkout
- *
  * @internal
  */
+#[Package('checkout')]
 class PromotionAbsoluteCalculationTest extends TestCase
 {
     use IntegrationTestBehaviour;
@@ -50,7 +50,6 @@ class PromotionAbsoluteCalculationTest extends TestCase
      * We add a product and also an absolute promotion.
      * Our final price should then be as expected.
      *
-     * @test
      * @group promotions
      *
      * @throws CartException
@@ -88,7 +87,6 @@ class PromotionAbsoluteCalculationTest extends TestCase
      * The standard value of discount would be 15, but our currency price value is 30
      * Our cart should have a total value of 70,00 (and not 85 as standard) in the end.
      *
-     * @test
      * @group promotions
      */
     public function testAbsoluteDiscountWithCurrencyPriceValues(): void

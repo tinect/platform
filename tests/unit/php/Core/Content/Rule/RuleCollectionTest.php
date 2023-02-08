@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Shopware\Tests\Unit\Core\Content\Rule\DataAbstractionLayer;
+namespace Shopware\Tests\Unit\Core\Content\Rule;
 
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Content\Rule\RuleCollection;
@@ -11,6 +11,7 @@ use Shopware\Core\Framework\Uuid\Uuid;
  * @package business-ops
  *
  * @internal
+ *
  * @covers \Shopware\Core\Content\Rule\RuleCollection
  */
 class RuleCollectionTest extends TestCase

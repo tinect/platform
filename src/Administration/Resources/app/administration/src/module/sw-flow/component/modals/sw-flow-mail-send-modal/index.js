@@ -127,7 +127,7 @@ export default {
             if (['newsletter.confirm', 'newsletter.register', 'newsletter.unsubscribe']
                 .includes(this.triggerEvent.name)) {
                 return [
-                    ...this.recipientDefault,
+                    ...this.recipientCustomer,
                     ...this.recipientAdmin,
                     ...this.recipientCustom,
                 ];
@@ -486,7 +486,7 @@ export default {
                     return;
                 case 'contactFormMail':
                     this.replyToError = null;
-                    this.replyTo = null;
+                    this.replyTo = 'contactFormMail';
 
                     return;
                 default:

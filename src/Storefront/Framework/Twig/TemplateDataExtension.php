@@ -2,6 +2,7 @@
 
 namespace Shopware\Storefront\Framework\Twig;
 
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\PlatformRequest;
 use Shopware\Core\SalesChannelRequest;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -10,37 +11,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
 
-/**
- * @package storefront
- */
+#[Package('storefront')]
 class TemplateDataExtension extends AbstractExtension implements GlobalsInterface
 {
     /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var bool
-     */
-    private $csrfEnabled;
-
-    /**
-     * @var string
-     */
-    private $csrfMode;
-
-    /**
      * @internal
      */
-    public function __construct(
-        RequestStack $requestStack,
-        bool $csrfEnabled,
-        string $csrfMode
-    ) {
-        $this->requestStack = $requestStack;
-        $this->csrfEnabled = $csrfEnabled;
-        $this->csrfMode = $csrfMode;
+    public function __construct(private readonly RequestStack $requestStack)
+    {
     }
 
     /**
@@ -68,8 +46,6 @@ class TemplateDataExtension extends AbstractExtension implements GlobalsInterfac
         return [
             'shopware' => [
                 'dateFormat' => \DATE_ATOM,
-                'csrfEnabled' => $this->csrfEnabled,
-                'csrfMode' => $this->csrfMode,
             ],
             'themeId' => $themeId,
             'controllerName' => (string) $controllerInfo->getName(),
@@ -90,7 +66,7 @@ class TemplateDataExtension extends AbstractExtension implements GlobalsInterfac
         }
 
         $matches = [];
-        preg_match('/Controller\\\\(\w+)Controller::?(\w+)$/', $controller, $matches);
+        preg_match('/Controller\\\\(\w+)Controller::?(\w+)$/', (string) $controller, $matches);
 
         if ($matches) {
             $controllerInfo->setName($matches[1]);

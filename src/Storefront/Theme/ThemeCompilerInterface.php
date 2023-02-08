@@ -3,9 +3,11 @@
 namespace Shopware\Storefront\Theme;
 
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Storefront\Theme\StorefrontPluginConfiguration\StorefrontPluginConfiguration;
 use Shopware\Storefront\Theme\StorefrontPluginConfiguration\StorefrontPluginConfigurationCollection;
 
+#[Package('storefront')]
 interface ThemeCompilerInterface
 {
     public function compileTheme(

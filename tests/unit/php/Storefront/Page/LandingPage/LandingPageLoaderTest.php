@@ -22,7 +22,6 @@ use Shopware\Core\Content\LandingPage\SalesChannel\LandingPageRouteResponse;
 use Shopware\Core\Content\Product\SalesChannel\SalesChannelProductEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Pricing\CashRoundingConfig;
-use Shopware\Core\Framework\Feature;
 use Shopware\Core\Framework\Routing\Exception\MissingRequestParameterException;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Country\CountryEntity;
@@ -39,6 +38,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @internal
  *
  * @package content
+ *
  * @covers \Shopware\Storefront\Page\LandingPage\LandingPageLoader
  */
 class LandingPageLoaderTest extends TestCase
@@ -55,7 +55,7 @@ class LandingPageLoaderTest extends TestCase
         );
 
         $request = new Request([], [], []);
-        $salesChannelContext = $this->getSalesChannelContext('salesChannelId');
+        $salesChannelContext = $this->getSalesChannelContext();
 
         static::expectExceptionObject(new MissingRequestParameterException('landingPageId', '/landingPageId'));
         $landingPageLoader->load($request, $salesChannelContext);
@@ -74,7 +74,7 @@ class LandingPageLoaderTest extends TestCase
 
         $landingPageId = Uuid::randomHex();
         $request = new Request([], [], ['landingPageId' => $landingPageId]);
-        $salesChannelContext = $this->getSalesChannelContext('salesChannelId');
+        $salesChannelContext = $this->getSalesChannelContext();
 
         static::expectExceptionObject(new PageNotFoundException($landingPageId));
         $landingPageLoader->load($request, $salesChannelContext);
@@ -85,7 +85,7 @@ class LandingPageLoaderTest extends TestCase
         $productId = Uuid::randomHex();
         $landingPageId = Uuid::randomHex();
         $request = new Request([], [], ['landingPageId' => $landingPageId]);
-        $salesChannelContext = $this->getSalesChannelContext('salesChannelId');
+        $salesChannelContext = $this->getSalesChannelContext();
 
         $product = $this->getProduct($productId);
         $cmsPage = $this->getCmsPage($product);
@@ -94,12 +94,8 @@ class LandingPageLoaderTest extends TestCase
 
         $page = $landingPageLoader->load($request, $salesChannelContext);
 
-        if (Feature::isActive('v6.5.0.0')) {
-            /** @phpstan-ignore-next-line */
-            $cmsPageLoaded = $page->getLandingPage()->getCmsPage();
-        } else {
-            $cmsPageLoaded = $page->getCmsPage();
-        }
+        /** @phpstan-ignore-next-line */
+        $cmsPageLoaded = $page->getLandingPage()->getCmsPage();
 
         static::assertEquals($cmsPage, $cmsPageLoaded);
     }
@@ -131,10 +127,10 @@ class LandingPageLoaderTest extends TestCase
         return $product;
     }
 
-    private function getSalesChannelContext(string $salesChanelId): SalesChannelContext
+    private function getSalesChannelContext(): SalesChannelContext
     {
         $salesChannelEntity = new SalesChannelEntity();
-        $salesChannelEntity->setId($salesChanelId);
+        $salesChannelEntity->setId('salesChannelId');
 
         return new SalesChannelContext(
             Context::createDefaultContext(),

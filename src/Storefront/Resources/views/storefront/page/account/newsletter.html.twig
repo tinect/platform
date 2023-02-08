@@ -21,11 +21,6 @@
               data-form-auto-submit="true"
               data-form-auto-submit-options='{{ formAutoSubmitOptions|json_encode }}'>
 
-            {# @deprecated tag:v6.5.0 - Block page_account_overview_newsletter_content_form_csrf will be removed. #}
-            {% block page_account_overview_newsletter_content_form_csrf %}
-                {{ sw_csrf('frontend.account.newsletter') }}
-            {% endblock %}
-
             {% block page_account_overview_newsletter_content_form_check_control %}
                 <div class="form-check">
                     {% block page_account_overview_newsletter_content_form_input %}
@@ -43,7 +38,7 @@
                                id="newsletterRegister"
                                name="option"
                                autocomplete="off"
-                               value="{% if newsletterAccountPagelet.newsletterDoi %}{{ subscribe }}{% else %}{{ direct }}{% endif %}"
+                               value="subscribe"
                                {% if status %}checked="checked"{% endif %}>
                     {% endblock %}
 

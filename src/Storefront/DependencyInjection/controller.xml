@@ -98,9 +98,10 @@
         <service id="Shopware\Storefront\Controller\CartLineItemController">
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
             <argument type="service" id="Shopware\Core\Checkout\Promotion\Cart\PromotionItemBuilder"/>
-            <argument type="service" id="Shopware\Core\Content\Product\Cart\ProductLineItemFactory"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\LineItemFactoryHandler\ProductLineItemFactory"/>
             <argument type="service" id="Shopware\Core\Framework\Util\HtmlSanitizer"/>
             <argument type="service" id="Shopware\Core\Content\Product\SalesChannel\ProductListRoute"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\LineItemFactoryRegistry"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -173,7 +174,6 @@
             <argument type="service" id="Shopware\Core\System\SalesChannel\SalesChannel\ContextSwitchRoute"/>
             <argument type="service" id="request_stack"/>
             <argument type="service" id="router.default"/>
-            <argument type="service" id="Shopware\Core\Checkout\Customer\SalesChannel\ChangeLanguageRoute"/>
 
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
@@ -324,23 +324,8 @@
             <argument type="service" id="event_dispatcher"/>
         </service>
 
-        <service id="Shopware\Storefront\Controller\CsrfController">
-            <argument type="service" id="security.csrf.token_manager"/>
-            <argument>%storefront.csrf.enabled%</argument>
-            <argument>%storefront.csrf.mode%</argument>
-
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <call method="setTwig">
-                <argument type="service" id="twig"/>
-            </call>
-            <tag name="deprecated" flag="v6.5.0.0" version="tag:v6.5.0"/>
-        </service>
-
         <service id="Shopware\Storefront\Controller\CountryStateController" public="true">
             <argument type="service" id="Shopware\Storefront\Pagelet\Country\CountryStateDataPageletLoader"/>
-            <argument type="service" id="Shopware\Core\System\Country\SalesChannel\CountryRoute"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -348,6 +333,17 @@
 
         <service id="Shopware\Storefront\Controller\DocumentController" public="true">
             <argument type="service" id="Shopware\Core\Checkout\Document\SalesChannel\DocumentRoute"/>
+
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+            <call method="setTwig">
+                <argument type="service" id="twig"/>
+            </call>
+        </service>
+
+        <service id="Shopware\Storefront\Controller\DownloadController" public="true">
+            <argument type="service" id="Shopware\Core\Checkout\Customer\SalesChannel\DownloadRoute"/>
 
             <call method="setContainer">
                 <argument type="service" id="service_container"/>

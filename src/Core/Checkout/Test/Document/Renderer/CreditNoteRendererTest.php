@@ -5,7 +5,9 @@ namespace Shopware\Core\Checkout\Test\Document\Renderer;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
+use Shopware\Core\Checkout\Cart\LineItemFactoryHandler\ProductLineItemFactory;
 use Shopware\Core\Checkout\Cart\Price\Struct\AbsolutePriceDefinition;
+use Shopware\Core\Checkout\Cart\PriceDefinitionFactory;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Document\DocumentConfiguration;
 use Shopware\Core\Checkout\Document\Event\CreditNoteOrdersEvent;
@@ -22,11 +24,11 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Test\Cart\Common\TrueRule;
 use Shopware\Core\Checkout\Test\Document\DocumentTrait;
 use Shopware\Core\Checkout\Test\Payment\Handler\V630\SyncTestPaymentHandler;
-use Shopware\Core\Content\Product\Cart\ProductLineItemFactory;
 use Shopware\Core\Content\Test\Product\ProductBuilder;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Rule\Collector\RuleConditionRegistry;
 use Shopware\Core\Framework\Test\IdsCollection;
 use Shopware\Core\Framework\Test\TestCaseHelper\ReflectionHelper;
@@ -39,10 +41,9 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\Test\TestDefaults;
 
 /**
- * @package customer-order
- *
  * @internal
  */
+#[Package('customer-order')]
 class CreditNoteRendererTest extends TestCase
 {
     use DocumentTrait;
@@ -145,6 +146,8 @@ class CreditNoteRendererTest extends TestCase
         );
 
         static::assertInstanceOf(CreditNoteOrdersEvent::class, $caughtEvent);
+        static::assertCount(1, $caughtEvent->getOperations());
+        static::assertSame($operation, $caughtEvent->getOperations()[$orderId] ?? null);
         static::assertCount(1, $caughtEvent->getOrders());
         $order = $caughtEvent->getOrders()->get($orderId);
         static::assertNotNull($order);
@@ -421,13 +424,13 @@ class CreditNoteRendererTest extends TestCase
      */
     private function generateDemoCart(array $taxes): Cart
     {
-        $cart = $this->cartService->createNew('a-b-c', 'A');
+        $cart = $this->cartService->createNew('a-b-c');
 
         $keywords = ['awesome', 'epic', 'high quality'];
 
         $products = [];
 
-        $factory = new ProductLineItemFactory();
+        $factory = new ProductLineItemFactory(new PriceDefinitionFactory());
 
         $ids = new IdsCollection();
 
@@ -451,7 +454,7 @@ class CreditNoteRendererTest extends TestCase
 
             $products[] = $product;
 
-            $lineItems[] = $factory->create($ids->get($number));
+            $lineItems[] = $factory->create(['id' => $ids->get($number), 'referencedId' => $ids->get($number)], $this->salesChannelContext);
             $this->addTaxDataToSalesChannel($this->salesChannelContext, $product['tax']);
         }
 

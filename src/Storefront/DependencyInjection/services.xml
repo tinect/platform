@@ -92,9 +92,6 @@
 
         <service id="Shopware\Storefront\Framework\Twig\TemplateDataExtension">
             <argument type="service" id="request_stack"/>
-            <argument>%storefront.csrf.enabled%</argument>
-            <argument>%storefront.csrf.mode%</argument>
-
             <tag name="twig.extension"/>
         </service>
 
@@ -124,6 +121,7 @@
         </service>
 
         <service id="Shopware\Storefront\Framework\Twig\TwigDateRequestListener">
+            <argument type="service" id="service_container"/>
             <tag name="kernel.event_listener" event="kernel.request"/>
         </service>
 
@@ -137,27 +135,6 @@
 
         <service id="Shopware\Storefront\Framework\Twig\Extension\IconCacheTwigFilter" public="false">
             <tag name="twig.extension"/>
-        </service>
-
-
-        <service id="Shopware\Storefront\Framework\Twig\Extension\CsrfFunctionExtension">
-            <tag name="twig.extension"/>
-            <tag name="deprecated" flag="v6.5.0.0" version="tag:v6.5.0"/>
-        </service>
-
-        <service id="Shopware\Storefront\Framework\Csrf\SessionProvider" lazy="true">
-            <deprecated package="shopware/storefront" version="6.5.0.0">This service %service_id% is deprecated. Please inject request_stack and use the session from current request</deprecated>
-            <argument type="service" id="session"/>
-            <tag name="deprecated" flag="v6.5.0.0" version="tag:v6.5.0"/>
-        </service>
-
-        <service id="Shopware\Storefront\Framework\Csrf\CsrfPlaceholderHandler" public="true">
-            <argument type="service" id="security.csrf.token_manager"/>
-            <argument>%storefront.csrf.enabled%</argument>
-            <argument>%storefront.csrf.mode%</argument>
-            <argument type="service" id="request_stack"/>
-            <argument type="service" id="session.storage.factory"/>
-            <tag name="deprecated" flag="v6.5.0.0" version="tag:v6.5.0"/>
         </service>
 
         <service id="Shopware\Storefront\Framework\Media\StorefrontMediaUploader">
@@ -181,14 +158,12 @@
         <service id="Shopware\Storefront\Framework\Routing\StorefrontSubscriber">
             <argument type="service" id="request_stack"/>
             <argument type="service" id="router"/>
-            <argument type="service" id="Shopware\Storefront\Framework\Csrf\CsrfPlaceholderHandler"/>
             <argument type="service" id="Shopware\Core\Content\Seo\HreflangLoaderInterface"/>
             <argument type="service" id="Shopware\Storefront\Framework\Routing\MaintenanceModeResolver"/>
             <argument type="service" id="Shopware\Core\Framework\App\ShopId\ShopIdProvider"/>
             <argument type="service" id="Shopware\Core\Framework\App\ActiveAppsLoader"/>
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
             <argument type="service" id="Shopware\Storefront\Theme\StorefrontPluginRegistry"/>
-            <argument type="service" id="Shopware\Storefront\Framework\Routing\NotFound\NotFoundSubscriber"/>
 
             <tag name="kernel.event_subscriber"/>
         </service>
@@ -205,17 +180,6 @@
             <argument type="service" id="event_dispatcher"/>
 
             <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="Shopware\Storefront\Framework\Csrf\CsrfRouteListener">
-            <argument type="service" id="security.csrf.token_manager"/>
-            <argument>%storefront.csrf.enabled%</argument>
-            <argument>%storefront.csrf.mode%</argument>
-            <argument type="service" id="translator"/>
-
-            <tag name="kernel.event_subscriber"/>
-            <tag name="kernel.reset" method="reset"/>
-            <tag name="deprecated" flag="v6.5.0.0" version="tag:v6.5.0"/>
         </service>
 
         <service id="Shopware\Storefront\Framework\AffiliateTracking\AffiliateTrackingListener">
@@ -415,12 +379,6 @@
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
             <argument type="service" id="Shopware\Core\System\Salutation\SalesChannel\SalutationRoute"/>
             <argument type="service" id="Shopware\Core\System\Country\SalesChannel\CountryRoute"/>
-        </service>
-
-        <service id="Shopware\Storefront\Page\Newsletter\Register\NewsletterRegisterPageLoader">
-            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
-            <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="sales_channel.salutation.repository"/>
         </service>
 
         <service id="Shopware\Storefront\Page\Newsletter\Subscribe\NewsletterSubscribePageLoader">

@@ -204,6 +204,7 @@ Component.register('sw-duplicated-media-v2', {
                         [
                             Criteria.equals('fileName', this.currentTask.fileName),
                             Criteria.equals('fileExtension', this.currentTask.extension),
+                            Criteria.equals('private', this.currentTask.isPrivate),
                         ],
                     ),
                 );
@@ -251,7 +252,7 @@ Component.register('sw-duplicated-media-v2', {
         },
 
         async renameFile(uploadTask) {
-            const newTask = Object.assign({}, uploadTask);
+            const newTask = { ...uploadTask };
 
             const { fileName } = await this.mediaService.provideName(uploadTask.fileName, uploadTask.extension);
             newTask.fileName = fileName;
@@ -292,11 +293,14 @@ Component.register('sw-duplicated-media-v2', {
 
         async replaceFile(uploadTask) {
             const criteria = new Criteria(1, 1)
-                .addFilter(Criteria.multi('AND',
+                .addFilter(Criteria.multi(
+                    'AND',
                     [
                         Criteria.equals('fileName', uploadTask.fileName),
                         Criteria.equals('fileExtension', uploadTask.extension),
-                    ]));
+                        Criteria.equals('private', uploadTask.isPrivate),
+                    ],
+                ));
 
             const searchResult = await this.mediaRepository.search(criteria, Context.api);
             const newTarget = searchResult[0];
@@ -322,11 +326,14 @@ Component.register('sw-duplicated-media-v2', {
             }
 
             const criteria = new Criteria(1, 1)
-                .addFilter(Criteria.multi('AND',
+                .addFilter(Criteria.multi(
+                    'AND',
                     [
                         Criteria.equals('fileName', uploadTask.fileName),
                         Criteria.equals('fileExtension', uploadTask.extension),
-                    ]));
+                        Criteria.equals('private', uploadTask.isPrivate),
+                    ],
+                ));
 
             const searchResult = await this.mediaRepository.search(criteria, Context.api);
             const newTarget = searchResult[0];

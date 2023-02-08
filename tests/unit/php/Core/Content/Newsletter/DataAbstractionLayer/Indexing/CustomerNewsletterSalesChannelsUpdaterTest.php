@@ -12,6 +12,7 @@ use Shopware\Core\Framework\Uuid\Uuid;
  * @package customer-order
  *
  * @internal
+ *
  * @covers \Shopware\Core\Content\Newsletter\DataAbstractionLayer\Indexing\CustomerNewsletterSalesChannelsUpdater
  */
 class CustomerNewsletterSalesChannelsUpdaterTest extends TestCase
@@ -33,7 +34,7 @@ class CustomerNewsletterSalesChannelsUpdaterTest extends TestCase
 
         $expectsClosure(
             $connection,
-            $newsletterIds ? array_keys(json_decode((string) $newsletterIds, true)) : null
+            $newsletterIds ? array_keys(json_decode($newsletterIds, true, 512, \JSON_THROW_ON_ERROR)) : null
         );
 
         $indexing = new CustomerNewsletterSalesChannelsUpdater($connection);
@@ -43,7 +44,7 @@ class CustomerNewsletterSalesChannelsUpdaterTest extends TestCase
     public function dataProvider(): \Generator
     {
         yield 'Email Newsletter Recipient Registered' => [
-            'newsletter_sales_channel_ids' => json_encode([Uuid::randomHex() => Uuid::randomHex()]),
+            'newsletter_sales_channel_ids' => json_encode([Uuid::randomHex() => Uuid::randomHex()], \JSON_THROW_ON_ERROR),
             function (MockObject $connection, ?array $ids): void {
                 $connection->expects(static::once())->method('executeStatement')->willReturnCallback(function ($sql, $params) use ($ids): void {
                     static::assertSame('UPDATE newsletter_recipient SET email = (:email), first_name = (:firstName), last_name = (:lastName) WHERE id IN (:ids)', $sql);
@@ -60,7 +61,7 @@ class CustomerNewsletterSalesChannelsUpdaterTest extends TestCase
         ];
 
         yield 'Email Newsletter Recipient Registered Multiple' => [
-            'newsletter_sales_channel_ids' => json_encode([Uuid::randomHex() => Uuid::randomHex(), Uuid::randomHex() => Uuid::randomHex()]),
+            'newsletter_sales_channel_ids' => json_encode([Uuid::randomHex() => Uuid::randomHex(), Uuid::randomHex() => Uuid::randomHex()], \JSON_THROW_ON_ERROR),
             function (MockObject $connection, ?array $ids): void {
                 $connection->expects(static::once())->method('executeStatement')->willReturnCallback(function ($sql, $params) use ($ids): void {
                     static::assertSame('UPDATE newsletter_recipient SET email = (:email), first_name = (:firstName), last_name = (:lastName) WHERE id IN (:ids)', $sql);

@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
  * @internal
+ *
  * @group store-api
  */
 class ListAddressRouteTest extends TestCase
@@ -64,7 +65,7 @@ class ListAddressRouteTest extends TestCase
                 ]
             );
 
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertSame(1, $response['total']);
         static::assertNotEmpty($response['elements']);
@@ -92,7 +93,7 @@ class ListAddressRouteTest extends TestCase
                 ]
             );
 
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertSame(1, $response['total']);
         static::assertNotEmpty($response['elements']);
@@ -116,7 +117,7 @@ class ListAddressRouteTest extends TestCase
                 ]
             );
 
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertSame(1, $response['total']);
         static::assertNotEmpty($response['elements']);

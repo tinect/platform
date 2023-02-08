@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @internal
+ *
  * @group needsWebserver
  */
 class MediaUploadControllerTest extends TestCase
@@ -23,7 +24,7 @@ class MediaUploadControllerTest extends TestCase
     use AdminFunctionalTestBehaviour;
     use MediaFixtures;
 
-    public const TEST_IMAGE = __DIR__ . '/../fixtures/shopware-logo.png';
+    final public const TEST_IMAGE = __DIR__ . '/../fixtures/shopware-logo.png';
 
     private EntityRepository $mediaRepository;
 
@@ -175,7 +176,7 @@ class MediaUploadControllerTest extends TestCase
         );
 
         $response = $this->getBrowser()->getResponse();
-        $responseData = json_decode((string) $response->getContent(), true);
+        $responseData = json_decode((string) $response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertEquals(400, $response->getStatusCode());
         static::assertEquals('CONTENT__MEDIA_EMPTY_FILE', $responseData['errors'][0]['code']);
@@ -233,7 +234,7 @@ class MediaUploadControllerTest extends TestCase
         $response = $this->getBrowser()->getResponse();
         static::assertEquals(200, $response->getStatusCode());
 
-        $result = json_decode((string) $response->getContent(), true);
+        $result = json_decode((string) $response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         static::assertEquals($media->getFileName() . '_(1)', $result['fileName']);
     }
 
@@ -257,7 +258,7 @@ class MediaUploadControllerTest extends TestCase
         $response = $this->getBrowser()->getResponse();
         static::assertEquals(200, $response->getStatusCode());
 
-        $result = json_decode((string) $response->getContent(), true);
+        $result = json_decode((string) $response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         static::assertEquals($media->getFileName(), $result['fileName']);
     }
 
@@ -285,7 +286,7 @@ class MediaUploadControllerTest extends TestCase
             '/api/media/' . $this->mediaId
         );
 
-        $responseData = json_decode((string) $this->getBrowser()->getResponse()->getContent(), true);
+        $responseData = json_decode((string) $this->getBrowser()->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertCount(
             4,

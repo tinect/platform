@@ -5,7 +5,7 @@ namespace Shopware\Core\Framework\Demodata\Generator;
 use Faker\Generator;
 use Shopware\Core\Checkout\Cart\Rule\GoodsPriceRule;
 use Shopware\Core\Checkout\Customer\Rule\CustomerGroupRule;
-use Shopware\Core\Checkout\Customer\Rule\IsNewCustomerRule;
+use Shopware\Core\Checkout\Customer\Rule\DaysSinceFirstLoginRule;
 use Shopware\Core\Content\Rule\RuleDefinition;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -16,6 +16,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Write\EntityWriterInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\WriteContext;
 use Shopware\Core\Framework\Demodata\DemodataContext;
 use Shopware\Core\Framework\Demodata\DemodataGeneratorInterface;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Rule\Container\AndRule;
 use Shopware\Core\Framework\Rule\Container\Container;
 use Shopware\Core\Framework\Rule\Container\FilterRule;
@@ -29,6 +30,7 @@ use Shopware\Core\Test\TestDefaults;
 /**
  * @internal
  */
+#[Package('core')]
 class RuleGenerator implements DemodataGeneratorInterface
 {
     private Generator $faker;
@@ -37,11 +39,11 @@ class RuleGenerator implements DemodataGeneratorInterface
      * @internal
      */
     public function __construct(
-        private EntityRepository $ruleRepository,
-        private EntityWriterInterface $writer,
-        private EntityRepository $paymentMethodRepository,
-        private EntityRepository $shippingMethodRepository,
-        private RuleDefinition $ruleDefinition
+        private readonly EntityRepository $ruleRepository,
+        private readonly EntityWriterInterface $writer,
+        private readonly EntityRepository $paymentMethodRepository,
+        private readonly EntityRepository $shippingMethodRepository,
+        private readonly RuleDefinition $ruleDefinition
     ) {
     }
 
@@ -77,7 +79,7 @@ class RuleGenerator implements DemodataGeneratorInterface
 
         $pool = [
             [
-                'rule' => new IsNewCustomerRule(),
+                'rule' => (new DaysSinceFirstLoginRule())->assign(['daysPassed' => 0]),
                 'name' => 'New customer',
             ],
             [

@@ -28,6 +28,11 @@
         {% set attributes = attributes|merge({'title': media.translated.title}) %}
     {% endif %}
 
+    {# If no loading attribute is defined, use the default behaivour for images. #}
+    {% if attributes.loading is not defined %}
+        {% set attributes = attributes|merge({ 'loading': 'eager' }) %}
+    {% endif %}
+
     {# uses cms block column count and all available thumbnails to determine the correct image size for the current viewport #}
     {% if media.thumbnails|length > 0 %}
         {% if autoColumnSizes and columns and sizes is not defined %}
@@ -72,11 +77,6 @@
                 'lg': theme_config('breakpoint.lg'),
                 'xl': theme_config('breakpoint.xl')
             } %}
-
-            {% if thumbnails|first.width > breakpoint|reverse|first %}
-                {# @deprecated tag:v6.5.0 - Variable `maxWidth` and parent condition will be removed #}
-                {% set maxWidth = thumbnails|first.width %}
-            {% endif %}
 
             {% for key, value in breakpoint|reverse %}(min-width: {{ value }}px) {{ sizes[key] }}{% if not loop.last %}, {% endif %}{% endfor %}, {{ sizeFallback }}vw
         {% endapply %}{% endset %}

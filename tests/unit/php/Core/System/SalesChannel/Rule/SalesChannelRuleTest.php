@@ -16,6 +16,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
  * @package business-ops
  *
  * @internal
+ *
  * @covers \Shopware\Core\Framework\Rule\SalesChannelRule
  */
 class SalesChannelRuleTest extends TestCase
@@ -23,7 +24,7 @@ class SalesChannelRuleTest extends TestCase
     /**
      * @dataProvider provideTestData
      *
-     * @param string[] $salesChannelIds
+     * @param list<string> $salesChannelIds
      */
     public function testMatchesWithCorrectSalesChannel(string $operator, string $currentSalesChannel, ?array $salesChannelIds, bool $expected): void
     {

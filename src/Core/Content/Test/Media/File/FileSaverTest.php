@@ -36,8 +36,8 @@ class FileSaverTest extends TestCase
     use IntegrationTestBehaviour;
     use MediaFixtures;
 
-    public const TEST_IMAGE = __DIR__ . '/../fixtures/shopware-logo.png';
-    public const TEST_SCRIPT_FILE = __DIR__ . '/../fixtures/test.php';
+    final public const TEST_IMAGE = __DIR__ . '/../fixtures/shopware-logo.png';
+    final public const TEST_SCRIPT_FILE = __DIR__ . '/../fixtures/test.php';
 
     private EntityRepository $mediaRepository;
 
@@ -550,17 +550,23 @@ class FileSaverTest extends TestCase
             ->method('update')
             ->willThrowException(new \Exception());
 
+        /** @var list<string> $allowed */
+        $allowed = $this->getContainer()->getParameter('shopware.filesystem.allowed_extensions');
+        /** @var list<string> $allowedPrivate */
+        $allowedPrivate = $this->getContainer()->getParameter('shopware.filesystem.private_allowed_extensions');
+
         $fileSaverWithFailingRepository = new FileSaver(
             $repositoryMock,
             $this->getContainer()->get('shopware.filesystem.public'),
             $this->getContainer()->get('shopware.filesystem.private'),
+            $this->getContainer()->get(PathGenerator::class),
             $this->getContainer()->get(ThumbnailService::class),
             $this->getContainer()->get(MetadataLoader::class),
             $this->getContainer()->get(TypeDetector::class),
             $this->getContainer()->get('messenger.bus.shopware'),
             $this->getContainer()->get('event_dispatcher'),
-            $this->getContainer()->getParameter('shopware.filesystem.allowed_extensions'),
-            $this->getContainer()->get(PathGenerator::class)
+            $allowed,
+            $allowedPrivate
         );
 
         $mediaPath = $this->urlGenerator->getRelativeMediaUrl($png);

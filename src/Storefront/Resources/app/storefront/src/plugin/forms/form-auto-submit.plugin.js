@@ -4,6 +4,7 @@ import FormSerializeUtil from 'src/utility/form/form-serialize.util';
 import HttpClient from 'src/service/http-client.service';
 import DomAccess from 'src/helper/dom-access.helper';
 import querystring from 'query-string';
+import Debouncer from 'src/helper/debouncer.helper';
 
 /**
  * This plugin automatically submits a form,
@@ -23,6 +24,13 @@ export default class FormAutoSubmitPlugin extends Plugin {
          * @type null|[]String
          */
         changeTriggerSelectors: null,
+        /**
+         * When this option is used the submitting of the form is delayed
+         * for the given time in milliseconds
+         *
+         * @type null|number
+         */
+        delayChangeEvent: null,
     };
 
     init() {
@@ -68,11 +76,19 @@ export default class FormAutoSubmitPlugin extends Plugin {
      */
     _registerEvents() {
         if (this.options.useAjax) {
-            const onSubmit = this._onSubmit.bind(this);
+            const onSubmit =
+                this.options.delayChangeEvent ?
+                    Debouncer.debounce(this._onSubmit.bind(this), this.options.delayChangeEvent) :
+                    this._onSubmit.bind(this);
+
             this._form.removeEventListener('change', onSubmit);
             this._form.addEventListener('change', onSubmit);
         } else {
-            const onChange = this._onChange.bind(this);
+            const onChange =
+                this.options.delayChangeEvent ?
+                    Debouncer.debounce(this._onChange.bind(this), this.options.delayChangeEvent) :
+                    this._onChange.bind(this);
+
             this._form.removeEventListener('change', onChange);
             this._form.addEventListener('change', onChange);
         }
@@ -101,20 +117,8 @@ export default class FormAutoSubmitPlugin extends Plugin {
             return;
         }
 
-        /** @deprecated tag:v6.5.0 - CSRF implementation will be removed. Remove if-condition and keep else-condition content. */
-        if (window.csrf.enabled && window.csrf.mode === 'ajax') {
-            // A new csrf token needs to be appended to the form if ajax csrf mode is used
-            this._client.fetchCsrfToken((token) => {
-                const csrfInput = document.createElement('input');
-                csrfInput.name = '_csrf_token';
-                csrfInput.value = token;
-                csrfInput.type = 'hidden';
-                this._form.appendChild(csrfInput);
-                this._submitNativeForm();
-            });
-        } else {
-            this._submitNativeForm();
-        }
+        this._submitNativeForm();
+
     }
 
     /**

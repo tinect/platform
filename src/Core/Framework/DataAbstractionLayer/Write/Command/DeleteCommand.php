@@ -5,10 +5,9 @@ namespace Shopware\Core\Framework\DataAbstractionLayer\Write\Command;
 use Shopware\Core\Framework\Api\Acl\Role\AclRoleDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\EntityExistence;
+use Shopware\Core\Framework\Log\Package;
 
-/**
- * @package core
- */
+#[Package('core')]
 class DeleteCommand extends WriteCommand implements ChangeSetAware
 {
     use ChangeSetAwareTrait;
@@ -16,8 +15,11 @@ class DeleteCommand extends WriteCommand implements ChangeSetAware
     /**
      * @param array<string> $primaryKey
      */
-    public function __construct(EntityDefinition $definition, array $primaryKey, EntityExistence $existence)
-    {
+    public function __construct(
+        EntityDefinition $definition,
+        array $primaryKey,
+        EntityExistence $existence
+    ) {
         parent::__construct($definition, [], $primaryKey, $existence, '');
     }
 

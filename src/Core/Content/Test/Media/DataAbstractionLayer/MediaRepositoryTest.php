@@ -22,6 +22,7 @@ use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
+use Shopware\Core\Framework\DataAbstractionLayer\Pricing\CashRoundingConfig;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\Validation\RestrictDeleteViolationException;
@@ -34,6 +35,7 @@ use Shopware\Core\Test\TestDefaults;
 
 /**
  * @internal
+ *
  * @group slow
  * @group skip-paratest
  */
@@ -192,9 +194,7 @@ class MediaRepositoryTest extends TestCase
             $this->context
         );
         $mediaRepository = $this->mediaRepository;
-        $media = $this->context->scope(Context::USER_SCOPE, function (Context $context) use ($mediaId, $mediaRepository) {
-            return $mediaRepository->search(new Criteria([$mediaId]), $context);
-        });
+        $media = $this->context->scope(Context::USER_SCOPE, fn (Context $context) => $mediaRepository->search(new Criteria([$mediaId]), $context));
 
         static::assertInstanceOf(EntitySearchResult::class, $media);
         static::assertEquals(0, $media->count());
@@ -519,7 +519,7 @@ class MediaRepositoryTest extends TestCase
         try {
             $this->mediaRepository->delete([['id' => $mediaId]], $this->context);
             static::fail('asserted DeleteRestrictViolationException');
-        } catch (RestrictDeleteViolationException $e) {
+        } catch (RestrictDeleteViolationException) {
             // ignore asserted exception
         }
 
@@ -571,6 +571,8 @@ class MediaRepositoryTest extends TestCase
 
         return [
             'id' => $orderId,
+            'itemRounding' => json_decode(json_encode(new CashRoundingConfig(2, 0.01, true), \JSON_THROW_ON_ERROR), true, 512, \JSON_THROW_ON_ERROR),
+            'totalRounding' => json_decode(json_encode(new CashRoundingConfig(2, 0.01, true), \JSON_THROW_ON_ERROR), true, 512, \JSON_THROW_ON_ERROR),
             'orderDateTime' => (new \DateTimeImmutable())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
             'price' => new CartPrice(10, 10, 10, new CalculatedTaxCollection(), new TaxRuleCollection(), CartPrice::TAX_STATE_NET),
             'shippingCosts' => new CalculatedPrice(10, 10, new CalculatedTaxCollection(), new TaxRuleCollection()),

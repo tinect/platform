@@ -28,6 +28,7 @@ export default {
         'acl',
         'appCmsService',
         'systemConfigApiService',
+        'cmsPageTypeService',
     ],
 
     mixins: [
@@ -165,15 +166,6 @@ export default {
             ];
         },
 
-        cmsPageTypes() {
-            return {
-                page: this.$tc('sw-cms.detail.label.pageTypeShopPage'),
-                landingpage: this.$tc('sw-cms.detail.label.pageTypeLandingpage'),
-                product_list: this.$tc('sw-cms.detail.label.pageTypeCategory'),
-                product_detail: this.$tc('sw-cms.detail.label.pageTypeProduct'),
-            };
-        },
-
         cmsPageTypeSettings() {
             const mappingEntity = CMS.TYPE_MAPPING_ENTITIES;
 
@@ -289,6 +281,10 @@ export default {
             return this.pageErrors.length > 0;
         },
 
+        pageType() {
+            this.cmsPageTypeService.getType(this.page.type);
+        },
+
         ...mapPropertyErrors('page', [
             'name',
             'sections',
@@ -324,6 +320,8 @@ export default {
                 this.pageId = this.$route.params.id;
                 this.isLoading = true;
                 const defaultStorefrontId = '8A243080F92E4C719546314B577CF82B';
+
+                Shopware.State.commit('shopwareApps/setSelectedIds', [this.pageId]);
 
                 const criteria = new Criteria(1, 25);
                 criteria.addFilter(

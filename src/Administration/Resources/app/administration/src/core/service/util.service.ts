@@ -71,6 +71,7 @@ export const dom = {
     getScrollbarHeight: domUtils.getScrollbarHeight,
     getScrollbarWidth: domUtils.getScrollbarWidth,
     copyToClipboard: domUtils.copyToClipboard,
+    copyStringToClipboard: domUtils.copyStringToClipboard,
 };
 
 // eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
@@ -145,9 +146,9 @@ export default {
 };
 
 /**
- * Returns a uuid string in hex format.
+ * Returns an uuid string in hex format.
  *
- * @returns {String}
+ * @returns { String }
  */
 function createId(): string {
     // eslint-disable-next-line max-len

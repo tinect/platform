@@ -4,6 +4,7 @@ namespace Shopware\Core\Framework\Event\Command;
 
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Event\BusinessEventCollector;
+use Shopware\Core\Framework\Log\Package;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
@@ -14,6 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: 'debug:business-events',
     description: 'Dumps all business events',
 )]
+#[Package('business-ops')]
 class DebugDumpBusinessEventsCommand extends Command
 {
     /**

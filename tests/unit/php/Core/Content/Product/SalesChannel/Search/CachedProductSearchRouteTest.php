@@ -33,19 +33,14 @@ use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\Content\Product\SalesChannel\Search\CachedProductSearchRoute
  */
 class CachedProductSearchRouteTest extends TestCase
 {
-    /**
-     * @var AbstractProductSearchRoute&MockObject
-     */
-    private $decorated;
+    private MockObject&AbstractProductSearchRoute $decorated;
 
-    /**
-     * @var CacheInterface&MockObject
-     */
-    private $cache;
+    private MockObject&CacheInterface $cache;
 
     private EventDispatcher $eventDispatcher;
 

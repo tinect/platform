@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace Shopware\Core\Content\Product\Cart;
 
 use Shopware\Core\Checkout\Cart\Error\Error;
+use Shopware\Core\Framework\Log\Package;
 
+#[Package('inventory')]
 class PurchaseStepsError extends Error
 {
     /**
@@ -22,8 +24,11 @@ class PurchaseStepsError extends Error
      */
     protected $quantity;
 
-    public function __construct(string $id, string $name, int $quantity)
-    {
+    public function __construct(
+        string $id,
+        string $name,
+        int $quantity
+    ) {
         $this->id = $id;
 
         $this->message = sprintf(

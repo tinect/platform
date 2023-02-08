@@ -57,7 +57,7 @@ class ApplicationBootstrapper {
     }
 
     /**
-     * Returns all containers. Use this method if you're want to get initializers in your services.
+     * Returns all containers. Use this method if you want to get initializers in your services.
      */
     getContainer<T extends Bottle.IContainerChildren>(containerName: T): Bottle.IContainer[T] {
         if (typeof containerName === 'string' && this.$container.container[containerName]) {
@@ -348,7 +348,7 @@ class ApplicationBootstrapper {
         // if user is not logged in
         if (!isUserLoggedIn) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-            loginService.logout();
+            loginService.logout(false, false);
             return this.bootLogin();
         }
 
@@ -463,7 +463,7 @@ class ApplicationBootstrapper {
      */
     viewInitialized = new Promise((resolve) => {
         this._resolveViewInitialized = resolve;
-    })
+    });
 
     /**
      * Creates the application root and show the error message.

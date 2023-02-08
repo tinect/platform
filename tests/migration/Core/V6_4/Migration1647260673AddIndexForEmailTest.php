@@ -10,6 +10,7 @@ use function array_column;
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\Migration\V6_4\Migration1647260673AddIndexForEmail
  */
 class Migration1647260673AddIndexForEmailTest extends TestCase
@@ -25,7 +26,7 @@ class Migration1647260673AddIndexForEmailTest extends TestCase
         // Kill index if exists
         try {
             $this->connection->executeStatement('DROP INDEX `idx.email` ON customer');
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
         }
     }
 

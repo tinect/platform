@@ -8,31 +8,24 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
+use Shopware\Core\Framework\Log\Package;
 
-/**
- * @package core
- */
+#[Package('core')]
 class RepositoryIterator
 {
-    /**
-     * @var Criteria
-     */
-    private $criteria;
+    private readonly Criteria $criteria;
 
-    /**
-     * @var EntityRepository
-     */
-    private $repository;
+    private readonly EntityRepository $repository;
 
-    /**
-     * @var Context
-     */
-    private $context;
+    private readonly Context $context;
 
     private bool $autoIncrement = false;
 
-    public function __construct(EntityRepository $repository, Context $context, ?Criteria $criteria = null)
-    {
+    public function __construct(
+        EntityRepository $repository,
+        Context $context,
+        ?Criteria $criteria = null
+    ) {
         if ($criteria === null) {
             $criteria = new Criteria();
             $criteria->setOffset(0);

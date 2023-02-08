@@ -135,9 +135,9 @@
                             <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
                             {% block sw_cms_list_listing_list_grid_content %}
                             <div class="sw-cms-list__list-grid-content">
-                                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
-                                {% block sw_cms_list_listing_list_item %}
                                 <template v-if="!isLoading">
+                                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                                    {% block sw_cms_list_listing_list_item %}
                                     <sw-cms-list-item
                                         v-for="(cmsPage, index) in pages"
                                         :key="cmsPage.id"
@@ -171,9 +171,9 @@
                                                     {{ $tc('sw-cms.components.cmsListItem.setAsDefaultProductList') }}
                                                 </sw-context-menu-item>
 
-                                                <!-- @deprecated tag:v6.5.0 default layouts for products will be enabled -->
+                                                <!-- @deprecated tag:v6.6.0 default layouts for products will be enabled -->
                                                 <sw-context-menu-item
-                                                    v-else-if="feature.isActive('v6.5.0.0') && cmsPage.type === 'product_detail' && !(defaultProductId === cmsPage.id)"
+                                                    v-else-if="feature.isActive('v6.6.0.0') && cmsPage.type === 'product_detail' && !(defaultProductId === cmsPage.id)"
                                                     class="sw-cms-list-item__option-set-as-default"
                                                     :disabled="!acl.can('cms.editor')"
                                                     @click="onOpenLayoutSetAsDefault(cmsPage)"
@@ -222,8 +222,8 @@
                                             </sw-context-button>
                                         </template>
                                     </sw-cms-list-item>
+                                    {% endblock %}
                                 </template>
-                                {% endblock %}
 
                                 <template v-else>
                                     <sw-skeleton
@@ -434,10 +434,6 @@
                 {% endblock %}
             </div>
             {% endblock %}
-
-            {# @deprecated tag:v6.5.0 - Will be removed #}
-            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
-            {% block sw_cms_list_listing_list_loader %}{% endblock %}
 
             <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
             {% block sw_cms_list_media_modal %}

@@ -55,15 +55,10 @@
                     <div class="offcanvas-cart-items">
                         {% for lineItem in page.cart.lineItems %}
                             {% block component_offcanvas_cart_item %}
-                                {# @deprecated tag:v6.5.0 - Template `offcanvas-item.html.twig` is deprecated. Use `storefront/component/line-item/line-item.html.twig` instead. #}
-                                {% if feature('v6.5.0.0') %}
-                                    {% sw_include '@Storefront/storefront/component/line-item/line-item.html.twig' with {
-                                        displayMode: 'offcanvas',
-                                        redirectTo: 'frontend.cart.offcanvas'
-                                    } %}
-                                {% else %}
-                                    {% sw_include '@Storefront/storefront/component/checkout/offcanvas-item.html.twig' %}
-                                {% endif %}
+                                {% sw_include '@Storefront/storefront/component/line-item/line-item.html.twig' with {
+                                    displayMode: 'offcanvas',
+                                    redirectTo: 'frontend.cart.offcanvas'
+                                } %}
                             {% endblock %}
                         {% endfor %}
                     </div>
@@ -92,11 +87,6 @@
                                     <form action="{{ path('frontend.checkout.promotion.add') }}"
                                           class="offcanvas-cart-promotion-form js-offcanvas-cart-add-promotion"
                                           method="post">
-
-                                        {# @deprecated tag:v6.5.0 - Block component_offcanvas_cart_actions_promotion_form_csrf will be removed. #}
-                                        {% block component_offcanvas_cart_actions_promotion_form_csrf %}
-                                            {{ sw_csrf('frontend.checkout.promotion.add') }}
-                                        {% endblock %}
 
                                         {% block component_offcanvas_cart_actions_promotion_redirect %}
                                             <input type="hidden"

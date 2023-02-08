@@ -6,42 +6,23 @@ use Shopware\Core\Content\Media\Exception\DisabledUrlUploadFeatureException;
 use Shopware\Core\Content\Media\Exception\IllegalUrlException;
 use Shopware\Core\Content\Media\Exception\MissingFileExtensionException;
 use Shopware\Core\Content\Media\Exception\UploadException;
+use Shopware\Core\Framework\Log\Package;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * @package content
- */
+#[Package('content')]
 class FileFetcher
 {
     private const ALLOWED_PROTOCOLS = ['http', 'https', 'ftp', 'sftp'];
 
     /**
-     * @var bool
-     *
-     * @deprecated tag:v6.5.0 - Property will become private
-     */
-    public $enableUrlUploadFeature;
-
-    /**
-     * @var bool
-     *
-     * @deprecated tag:v6.5.0 - Property will become private
-     */
-    public $enableUrlValidation;
-
-    private FileUrlValidatorInterface $fileUrlValidator;
-
-    private int $maxFileSize;
-
-    /**
      * @internal
      */
-    public function __construct(FileUrlValidatorInterface $fileUrlValidator, bool $enableUrlUploadFeature = true, bool $enableUrlValidation = true, int $maxFileSize = 0)
-    {
-        $this->fileUrlValidator = $fileUrlValidator;
-        $this->enableUrlUploadFeature = $enableUrlUploadFeature;
-        $this->enableUrlValidation = $enableUrlValidation;
-        $this->maxFileSize = $maxFileSize;
+    public function __construct(
+        private readonly FileUrlValidatorInterface $fileUrlValidator,
+        private readonly bool $enableUrlUploadFeature = true,
+        private readonly bool $enableUrlValidation = true,
+        private readonly int $maxFileSize = 0
+    ) {
     }
 
     public function fetchRequestData(Request $request, string $fileName): MediaFile
@@ -170,7 +151,7 @@ class FileFetcher
 
         try {
             $inputStream = @fopen($url, 'rb', false, $streamContext);
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             throw new UploadException("Could not open source stream from {$url}");
         }
 
@@ -190,7 +171,7 @@ class FileFetcher
     {
         try {
             $inputStream = @fopen($filename, 'wb');
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             throw new UploadException("Could not open Stream to write upload data: {$filename}");
         }
 

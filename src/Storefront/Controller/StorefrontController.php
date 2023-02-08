@@ -7,7 +7,7 @@ use Shopware\Core\Checkout\Cart\Error\Error;
 use Shopware\Core\Checkout\Cart\Error\ErrorRoute;
 use Shopware\Core\Content\Seo\SeoUrlPlaceholderHandlerInterface;
 use Shopware\Core\Framework\Adapter\Twig\TemplateFinder;
-use Shopware\Core\Framework\Feature;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Routing\RequestTransformerInterface;
 use Shopware\Core\Framework\Script\Execution\Hook;
 use Shopware\Core\Framework\Script\Execution\ScriptExecutor;
@@ -22,12 +22,9 @@ use Shopware\Storefront\Framework\Twig\Extension\IconCacheTwigFilter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
 use Twig\Environment;
 
-/**
- * @package storefront
- */
+#[Package('storefront')]
 abstract class StorefrontController extends AbstractController
 {
     public const SUCCESS = 'success';
@@ -55,14 +52,8 @@ abstract class StorefrontController extends AbstractController
 
         $salesChannelContext = $request->attributes->get(PlatformRequest::ATTRIBUTE_SALES_CHANNEL_CONTEXT_OBJECT);
 
-        /* @feature-deprecated $view will be original template in StorefrontRenderEvent from 6.5.0.0 */
-        if (Feature::isActive('FEATURE_NEXT_17275')) {
-            $event = new StorefrontRenderEvent($view, $parameters, $request, $salesChannelContext);
-        } else {
-            $inheritedView = $this->getTemplateFinder()->find($view);
+        $event = new StorefrontRenderEvent($view, $parameters, $request, $salesChannelContext);
 
-            $event = new StorefrontRenderEvent($inheritedView, $parameters, $request, $salesChannelContext);
-        }
         $this->container->get('event_dispatcher')->dispatch($event);
 
         $iconCacheEnabled = $this->getSystemConfigService()->get('core.storefrontSettings.iconCache') ?? true;
@@ -71,9 +62,7 @@ abstract class StorefrontController extends AbstractController
             IconCacheTwigFilter::enable();
         }
 
-        $response = Profiler::trace('twig-rendering', function () use ($view, $event) {
-            return $this->render($view, $event->getParameters(), new StorefrontResponse());
-        });
+        $response = Profiler::trace('twig-rendering', fn () => $this->render($view, $event->getParameters(), new StorefrontResponse()));
 
         if ($iconCacheEnabled) {
             IconCacheTwigFilter::disable();
@@ -95,7 +84,7 @@ abstract class StorefrontController extends AbstractController
 
         $response->setData($parameters);
         $response->setContext($salesChannelContext);
-        $response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, '1');
+
         $response->headers->set('Content-Type', 'text/html');
 
         return $response;
@@ -250,12 +239,9 @@ abstract class StorefrontController extends AbstractController
             return $this->twig->render($view, $parameters);
         }
 
-        Feature::triggerDeprecationOrThrow(
-            'v6.5.0.0',
+        throw new \Exception(
             sprintf('Class %s does not have twig injected. Add to your service definition a method call to setTwig with the twig instance', static::class)
         );
-
-        return parent::renderView($view, $parameters);
     }
 
     protected function getTemplateFinder(): TemplateFinder

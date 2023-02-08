@@ -15,21 +15,16 @@ use Shopware\Core\Framework\Uuid\Uuid;
  * @package business-ops
  *
  * @internal
+ *
  * @covers \Shopware\Core\Content\Flow\Dispatching\Action\AddCustomerTagAction
  */
 class AddCustomerTagActionTest extends TestCase
 {
-    /**
-     * @var MockObject|EntityRepository
-     */
-    private $repository;
+    private MockObject&EntityRepository $repository;
 
     private AddCustomerTagAction $action;
 
-    /**
-     * @var MockObject|StorableFlow
-     */
-    private $flow;
+    private MockObject&StorableFlow $flow;
 
     public function setUp(): void
     {

@@ -3,6 +3,7 @@
 namespace Shopware\Core\Checkout\Customer\Rule;
 
 use Shopware\Core\Checkout\CheckoutRuleScope;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Rule\Rule;
 use Shopware\Core\Framework\Rule\RuleComparison;
 use Shopware\Core\Framework\Rule\RuleConfig;
@@ -10,28 +11,21 @@ use Shopware\Core\Framework\Rule\RuleConstraints;
 use Shopware\Core\Framework\Rule\RuleScope;
 use Shopware\Core\System\Country\CountryDefinition;
 
-/**
- * @package business-ops
- */
+#[Package('business-ops')]
 class BillingCountryRule extends Rule
 {
-    /**
-     * @var array<string>|null
-     */
-    protected ?array $countryIds;
-
-    protected string $operator;
+    final public const RULE_NAME = 'customerBillingCountry';
 
     /**
      * @internal
      *
-     * @param array<string>|null $countryIds
+     * @param list<string>|null $countryIds
      */
-    public function __construct(string $operator = self::OPERATOR_EQ, ?array $countryIds = null)
-    {
+    public function __construct(
+        protected string $operator = self::OPERATOR_EQ,
+        protected ?array $countryIds = null
+    ) {
         parent::__construct();
-        $this->operator = $operator;
-        $this->countryIds = $countryIds;
     }
 
     public function match(RuleScope $scope): bool
@@ -76,11 +70,6 @@ class BillingCountryRule extends Rule
         $constraints['countryIds'] = RuleConstraints::uuids();
 
         return $constraints;
-    }
-
-    public function getName(): string
-    {
-        return 'customerBillingCountry';
     }
 
     public function getConfig(): RuleConfig

@@ -12,21 +12,17 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * @deprecated tag:v6.5.0 - reason:becomes-internal - EventSubscribers will become internal in v6.5.0
- *
- * @package system-settings
+ * @internal
  */
+#[Package('system-settings')]
 class ProductCategoryPathsSubscriber implements EventSubscriberInterface, ResetInterface
 {
-    private EntityRepository $categoryRepository;
-
-    private SyncServiceInterface $syncService;
-
     /**
      * @var array<string, string>
      */
@@ -35,16 +31,16 @@ class ProductCategoryPathsSubscriber implements EventSubscriberInterface, ResetI
     /**
      * @internal
      */
-    public function __construct(EntityRepository $categoryRepository, SyncServiceInterface $syncService)
-    {
-        $this->categoryRepository = $categoryRepository;
-        $this->syncService = $syncService;
+    public function __construct(
+        private readonly EntityRepository $categoryRepository,
+        private readonly SyncServiceInterface $syncService
+    ) {
     }
 
     /**
      * @return array<string, string|array{0: string, 1: int}|list<array{0: string, 1?: int}>>
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ImportExportBeforeImportRecordEvent::class => 'categoryPathsToAssignment',
@@ -61,7 +57,7 @@ class ProductCategoryPathsSubscriber implements EventSubscriberInterface, ResetI
         }
 
         $result = [];
-        $categoriesPaths = explode('|', $row['category_paths']);
+        $categoriesPaths = explode('|', (string) $row['category_paths']);
         $newCategoriesPayload = [];
 
         foreach ($categoriesPaths as $path) {

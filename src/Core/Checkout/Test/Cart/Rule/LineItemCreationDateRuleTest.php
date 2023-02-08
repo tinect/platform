@@ -10,6 +10,7 @@ use Shopware\Core\Checkout\Cart\Rule\LineItemCreationDateRule;
 use Shopware\Core\Checkout\Cart\Rule\LineItemScope;
 use Shopware\Core\Checkout\CheckoutRuleScope;
 use Shopware\Core\Checkout\Test\Cart\Rule\Helper\CartRuleHelperTrait;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Rule\Rule;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -18,11 +19,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Type;
 
 /**
- * @package business-ops
- *
  * @internal
+ *
  * @group rules
  */
+#[Package('business-ops')]
 class LineItemCreationDateRuleTest extends TestCase
 {
     use CartRuleHelperTrait;
@@ -231,6 +232,6 @@ class LineItemCreationDateRuleTest extends TestCase
 
     private function createLineItemWithCreatedDate(string $createdAt): LineItem
     {
-        return ($this->createLineItem())->setPayloadValue(self::PAYLOAD_KEY, $createdAt);
+        return $this->createLineItem()->setPayloadValue(self::PAYLOAD_KEY, $createdAt);
     }
 }

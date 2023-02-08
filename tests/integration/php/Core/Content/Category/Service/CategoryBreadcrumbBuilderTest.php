@@ -110,6 +110,7 @@ class CategoryBreadcrumbBuilderTest extends TestCase
 
     /**
      * @dataProvider breadcrumbDataProvider
+     *
      * @group slow
      */
     public function testIsWithoutEntrypoint(string $key, bool $withSalesChannel, bool $withCategoryId = false): void
@@ -172,6 +173,7 @@ class CategoryBreadcrumbBuilderTest extends TestCase
 
     /**
      * @dataProvider seoCategoryProvider
+     *
      * @group slow
      */
     public function testItHasSeoCategory(bool $hasCategories, bool $hasMainCategory, bool $hasMainCategory2ndChannel): void
@@ -299,7 +301,7 @@ class CategoryBreadcrumbBuilderTest extends TestCase
         static::assertIsString($response->getContent());
         static::assertSame(200, $response->getStatusCode());
 
-        $json = json_decode($response->getContent(), true);
+        $json = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertNotEmpty($json);
         static::assertArrayHasKey('product', $json);
@@ -674,7 +676,7 @@ class CategoryBreadcrumbBuilderTest extends TestCase
         $connection->executeStatement(
             'UPDATE `product` SET `stream_ids` = :streamIds WHERE `id` = :id',
             [
-                'streamIds' => json_encode([$streamId]),
+                'streamIds' => json_encode([$streamId], \JSON_THROW_ON_ERROR),
                 'id' => Uuid::fromHexToBytes($productId),
             ]
         );

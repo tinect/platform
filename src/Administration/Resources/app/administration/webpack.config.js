@@ -15,12 +15,17 @@ const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const WebpackCopyAfterBuildPlugin = require('@shopware-ag/webpack-copy-after-build');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const WebpackDynamicPublicPathPlugin = require('webpack-dynamic-public-path');
 const path = require('path');
 const fs = require('fs');
 const chalk = require('chalk');
 const crypto = require('crypto');
 
-/** HACK: OpenSSL 3 does not support md4 any more,
+if (process.env.IPV4FIRST) {
+    require('dns').setDefaultResultOrder('ipv4first');
+}
+
+/** HACK: OpenSSL 3 does not support md4 anymore,
 * but webpack hardcodes it all over the place: https://github.com/webpack/webpack/issues/13572
 */
 const cryptoOrigCreateHash = crypto.createHash;
@@ -29,6 +34,7 @@ crypto.createHash = algorithm => cryptoOrigCreateHash(algorithm === 'md4' ? 'sha
 /* eslint-disable */
 
 const buildOnlyExtensions = process.env.SHOPWARE_ADMIN_BUILD_ONLY_EXTENSIONS === '1';
+const openBrowserForWatch = process.env.DISABLE_DEVSERVER_OPEN  !== '1';
 
 const flagsPath = path.join(process.env.PROJECT_ROOT, 'var', 'config_js_features.json');
 let featureFlags = {};
@@ -495,7 +501,7 @@ const coreConfig = {
                     host: process.env.HOST,
                     port: process.env.PORT,
                     disableHostCheck: true,
-                    open: true,
+                    open: openBrowserForWatch,
                     proxy: {
                         '/api': {
                             target: process.env.APP_URL,
@@ -612,6 +618,10 @@ const coreConfig = {
                             },
                         ],
                     }),
+                    // needed to set paths for chunks dynamically (e.g. needed for S3 asset bucket)
+                    new WebpackDynamicPublicPathPlugin({
+                        externalPublicPath: `(window.__sw__.assetPath + '/bundles/administration/')`,
+                    }),
                 ];
             }
 
@@ -638,7 +648,7 @@ const coreConfig = {
 
 /**
  * We iterate through all activated plugins and create a separate webpack configuration for each plugin. We use the
- * base configuration for this. Additionally we allow plugin developers to extend or modify their webpack configuration
+ * base configuration for this. Additionally, we allow plugin developers to extend or modify their webpack configuration
  * when needed.
  *
  * The entry file and the output will be defined for each plugin so that the generated files are in the correct folders.
@@ -720,15 +730,21 @@ const configsForPlugins = pluginEntries.map((plugin) => {
                 }),
 
                 ...(() => {
-                    if (isProd) {
+                    if (isProd && !hasHtmlFile) {
                         return [
+                            // needed to set paths for chunks dynamically (e.g. needed for S3 asset bucket)
+                            new WebpackDynamicPublicPathPlugin({
+                                externalPublicPath: `(window.__sw__.assetPath + '/bundles/${plugin.technicalFolderName}/')`,
+                            }),
+
                             new ESLintPlugin({
                                 context: path.resolve(plugin.path),
                                 useEslintrc: false,
                                 baseConfig: {
-                                    parser: 'babel-eslint',
+                                    parser: '@babel/eslint-parser',
                                     parserOptions: {
-                                        sourceType: 'module'
+                                        sourceType: 'module',
+                                        requireConfigFile: false,
                                     },
                                     plugins: [ 'plugin-rules' ],
                                     rules: {

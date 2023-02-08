@@ -11,6 +11,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Write\EntityWriterInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\WriteContext;
 use Shopware\Core\Framework\Demodata\DemodataContext;
 use Shopware\Core\Framework\Demodata\DemodataGeneratorInterface;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface;
 use Shopware\Core\Test\TestDefaults;
@@ -18,6 +19,7 @@ use Shopware\Core\Test\TestDefaults;
 /**
  * @internal
  */
+#[Package('core')]
 class CustomerGenerator implements DemodataGeneratorInterface
 {
     /**
@@ -31,11 +33,11 @@ class CustomerGenerator implements DemodataGeneratorInterface
      * @internal
      */
     public function __construct(
-        private EntityWriterInterface $writer,
-        private Connection $connection,
-        private EntityRepository $customerGroupRepository,
-        private NumberRangeValueGeneratorInterface $numberRangeValueGenerator,
-        private CustomerDefinition $customerDefinition
+        private readonly EntityWriterInterface $writer,
+        private readonly Connection $connection,
+        private readonly EntityRepository $customerGroupRepository,
+        private readonly NumberRangeValueGeneratorInterface $numberRangeValueGenerator,
+        private readonly CustomerDefinition $customerDefinition
     ) {
     }
 
@@ -227,9 +229,7 @@ class CustomerGenerator implements DemodataGeneratorInterface
 
             if (!empty($chosenTags)) {
                 $tagAssignments = array_map(
-                    function ($id) {
-                        return ['id' => $id];
-                    },
+                    fn ($id) => ['id' => $id],
                     $chosenTags
                 );
             }

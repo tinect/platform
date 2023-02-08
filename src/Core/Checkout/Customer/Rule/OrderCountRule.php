@@ -3,25 +3,21 @@
 namespace Shopware\Core\Checkout\Customer\Rule;
 
 use Shopware\Core\Checkout\CheckoutRuleScope;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Rule\Rule;
 use Shopware\Core\Framework\Rule\RuleComparison;
 use Shopware\Core\Framework\Rule\RuleConfig;
 use Shopware\Core\Framework\Rule\RuleConstraints;
 use Shopware\Core\Framework\Rule\RuleScope;
 
-/**
- * @package business-ops
- */
+#[Package('business-ops')]
 class OrderCountRule extends Rule
 {
+    final public const RULE_NAME = 'customerOrderCount';
+
     protected string $operator;
 
     protected int $count;
-
-    public function getName(): string
-    {
-        return 'customerOrderCount';
-    }
 
     public function match(RuleScope $scope): bool
     {

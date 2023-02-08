@@ -14,12 +14,12 @@ use Shopware\Core\Content\Rule\Aggregate\RuleCondition\RuleConditionCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCustomFieldsTrait;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Rule\Rule;
 use Shopware\Core\System\Tag\TagCollection;
+use Shopware\Core\System\TaxProvider\TaxProviderCollection;
 
-/**
- * @package business-ops
- */
+#[Package('business-ops')]
 class RuleEntity extends Entity
 {
     use EntityIdTrait;
@@ -41,7 +41,7 @@ class RuleEntity extends Entity
     protected $priority;
 
     /**
-     * @deprecated tag:v6.5.0 - Will be internal from 6.5.0 onward
+     * @internal
      *
      * @var string|Rule|null
      */
@@ -127,6 +127,8 @@ class RuleEntity extends Entity
      */
     protected $cartPromotions;
 
+    protected ?TaxProviderCollection $taxProviders = null;
+
     public function getName(): string
     {
         return $this->name;
@@ -148,7 +150,7 @@ class RuleEntity extends Entity
     }
 
     /**
-     * @deprecated tag:v6.5.0 - reason:becomes-internal - Will be internal from 6.5.0 onward
+     * @internal
      *
      * @param Rule|string|null $payload
      */
@@ -371,5 +373,15 @@ class RuleEntity extends Entity
     public function setCartPromotions(PromotionCollection $cartPromotions): void
     {
         $this->cartPromotions = $cartPromotions;
+    }
+
+    public function getTaxProviders(): ?TaxProviderCollection
+    {
+        return $this->taxProviders;
+    }
+
+    public function setTaxProviders(TaxProviderCollection $taxProviders): void
+    {
+        $this->taxProviders = $taxProviders;
     }
 }

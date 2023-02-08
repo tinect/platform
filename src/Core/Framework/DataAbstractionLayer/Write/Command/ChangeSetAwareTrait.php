@@ -2,9 +2,12 @@
 
 namespace Shopware\Core\Framework\DataAbstractionLayer\Write\Command;
 
+use Shopware\Core\Framework\Log\Package;
+
 /**
  * @internal
  */
+#[Package('core')]
 trait ChangeSetAwareTrait
 {
     protected bool $requireChangeSet = false;

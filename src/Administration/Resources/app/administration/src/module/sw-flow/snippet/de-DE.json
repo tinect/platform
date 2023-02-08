@@ -75,6 +75,7 @@
       "messageDeleteSuccess": "Flow gelöscht.",
       "messageDeleteError": "Flow konnte nicht gelöscht werden.",
       "messageSaveError": "Flow konnte nicht gespeichert werden.",
+      "messageWarningSave": "Flow-Vorlagen können nicht bearbeitet werden.",
       "messageError": "Ein Fehler ist aufgetreten.",
       "messageRequiredEventName": "Wähle vor dem Speichern ein Auslöser-Ereignis aus.",
       "messageRequiredEmptyFields": "Wähle vor dem Speichern eine Regel oder Aktion aus.",
@@ -83,6 +84,7 @@
       "messageDownloadSuccess": "Flow heruntergeladen.",
       "messageDownloadError": "Flow konnte nicht heruntergeladen werden.",
       "messageCreateSuccess": "Flow erstellt.",
+      "messageUpdateTemplateSuccess": "Flow template updated.",
       "messageCreateError": "Flow konnte nicht erstellt werden."
     },
     "actions": {
@@ -90,6 +92,7 @@
       "generateDocument": "Dokumente erzeugen",
       "removeTag": "Tag entfernen",
       "mailSend": "E-Mail verschicken",
+      "grantDownloadAccess": "Download-Recht setzen",
       "setOrderState": "Status zuweisen",
       "stopFlow": "Flow anhalten",
       "changeCustomerGroup": "Kundengruppe zuweisen",
@@ -178,6 +181,15 @@
         "labelDocumentType": "Dokumente",
         "placeholderDocumentType": "Dokumente auswählen ..."
       },
+      "downloadAccess": {
+        "titleSetDownloadAccess": "Download-Recht setzen",
+        "labelValueField": "Recht",
+        "placeholderValueField": "Anwendung auswählen ...",
+        "options": {
+          "grant": "Erteilen",
+          "revoke": "Entziehen"
+        }
+      },
       "customerGroup": {
         "titleChangeCustomerGroup": "Kundengruppe zuweisen",
         "labelCustomerGroup": "Kundengruppe",
@@ -219,7 +231,7 @@
         "labelCustomer": "Kunde",
         "labelAdmin": "Administrator",
         "labelCustom": "Anderer Empfänger",
-        "labelContactFormMail": "Kontaktformular-Bestätigung",
+        "labelContactFormMail": "Anfragesteller",
         "labelRecipient": "Empfänger",
         "placeholderRecipient": "E-Mail-Empfänger auswählen ...",
         "useDifferentReplyToLabel": "Andere Absender-Adresse verwenden",
@@ -282,6 +294,7 @@
       "order": "Bestellung",
       "paymentMethod": "Zahlungsart",
       "contactForm": "Kontaktformular",
+      "reviewForm": "Produktbewertung",
       "group": "Gruppe",
       "recovery": "Wiederherstellung",
       "registration": "Registrierung",
@@ -319,7 +332,7 @@
       "cancelled": "Abgebrochen",
       "completed": "Abgeschlossen",
       "inProgress": "In Bearbeitung",
-      "open": "Open",
+      "open": "Offen",
       "returned": "Zurückgeschickt",
       "returnedPartially": "Teilweise zurückgeschickt",
       "shipped": "Versendet",
@@ -334,7 +347,8 @@
       "reminded": "Erinnert",
       "unconfirmed": "Unbestätigt",
       "pending": "Ausstehend",
-      "changed": "Geändert"
+      "changed": "Geändert",
+      "update": "Aktualisierung"
     }
   },
   "sw-privileges": {

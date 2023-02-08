@@ -12,27 +12,21 @@ use Shopware\Core\Content\Flow\Dispatching\StorableFlow;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Event\MailAware;
 use Shopware\Core\Framework\Event\OrderAware;
+use Shopware\Core\Framework\Log\Package;
 
 /**
- * @package business-ops
- *
  * @internal
  */
+#[Package('business-ops')]
 class GenerateDocumentAction extends FlowAction implements DelayableAction
 {
-    private DocumentGenerator $documentGenerator;
-
-    private LoggerInterface $logger;
-
     /**
      * @internal
      */
     public function __construct(
-        DocumentGenerator $documentGenerator,
-        LoggerInterface $logger
+        private readonly DocumentGenerator $documentGenerator,
+        private readonly LoggerInterface $logger
     ) {
-        $this->documentGenerator = $documentGenerator;
-        $this->logger = $logger;
     }
 
     public static function getName(): string

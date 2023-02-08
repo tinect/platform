@@ -12,27 +12,20 @@ use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Indexing\EntityIndexerRegistry;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\EntityWriterInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\WriteContext;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Struct\ArrayEntity;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
- * @package core
- */
+#[Package('core')]
 class SyncService implements SyncServiceInterface
 {
-    private EntityWriterInterface $writer;
-
-    private EventDispatcherInterface $eventDispatcher;
-
     /**
      * @internal
      */
     public function __construct(
-        EntityWriterInterface $writer,
-        EventDispatcherInterface $eventDispatcher
+        private readonly EntityWriterInterface $writer,
+        private readonly EventDispatcherInterface $eventDispatcher
     ) {
-        $this->writer = $writer;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**

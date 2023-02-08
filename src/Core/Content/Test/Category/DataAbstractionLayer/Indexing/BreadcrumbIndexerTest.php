@@ -24,10 +24,7 @@ class BreadcrumbIndexerTest extends TestCase
      */
     private $repository;
 
-    /**
-     * @var string
-     */
-    private $deLanguageId;
+    private string $deLanguageId;
 
     protected function setUp(): void
     {
@@ -319,8 +316,11 @@ class SetUpData
      */
     public $level3;
 
-    public function __construct(string $level1, string $level2, string $level3)
-    {
+    public function __construct(
+        string $level1,
+        string $level2,
+        string $level3
+    ) {
         $this->level1 = $level1;
         $this->level2 = $level2;
         $this->level3 = $level3;

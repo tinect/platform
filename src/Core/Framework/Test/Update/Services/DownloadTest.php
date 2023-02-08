@@ -11,6 +11,7 @@ use Shopware\Core\Framework\Update\Services\Download;
 
 /**
  * @internal
+ *
  * @group needsWebserver
  */
 class DownloadTest extends TestCase
@@ -33,7 +34,7 @@ class DownloadTest extends TestCase
         try {
             stream_wrapper_restore('file');
             self::$restored = true;
-        } catch (\Throwable $exception) {
+        } catch (\Throwable) {
             // nth
         }
 

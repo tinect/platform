@@ -16,6 +16,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Write\Command\UpdateCommand;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\Command\WriteCommand;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\Validation\PreWriteValidationEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\WriteException;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Rule\Collector\RuleConditionRegistry;
 use Shopware\Core\Framework\Rule\Exception\InvalidConditionException;
 use Shopware\Core\Framework\Rule\ScriptRule;
@@ -29,33 +30,20 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @package business-ops
- *
- * @deprecated tag:v6.5.0 - reason:becomes-internal - EventSubscribers will become internal in v6.5.0
+ * @internal
  */
+#[Package('business-ops')]
 class RuleValidator implements EventSubscriberInterface
 {
-    private ValidatorInterface $validator;
-
-    private RuleConditionRegistry $ruleConditionRegistry;
-
-    private EntityRepository $ruleConditionRepository;
-
-    private EntityRepository $appScriptConditionRepository;
-
     /**
      * @internal
      */
     public function __construct(
-        ValidatorInterface $validator,
-        RuleConditionRegistry $ruleConditionRegistry,
-        EntityRepository $ruleConditionRepository,
-        EntityRepository $appScriptConditionRepository
+        private readonly ValidatorInterface $validator,
+        private readonly RuleConditionRegistry $ruleConditionRegistry,
+        private readonly EntityRepository $ruleConditionRepository,
+        private readonly EntityRepository $appScriptConditionRepository
     ) {
-        $this->validator = $validator;
-        $this->ruleConditionRegistry = $ruleConditionRegistry;
-        $this->ruleConditionRepository = $ruleConditionRepository;
-        $this->appScriptConditionRepository = $appScriptConditionRepository;
     }
 
     public static function getSubscribedEvents(): array
@@ -119,7 +107,7 @@ class RuleValidator implements EventSubscriberInterface
 
         try {
             $ruleInstance = $this->ruleConditionRegistry->getRuleInstance($type);
-        } catch (InvalidConditionException $e) {
+        } catch (InvalidConditionException) {
             $violation = $this->buildViolation(
                 'This {{ value }} is not a valid condition type.',
                 ['{{ value }}' => $type],
@@ -172,7 +160,7 @@ class RuleValidator implements EventSubscriberInterface
     {
         $value = $condition !== null ? $condition->getValue() : [];
         if (isset($payload['value']) && $payload['value'] !== null) {
-            $value = json_decode($payload['value'], true);
+            $value = json_decode((string) $payload['value'], true, 512, \JSON_THROW_ON_ERROR);
         }
 
         return $value ?? [];

@@ -17,6 +17,7 @@ use Shopware\Core\Checkout\Test\Customer\SalesChannel\CustomerTestTrait;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Pricing\CashRoundingConfig;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
@@ -67,17 +68,17 @@ class SetPaymentOrderRouteTest extends TestCase
         $this->assignSalesChannelContext($this->browser);
 
         $email = Uuid::randomHex() . '@example.com';
-        $customerId = $this->createCustomer('shopware', $email);
+        $customerId = $this->createCustomer('shopware1234', $email);
 
         $this->ids->set('order-1', $this->createOrder($customerId));
-        $this->ids->set('order-2', $this->createOrder($this->createCustomer('test', 'test-other@test.de')));
+        $this->ids->set('order-2', $this->createOrder($this->createCustomer('test1234', 'test-other@test.de')));
 
         $this->browser->request(
             'POST',
             '/store-api/account/login',
             [
                 'email' => $email,
-                'password' => 'shopware',
+                'password' => 'shopware1234',
             ]
         );
         $response = $this->browser->getResponse();
@@ -188,15 +189,18 @@ class SetPaymentOrderRouteTest extends TestCase
         $lastTransaction = $transactions->last();
         static::assertNotNull($lastTransaction);
 
+        $paymentMethodChangedCriteriaEventResult = $this->paymentMethodChangedCriteriaEventResult;
+        $paymentMethodChangedEventResult = $this->paymentMethodChangedEventResult;
+        $transactionStateEventResult = $this->transactionStateEventResult;
+        static::assertNotNull($paymentMethodChangedEventResult);
+        static::assertNotNull($transactionStateEventResult);
+        static::assertNotNull($paymentMethodChangedCriteriaEventResult);
         static::assertSame('open', $lastTransaction->getStateMachineState()->getTechnicalName());
-        static::assertNotNull($this->paymentMethodChangedCriteriaEventResult);
-        static::assertNotNull($this->paymentMethodChangedEventResult);
-        static::assertSame($lastTransaction->getId(), $this->paymentMethodChangedEventResult->getOrderTransaction()->getId());
-        static::assertNotNull($this->transactionStateEventResult);
-        static::assertNotSame($firstTransaction->getId(), $this->transactionStateEventResult->getEntityId());
-        static::assertNotSame($lastTransaction->getId(), $this->transactionStateEventResult->getEntityId());
-        static::assertSame('open', $this->transactionStateEventResult->getFromPlace()->getTechnicalName());
-        static::assertSame('cancelled', $this->transactionStateEventResult->getToPlace()->getTechnicalName());
+        static::assertSame($lastTransaction->getId(), $paymentMethodChangedEventResult->getOrderTransaction()->getId());
+        static::assertNotSame($firstTransaction->getId(), $transactionStateEventResult->getEntityId());
+        static::assertNotSame($lastTransaction->getId(), $transactionStateEventResult->getEntityId());
+        static::assertSame('open', $transactionStateEventResult->getFromPlace()->getTechnicalName());
+        static::assertSame('cancelled', $transactionStateEventResult->getToPlace()->getTechnicalName());
     }
 
     public function testSetPaymentMethodRandomOrder(): void
@@ -211,7 +215,7 @@ class SetPaymentOrderRouteTest extends TestCase
                 ]
             );
 
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertSame(Response::HTTP_NOT_FOUND, $this->browser->getResponse()->getStatusCode());
         static::assertSame('FRAMEWORK__ENTITY_NOT_FOUND', $response['errors'][0]['code']);
@@ -232,7 +236,7 @@ class SetPaymentOrderRouteTest extends TestCase
                 ]
             );
 
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertSame(Response::HTTP_NOT_FOUND, $this->browser->getResponse()->getStatusCode());
         static::assertSame('FRAMEWORK__ENTITY_NOT_FOUND', $response['errors'][0]['code']);
@@ -257,7 +261,7 @@ class SetPaymentOrderRouteTest extends TestCase
                 ]
             );
 
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertSame(Response::HTTP_FORBIDDEN, $this->browser->getResponse()->getStatusCode());
         static::assertSame('CHECKOUT__CUSTOMER_NOT_LOGGED_IN', $response['errors'][0]['code']);
@@ -314,6 +318,8 @@ class SetPaymentOrderRouteTest extends TestCase
         $this->getContainer()->get('order.repository')->create(
             [[
                 'id' => $id,
+                'itemRounding' => json_decode(json_encode(new CashRoundingConfig(2, 0.01, true), \JSON_THROW_ON_ERROR), true, 512, \JSON_THROW_ON_ERROR),
+                'totalRounding' => json_decode(json_encode(new CashRoundingConfig(2, 0.01, true), \JSON_THROW_ON_ERROR), true, 512, \JSON_THROW_ON_ERROR),
                 'orderDateTime' => (new \DateTimeImmutable())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
                 'price' => new CartPrice(10, 10, 10, new CalculatedTaxCollection(), new TaxRuleCollection(), CartPrice::TAX_STATE_NET),
                 'shippingCosts' => new CalculatedPrice(10, 10, new CalculatedTaxCollection(), new TaxRuleCollection()),
@@ -384,7 +390,7 @@ class SetPaymentOrderRouteTest extends TestCase
                 ]
             );
 
-        $response = json_decode((string) $this->browser->getResponse()->getContent(), true);
+        $response = json_decode((string) $this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         static::assertSame(Response::HTTP_OK, $this->browser->getResponse()->getStatusCode());
         static::assertTrue($response['success']);
     }

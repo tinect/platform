@@ -4,10 +4,12 @@ namespace Shopware\Core\Framework\DataAbstractionLayer\Write\Command;
 
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\EntityExistence;
+use Shopware\Core\Framework\Log\Package;
 
 /**
  * @final
  */
+#[Package('core')]
 class SetNullOnDeleteCommand extends UpdateCommand
 {
     /**
@@ -20,7 +22,7 @@ class SetNullOnDeleteCommand extends UpdateCommand
         array $primaryKey,
         EntityExistence $existence,
         string $path,
-        private bool $enforcedByConstraint
+        private readonly bool $enforcedByConstraint
     ) {
         parent::__construct($definition, $payload, $primaryKey, $existence, $path);
     }

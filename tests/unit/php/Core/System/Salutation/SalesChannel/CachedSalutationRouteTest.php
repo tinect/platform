@@ -34,19 +34,14 @@ use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\System\Salutation\SalesChannel\CachedSalutationRoute
  */
 class CachedSalutationRouteTest extends TestCase
 {
-    /**
-     * @var AbstractSalutationRoute&MockObject
-     */
-    private $decorated;
+    private MockObject&AbstractSalutationRoute $decorated;
 
-    /**
-     * @var CacheInterface&MockObject
-     */
-    private $cache;
+    private MockObject&CacheInterface $cache;
 
     private EventDispatcher $eventDispatcher;
 

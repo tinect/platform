@@ -16,11 +16,6 @@
               data-form-ajax-submit="true"
               data-form-ajax-submit-options='{{ formAjaxSubmitOptions|json_encode }}'>
 
-            {# @deprecated tag:v6.5.0 - Block page_product_detail_review_form_csrf will be removed. #}
-            {% block page_product_detail_review_form_csrf %}
-                {{ sw_csrf('frontend.detail.review.save') }}
-            {% endblock %}
-
             {% block page_product_detail_review_form_forward %}
                 <input type="hidden"
                        name="forwardTo"
@@ -94,7 +89,7 @@
                                 <input type="text"
                                        class="form-control{% if formViolations.getViolations('/title') %} is-invalid{% endif %}"
                                        id="reviewTitle"
-                                       placeholder="{{ "detail.reviewFormTitlePlaceholder"|trans|striptags }}{{ "general.required"|trans|striptags }}"
+                                       placeholder="{{ "detail.reviewFormTitlePlaceholder"|trans|striptags }}"
                                        name="title"
                                        value="{{ data.get('title') }}"
                                        required="required"
@@ -125,6 +120,7 @@
                         <textarea class="form-control{% if formViolations.getViolations('/content') %} is-invalid{% endif %}"
                                   id="reviewContent"
                                   name="content"
+                                  placeholder="{{ "detail.reviewFormContentPlaceholder"|trans|striptags }}"
                                   required="required"
                                   minlength="40"
                                   rows="8">{% if data.get('content') is not empty %}{{ data.get('content') }}{% endif %}</textarea>

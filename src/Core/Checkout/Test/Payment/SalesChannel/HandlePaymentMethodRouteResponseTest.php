@@ -13,6 +13,8 @@ use Shopware\Core\Checkout\Test\Payment\Handler\V630\AsyncTestPaymentHandler as 
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Pricing\CashRoundingConfig;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Test\TestCaseBase\SalesChannelApiTestBehaviour;
 use Shopware\Core\Framework\Test\TestDataCollection;
@@ -22,10 +24,9 @@ use Shopware\Core\Test\TestDefaults;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
- * @package checkout
- *
  * @internal
  */
+#[Package('checkout')]
 class HandlePaymentMethodRouteResponseTest extends TestCase
 {
     use IntegrationTestBehaviour;
@@ -68,7 +69,7 @@ class HandlePaymentMethodRouteResponseTest extends TestCase
             );
 
         static::assertIsString($this->browser->getResponse()->getContent());
-        $response = json_decode($this->browser->getResponse()->getContent(), true);
+        $response = json_decode($this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertArrayHasKey('errors', $response);
         static::assertSame('VIOLATION::IS_BLANK_ERROR', $response['errors'][0]['code']);
@@ -86,7 +87,7 @@ class HandlePaymentMethodRouteResponseTest extends TestCase
             );
 
         static::assertIsString($this->browser->getResponse()->getContent());
-        $response = json_decode($this->browser->getResponse()->getContent(), true);
+        $response = json_decode($this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         static::assertArrayHasKey('errors', $response);
         static::assertSame('CHECKOUT__INVALID_ORDER_ID', $response['errors'][0]['code']);
@@ -109,7 +110,7 @@ class HandlePaymentMethodRouteResponseTest extends TestCase
             );
 
         static::assertIsString($this->browser->getResponse()->getContent());
-        $response = json_decode($this->browser->getResponse()->getContent(), true);
+        $response = json_decode($this->browser->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         static::assertArrayHasKey('redirectUrl', $response);
         static::assertSame(AsyncTestPaymentHandlerV630::REDIRECT_URL, $response['redirectUrl']);
     }
@@ -146,6 +147,8 @@ class HandlePaymentMethodRouteResponseTest extends TestCase
         $order = [
             'id' => $orderId,
             'orderNumber' => Uuid::randomHex(),
+            'itemRounding' => json_decode(json_encode(new CashRoundingConfig(2, 0.01, true), \JSON_THROW_ON_ERROR), true, 512, \JSON_THROW_ON_ERROR),
+            'totalRounding' => json_decode(json_encode(new CashRoundingConfig(2, 0.01, true), \JSON_THROW_ON_ERROR), true, 512, \JSON_THROW_ON_ERROR),
             'orderDateTime' => (new \DateTimeImmutable())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
             'price' => new CartPrice(10, 10, 10, new CalculatedTaxCollection(), new TaxRuleCollection(), CartPrice::TAX_STATE_NET),
             'shippingCosts' => new CalculatedPrice(10, 10, new CalculatedTaxCollection(), new TaxRuleCollection()),

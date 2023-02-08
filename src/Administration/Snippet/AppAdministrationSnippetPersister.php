@@ -8,24 +8,20 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Locale\LocaleException;
 
 /**
  * @internal
  */
+#[Package('administration')]
 class AppAdministrationSnippetPersister
 {
-    private EntityRepository $appAdministrationSnippetRepository;
-
-    private EntityRepository $localeRepository;
-
     public function __construct(
-        EntityRepository $appAdministrationSnippetRepository,
-        EntityRepository $localeRepository
+        private readonly EntityRepository $appAdministrationSnippetRepository,
+        private readonly EntityRepository $localeRepository
     ) {
-        $this->appAdministrationSnippetRepository = $appAdministrationSnippetRepository;
-        $this->localeRepository = $localeRepository;
     }
 
     /**
@@ -39,7 +35,7 @@ class AppAdministrationSnippetPersister
 
         $firstLevelSnippetKeys = [];
         foreach ($snippets as $snippetString) {
-            $decodedSnippets = json_decode($snippetString, true);
+            $decodedSnippets = json_decode($snippetString, true, 512, \JSON_THROW_ON_ERROR);
             $firstLevelSnippetKeys = array_keys($decodedSnippets);
         }
 
@@ -113,7 +109,7 @@ class AppAdministrationSnippetPersister
             return [];
         }
 
-        return json_decode($snippets, true);
+        return json_decode($snippets, true, 512, \JSON_THROW_ON_ERROR);
     }
 
     /**

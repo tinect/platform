@@ -17,44 +17,25 @@ use Shopware\Core\Framework\DataAbstractionLayer\Indexing\EntityIndexer;
 use Shopware\Core\Framework\DataAbstractionLayer\Indexing\EntityIndexingMessage;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
- * @package content
- */
+#[Package('content')]
 class MediaIndexer extends EntityIndexer
 {
-    private IteratorFactory $iteratorFactory;
-
-    private EntityRepository $repository;
-
-    private Connection $connection;
-
-    private EventDispatcherInterface $eventDispatcher;
-
-    private EntityRepository $thumbnailRepository;
-
-    private AbstractPathGenerator $pathGenerator;
-
     /**
      * @internal
      */
     public function __construct(
-        IteratorFactory $iteratorFactory,
-        EntityRepository $repository,
-        EntityRepository $thumbnailRepository,
-        Connection $connection,
-        EventDispatcherInterface $eventDispatcher,
-        AbstractPathGenerator $pathGenerator
+        private readonly IteratorFactory $iteratorFactory,
+        private readonly EntityRepository $repository,
+        private readonly EntityRepository $thumbnailRepository,
+        private readonly Connection $connection,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly AbstractPathGenerator $pathGenerator
     ) {
-        $this->iteratorFactory = $iteratorFactory;
-        $this->repository = $repository;
-        $this->connection = $connection;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->thumbnailRepository = $thumbnailRepository;
-        $this->pathGenerator = $pathGenerator;
     }
 
     public function getName(): string
@@ -104,16 +85,6 @@ class MediaIndexer extends EntityIndexer
         $this->setMediaPaths($context, $ids);
 
         $this->eventDispatcher->dispatch(new MediaIndexerEvent($ids, $context, $message->getSkip()));
-    }
-
-    public function getTotal(): int
-    {
-        return $this->iteratorFactory->createIterator($this->repository->getDefinition())->fetchCount();
-    }
-
-    public function getDecorated(): EntityIndexer
-    {
-        throw new DecorationPatternException(static::class);
     }
 
     private function updateThumbnailsPath(Context $context, array $ids): void
@@ -207,5 +178,15 @@ class MediaIndexer extends EntityIndexer
                 'id' => Uuid::fromHexToBytes($media->getId()),
             ]);
         }
+    }
+
+    public function getTotal(): int
+    {
+        return $this->iteratorFactory->createIterator($this->repository->getDefinition())->fetchCount();
+    }
+
+    public function getDecorated(): EntityIndexer
+    {
+        throw new DecorationPatternException(static::class);
     }
 }

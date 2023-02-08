@@ -2,15 +2,16 @@
 
 namespace Shopware\Core\Content\Media\Exception;
 
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\ShopwareHttpException;
 
-/**
- * @package content
- */
+#[Package('content')]
 class CouldNotRenameFileException extends ShopwareHttpException
 {
-    public function __construct(string $mediaId, string $oldFileName)
-    {
+    public function __construct(
+        string $mediaId,
+        string $oldFileName
+    ) {
         parent::__construct(
             'Could not rename file for media with id: {{ mediaId }}. Rollback to filename: "{{ oldFileName }}"',
             ['mediaId' => $mediaId, 'oldFileName' => $oldFileName]

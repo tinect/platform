@@ -2,20 +2,24 @@
 
 namespace Shopware\Core\Framework\Struct;
 
+use Shopware\Core\Framework\Log\Package;
+
 /**
- * @package core
  * @template-covariant TKey
  * @template-covariant TValue
  *
  * @implements \ArrayAccess<string|int, mixed>
  */
+#[Package('core')]
 class ArrayStruct extends Struct implements \ArrayAccess
 {
     /**
      * @param array<string|int, mixed> $data
      */
-    public function __construct(protected array $data = [], protected ?string $apiAlias = null)
-    {
+    public function __construct(
+        protected array $data = [],
+        protected ?string $apiAlias = null
+    ) {
     }
 
     public function has(string|int $property): bool

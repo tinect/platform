@@ -81,7 +81,7 @@ export default {
                 const appGroup = this.actionGroups.find(group => group === action?.app?.name);
                 if (!appGroup) {
                     groups.unshift({
-                        id: action?.app?.name[0].toLowerCase() + action?.app?.name.slice(1),
+                        id: `${action?.app?.name[0].toLowerCase()}${action?.app?.name.slice(1)}`,
                         label: action?.app?.label,
                     });
                 }
@@ -158,7 +158,8 @@ export default {
             };
         },
 
-        ...mapState('swFlowState',
+        ...mapState(
+            'swFlowState',
             [
                 'invalidSequences',
                 'stateMachineState',
@@ -169,7 +170,8 @@ export default {
                 'customFields',
                 'triggerEvent',
                 'triggerActions',
-            ]),
+            ],
+        ),
         ...mapGetters('swFlowState', ['availableActions', 'actionGroups', 'sequences']),
     },
 
@@ -355,8 +357,20 @@ export default {
             State.commit('swFlowState/updateSequence', { id: action.id, position: moveActionClone.position });
         },
 
-        onEditAction(sequence) {
-            if (!sequence?.actionName) {
+        onEditAction(sequence, target, key) {
+            if (sequence.actionName && sequence.actionName === ACTION.STOP_FLOW) {
+                return;
+            }
+
+            if (!this.$refs.contextButton[key]) {
+                return;
+            }
+
+            if (!sequence?.actionName || !target) {
+                return;
+            }
+
+            if (this.$refs.contextButton[key].$el.contains(target)) {
                 return;
             }
 
@@ -386,7 +400,7 @@ export default {
                     iconRaw: appAction.icon,
                     value: appAction.name,
                     disabled: !appAction.app?.active,
-                    group: appAction.app?.name[0].toLowerCase() + appAction.app?.name.slice(1),
+                    group: `${appAction.app?.name[0].toLowerCase()}${appAction.app?.name.slice(1)}`,
                 };
             }
 

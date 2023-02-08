@@ -12,7 +12,8 @@
       "INVALID_MAIL": "Bitte gib eine gültige E-Mail-Adresse ein.",
       "FRAMEWORK__RATE_LIMIT_EXCEEDED": "Zu viele Anfragen. Bitte warten Sie {seconds} Sekunden, bevor Sie es erneut versuchen.",
       "DUPLICATED_URL": "Diese URL wird bereits genutzt. Bitte wähle eine andere Domain.",
-      "CONTENT__MEDIA_EMPTY_FILE": "Gib einen gültigen Dateinamen an."
+      "CONTENT__MEDIA_EMPTY_FILE": "Gib einen gültigen Dateinamen an.",
+      "CONTENT__INVALID_CUSTOM_ENTITY_FIELD_TYPE": "Datentyp kann nicht gerendert werden. Bitte kontaktiere Deinen Administrator."
     },
     "default": {
       "add": "Hinzufügen",
@@ -233,7 +234,7 @@
       "labelColumnHide": "Spalte ausblenden",
       "labelSelectionCount": "Ausgewählt:",
       "labelDeSelectAll": "Alle abwählen",
-      "maximumSelectionExceed": "Maximale Anzahl Artikel ausgewählt"
+      "maximumSelectionExceed": "Maximale Anzahl Einträge ausgewählt"
     },
     "sw-pagination": {
       "labelItemsPerPage": "Einträge pro Seite:"
@@ -563,6 +564,7 @@
       "placeholderTypeSearchField": "Alle {entity} durchsuchen ...",
       "placeholderShortcutInfo": "Tipp: Über die \"f\"-Taste, kannst Du die Suche schneller öffnen.",
       "placeholderSearchShortcutInfo": "<strong>Tipp:</strong> Drücke <span>f</span> um die Suche von überall zu öffnen.",
+      "placeholderESSearchShortcutInfo": "<strong>Tipp:</strong> Um genauere Ergebnisse zu erhalten können Sie die <a href=\"https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html#simple-query-string-syntax\" target=\"_blank\">Elasticsearch Abfragen</a> verwenden.",
       "moduleFiltersHeadline": "Modulfilter",
       "placeholderFilterShortcutInfo": "Tippe <span>#produkte</span> in die Suche ein, um den Modulfilter zu setzen.",
       "searchTypeAll": "Alle",
@@ -669,12 +671,14 @@
         "customerLoggedInRule": "Angemeldeter Kunde",
         "customerAgeRule": "Kundenalter",
         "customerDaysSinceLastLogin": "Tage seit der letzten Anmeldung",
+        "customerDaysSinceFirstLogin": "Tage seit der ersten Anmeldung",
         "customerAffiliateCodeRule": "Affiliate-Code",
         "customerCampaignCodeRule": "Kampagnen-Code",
         "cartAmountRule": "Gesamtsumme",
         "cartPositionPrice": "Summe",
         "goodsCountRule": "Gesamtanzahl unterschiedlicher Produkte",
         "goodsPriceRule": "Zwischensumme aller Positionen",
+        "cartTotalPurchasePrice": "Summe aller Einkaufspreise",
         "lineItemOfTypeRule": {
           "label": "Position vom Typ",
           "product": "Produkt",
@@ -687,6 +691,7 @@
         "lineItemTotalPriceRule": "Positionszwischensumme",
         "lineItemWithQuantityRule": "Positionsanzahl",
         "orderTagRule": "Bestellung mit Tag",
+        "orderDeliveryStatusRule": "Lieferstatus",
         "yes": "Ja",
         "no": "Nein",
         "withTime": "Mit Zeitabfrage",
@@ -742,6 +747,7 @@
         "lineItemListPriceRatioRule": "Position mit prozentualen Preis/Streichpreis Verhältnis",
         "lineItemActualStockRule": "Position mit Lagerbestand",
         "lineItemStockRule": "Position mit verfügbarem Bestand",
+        "lineItemProductStates": "Position mit Produktzustand",
         "paymentMethodRule": "Verwendete Zahlungsart",
         "shippingMethodRule": "Verwendete Versandart",
         "lineItemGoodsTotalRule": "Gesamtanzahl aller Produkte",
@@ -767,7 +773,8 @@
         "customerCustomFieldRule": "Kunde mit Zusatzfeld",
         "zipCodeWildcardPlaceholder": "\"*\" als Platzhalterzeichen verwenden ...",
         "customerBirthdayRule": "Kundengeburtstag",
-        "customerCreatedByAdminRule": "Kunde vom Administrator erstellt"
+        "customerCreatedByAdminRule": "Kunde vom Administrator erstellt",
+        "customerSalutationRule": "Kundenanrede"
       }
     },
     "sw-condition-generic": {
@@ -829,10 +836,28 @@
           }
         }
       },
+      "cartLineItemProductStates": {
+        "productState": {
+          "options": {
+            "is-physical": "Physisch",
+            "is-download": "Digital"
+          }
+        }
+      },
+      "cartTotalPurchasePrice": {
+        "type": {
+          "options": {
+            "gross": "Brutto",
+            "net": "Netto"
+          },
+          "placeholder": "Operator auswählen ..."
+        }
+      },
       "units": {
         "dimension": "mm",
         "weight": "kg",
-        "volume": "mm³"
+        "volume": "mm³",
+        "age": "Jahre"
       }
     },
     "sw-product-image": {
@@ -944,6 +969,7 @@
       "checkout_order_placed": "Bestellung ist eingegangen",
       "checkout_order_payment_method_changed": "Zahlungsmethode einer Bestellung wurde geändert",
       "contact_form_send": "Kontaktformular wurde verschickt",
+      "review_form_send": "Produktbewertung wurde verschickt",
       "customer_group_registration_accepted": "Kundengruppen-Registrierung wurde akzeptiert",
       "customer_group_registration_declined": "Kundengruppen-Registrierung wurde abgelehnt",
       "customer_recovery_request": "Kunde fordert neues Passwort an",

@@ -43,6 +43,9 @@ const sequencesFixture = [
     }
 ];
 
+const ID_FLOW = '4006d6aa64ce409692ac2b952fa56ade';
+const ID_FLOW_TEMPLATE = '0e6b005ca7a1440b8e87ac3d45ed5c9f';
+
 function getSequencesCollection(collection = []) {
     return new EntityCollection(
         '/flow_sequence',
@@ -55,29 +58,56 @@ function getSequencesCollection(collection = []) {
     );
 }
 
-async function createWrapper(privileges = []) {
+async function createWrapper(
+    privileges = [],
+    query = {},
+    config = {},
+    flowId = null,
+    saveSuccess = true,
+    param = {}
+) {
     const localVue = createLocalVue();
     localVue.use(Vuex);
 
     return shallowMount(await Shopware.Component.build('sw-flow-detail'), {
         localVue,
         provide: { repositoryFactory: {
-            create: () => ({
+            create: (entity) => ({
                 create: () => {
-                    return Promise.resolve({});
+                    return {};
                 },
                 save: () => {
-                    return Promise.resolve();
+                    return saveSuccess ? Promise.resolve() : Promise.reject();
                 },
                 get: (id) => {
+                    if (id === ID_FLOW) {
+                        return Promise.resolve(
+                            {
+                                id,
+                                name: 'Flow 1',
+                                eventName: 'checkout.customer',
+                                ...config
+                            }
+                        );
+                    }
+
                     return Promise.resolve(
                         {
                             id,
-                            name: 'Flow 1',
-                            eventName: 'checkout.customer'
+                            name: 'Flow template 1',
+                            config: config
                         }
                     );
-                }
+                },
+                search: () => {
+                    if (entity === 'rule') {
+                        return Promise.resolve([
+                            { id: '1111', name: 'test rule' },
+                        ]);
+                    }
+
+                    return Promise.resolve([]);
+                },
             })
         },
 
@@ -94,6 +124,14 @@ async function createWrapper(privileges = []) {
                 return privileges.includes(identifier);
             }
         } },
+
+        mocks: {
+            $route: { params: param, query: query }
+        },
+
+        propsData: {
+            flowId: flowId
+        },
 
         stubs: {
             'sw-page': {
@@ -124,6 +162,7 @@ async function createWrapper(privileges = []) {
                 `
             },
             'sw-skeleton': true,
+            'sw-alert': true,
         }
     });
 }
@@ -140,6 +179,14 @@ describe('module/sw-flow/page/sw-flow-detail', () => {
                 invalidSequences: []
             }
         });
+
+        Shopware.Service().register('flowBuilderService', () => {
+            return {
+                rearrangeArrayObjects: (sequences) => {
+                    return sequences;
+                }
+            };
+        });
     });
 
     it('should not be able to save a flow', async () => {
@@ -152,7 +199,7 @@ describe('module/sw-flow/page/sw-flow-detail', () => {
     it('should be able to save a flow ', async () => {
         const wrapper = await createWrapper([
             'flow.editor'
-        ]);
+        ], {}, {}, ID_FLOW);
 
         const saveButton = wrapper.find('.sw-flow-detail__save');
         expect(saveButton.attributes().disabled).toBeFalsy();
@@ -163,12 +210,14 @@ describe('module/sw-flow/page/sw-flow-detail', () => {
             'flow.editor'
         ]);
 
-        Shopware.State.commit('swFlowState/setFlow',
+        Shopware.State.commit(
+            'swFlowState/setFlow',
             {
                 eventName: 'checkout.customer',
                 name: 'Flow 1',
                 sequences: getSequencesCollection(sequencesFixture)
-            });
+            }
+        );
 
         let sequencesState = Shopware.State.getters['swFlowState/sequences'];
         expect(sequencesState.length).toEqual(4);
@@ -180,6 +229,36 @@ describe('module/sw-flow/page/sw-flow-detail', () => {
         expect(sequencesState.length).toEqual(2);
     });
 
+    it('should not able to saving flow', async () => {
+        const wrapper = await createWrapper([
+            'flow.editor'
+        ], {}, {
+            eventName: 'checkout.customer',
+            sequences: [1, 2]
+        }, null, false);
+
+        Shopware.State.commit('swFlowState/setFlow', {
+            name: 'Flow 1',
+            config: {
+                eventName: 'checkout.customer',
+                sequences: getSequencesCollection(sequencesFixture)
+            }
+        });
+
+        const sequencesState = Shopware.State.getters['swFlowState/sequences'];
+        expect(sequencesState.length).toEqual(4);
+
+        await flushPromises();
+
+        wrapper.vm.createNotificationError = jest.fn();
+
+        const saveButton = wrapper.find('.sw-flow-detail__save');
+        await saveButton.trigger('click');
+        await flushPromises();
+
+        expect(wrapper.vm.createNotificationError).toBeCalled();
+    });
+
     it('should able to validate sequences before saving', async () => {
         const wrapper = await createWrapper([
             'flow.editor'
@@ -187,7 +266,8 @@ describe('module/sw-flow/page/sw-flow-detail', () => {
 
         wrapper.vm.createNotificationWarning = jest.fn();
 
-        Shopware.State.commit('swFlowState/setFlow',
+        Shopware.State.commit(
+            'swFlowState/setFlow',
             {
                 eventName: 'checkout.customer',
                 name: 'Flow 1',
@@ -195,7 +275,8 @@ describe('module/sw-flow/page/sw-flow-detail', () => {
                     ...sequenceFixture,
                     ruleId: ''
                 }])
-            });
+            }
+        );
 
         let invalidSequences = Shopware.State.get('swFlowState').invalidSequences;
         expect(invalidSequences).toEqual([]);
@@ -208,5 +289,82 @@ describe('module/sw-flow/page/sw-flow-detail', () => {
 
         expect(wrapper.vm.createNotificationWarning).toHaveBeenCalled();
         wrapper.vm.createNotificationWarning.mockRestore();
+    });
+
+    it('should able to create flow from flow template', async () => {
+        const wrapper = await createWrapper([
+            'flow.editor'
+        ], {}, {
+            eventName: 'checkout.customer',
+            sequences: [{
+                id: 'sequence-id',
+                config: {}
+            }]
+        }, null, true, {
+            flowTemplateId: ID_FLOW_TEMPLATE
+        });
+
+        await flushPromises();
+
+        const sequencesState = Shopware.State.getters['swFlowState/sequences'];
+        expect(sequencesState.length).toEqual(1);
+
+        const saveButton = wrapper.find('.sw-flow-detail__save');
+        expect(saveButton.attributes().disabled).toBe(undefined);
+    });
+
+    it('should be able to build sequence collection from config of flow template', async () => {
+        const wrapper = await createWrapper();
+        await flushPromises();
+
+        const sequences = [
+            { id: 'd2b3a82c22284566b6a56fb47d577bfd', parentId: null },
+            { id: '900a915617054a5b8acbfda1a35831fa', parentId: 'd2b3a82c22284566b6a56fb47d577bfd' },
+            { id: 'f1beccf9c40244e6ace2726d2afc476c', parentId: '900a915617054a5b8acbfda1a35831fa' },
+        ];
+
+        jest.spyOn(Shopware.Utils, 'createId')
+            .mockReturnValueOnce('d2b3a82c22284566b6a56fb47d577bfd_new')
+            .mockReturnValueOnce('900a915617054a5b8acbfda1a35831fa_new')
+            .mockReturnValueOnce('f1beccf9c40244e6ace2726d2afc476c_new');
+
+        expect(JSON.stringify(wrapper.vm.buildSequencesFromConfig(sequences))).toEqual(JSON.stringify(getSequencesCollection([
+            { id: 'd2b3a82c22284566b6a56fb47d577bfd_new', parentId: null },
+            { id: '900a915617054a5b8acbfda1a35831fa_new', parentId: 'd2b3a82c22284566b6a56fb47d577bfd_new' },
+            { id: 'f1beccf9c40244e6ace2726d2afc476c_new', parentId: '900a915617054a5b8acbfda1a35831fa_new' },
+        ])));
+    });
+
+    it('should be show the warning message not able to edited flow template', async () => {
+        const wrapper = await createWrapper([
+            'flow.editor'
+        ], {
+            type: 'template'
+        }, {}, null, true, {
+            flowTemplateId: ID_FLOW_TEMPLATE
+        });
+
+        const alertElement = wrapper.findAll('.sw-flow-detail__template');
+        expect(alertElement.exists()).toBe(true);
+    });
+
+    it('should be able to get rule data for flow template', async () => {
+        const wrapper = await createWrapper([
+            'flow.editor'
+        ], {
+            type: 'template'
+        }, {}, null, true, {
+            flowTemplateId: ID_FLOW_TEMPLATE
+        });
+
+        Shopware.State.commit('swFlowState/setSequences', getSequencesCollection(sequencesFixture));
+
+        await wrapper.vm.getRuleDataForFlowTemplate();
+        await flushPromises();
+
+        const sequences = Shopware.State.getters['swFlowState/sequences'];
+        expect(sequences.length).toEqual(4);
+        expect(sequences[0]).toHaveProperty('rule');
+        expect(sequences[0].rule).toEqual({ id: '1111', name: 'test rule' });
     });
 });

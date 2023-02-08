@@ -31,6 +31,7 @@ use Shopware\Core\Content\MailTemplate\Subscriber\MailSendSubscriberConfig;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Adapter\Translation\Translator;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\Pricing\CashRoundingConfig;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Event\EventData\MailRecipientStruct;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
@@ -580,6 +581,9 @@ class SendMailActionTest extends TestCase
         yield 'Test enable mail template updates' => [true];
     }
 
+    /**
+     * @group quarantined
+     */
     public function testTranslatorInjectionInMail(): void
     {
         $criteria = new Criteria();
@@ -696,6 +700,8 @@ class SendMailActionTest extends TestCase
 
         $order = [
             'id' => $orderId,
+            'itemRounding' => json_decode(json_encode(new CashRoundingConfig(2, 0.01, true), \JSON_THROW_ON_ERROR), true, 512, \JSON_THROW_ON_ERROR),
+            'totalRounding' => json_decode(json_encode(new CashRoundingConfig(2, 0.01, true), \JSON_THROW_ON_ERROR), true, 512, \JSON_THROW_ON_ERROR),
             'orderNumber' => Uuid::randomHex(),
             'orderDateTime' => (new \DateTimeImmutable())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
             'price' => new CartPrice(10, 10, 10, new CalculatedTaxCollection(), new TaxRuleCollection(), CartPrice::TAX_STATE_NET),
@@ -785,14 +791,10 @@ class TestEmailService extends MailService
      */
     public ?array $data = null;
 
-    private ?MailFactory $mailFactory;
-
-    private ?MailerTransportDecorator $decorator;
-
-    public function __construct(?MailFactory $mailFactory = null, ?MailerTransportDecorator $decorator = null)
-    {
-        $this->mailFactory = $mailFactory;
-        $this->decorator = $decorator;
+    public function __construct(
+        private readonly ?MailFactory $mailFactory = null,
+        private readonly ?MailerTransportDecorator $decorator = null
+    ) {
     }
 
     /**

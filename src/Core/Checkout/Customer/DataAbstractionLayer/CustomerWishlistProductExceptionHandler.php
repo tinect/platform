@@ -4,7 +4,9 @@ namespace Shopware\Core\Checkout\Customer\DataAbstractionLayer;
 
 use Shopware\Core\Checkout\Customer\Exception\DuplicateWishlistProductException;
 use Shopware\Core\Framework\DataAbstractionLayer\Dbal\ExceptionHandlerInterface;
+use Shopware\Core\Framework\Log\Package;
 
+#[Package('core')]
 class CustomerWishlistProductExceptionHandler implements ExceptionHandlerInterface
 {
     public function getPriority(): int

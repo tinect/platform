@@ -9,15 +9,15 @@ use Shopware\Core\Content\Flow\Dispatching\Action\SetCustomerCustomFieldAction;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Test\TestCaseBase\CacheTestBehaviour;
 use Shopware\Core\Framework\Test\TestDataCollection;
 use Shopware\Core\Framework\Uuid\Uuid;
 
 /**
- * @package business-ops
- *
  * @internal
  */
+#[Package('business-ops')]
 class SetCustomerCustomFieldActionTest extends TestCase
 {
     use OrderActionTrait;
@@ -44,6 +44,7 @@ class SetCustomerCustomFieldActionTest extends TestCase
      * @param array<int, mixed>|null $existedData
      * @param array<int, mixed>|null $updateData
      * @param array<int, mixed>|null $expectData
+     *
      * @dataProvider createDataProvider
      */
     public function testCreateCustomFieldForCustomer(string $option, ?array $existedData, ?array $updateData, ?array $expectData): void

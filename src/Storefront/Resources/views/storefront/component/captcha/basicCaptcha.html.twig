@@ -1,5 +1,4 @@
 {% block component_basic_captcha %}
-    {# @deprecated tag:v6.5.0 - Option basicCaptchaOptions.preCheckRoute.token will be removed. #}
     {% set basicCaptchaOptions = {
         router: path('frontend.captcha.basic-captcha.load'),
         validate: path('frontend.captcha.basic-captcha.validate'),
@@ -11,7 +10,6 @@
         preCheck: preCheck,
         preCheckRoute : {
             path: path('frontend.captcha.basic-captcha.validate'),
-            token: sw_csrf('frontend.captcha.basic-captcha.validate', {'mode': 'token'})
         }
     } %}
 

@@ -8,10 +8,9 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
 use Shopware\Core\Framework\Event\GenericEvent;
 use Shopware\Core\Framework\Event\NestedEvent;
 use Shopware\Core\Framework\Event\NestedEventCollection;
+use Shopware\Core\Framework\Log\Package;
 
-/**
- * @package core
- */
+#[Package('core')]
 class EntityLoadedEvent extends NestedEvent implements GenericEvent
 {
     /**
@@ -37,8 +36,11 @@ class EntityLoadedEvent extends NestedEvent implements GenericEvent
     /**
      * @param Entity[] $entities
      */
-    public function __construct(EntityDefinition $definition, array $entities, Context $context)
-    {
+    public function __construct(
+        EntityDefinition $definition,
+        array $entities,
+        Context $context
+    ) {
         $this->entities = $entities;
         $this->definition = $definition;
         $this->context = $context;

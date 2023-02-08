@@ -32,6 +32,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\Checkout\Cart\Order\RecalculationService
  */
 class RecalculationServiceTest extends TestCase
@@ -49,7 +50,7 @@ class RecalculationServiceTest extends TestCase
 
         $orderId = Uuid::randomHex();
 
-        $cart = new Cart(OrderConverter::CART_TYPE, Uuid::randomHex());
+        $cart = new Cart(Uuid::randomHex());
         $cart->setPrice(new CartPrice(
             0.0,
             0.0,

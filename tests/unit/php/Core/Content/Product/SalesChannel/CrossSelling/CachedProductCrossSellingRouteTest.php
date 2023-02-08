@@ -33,19 +33,14 @@ use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\Content\Product\SalesChannel\CrossSelling\CachedProductCrossSellingRoute
  */
 class CachedProductCrossSellingRouteTest extends TestCase
 {
-    /**
-     * @var AbstractProductCrossSellingRoute&MockObject
-     */
-    private $decorated;
+    private MockObject&AbstractProductCrossSellingRoute $decorated;
 
-    /**
-     * @var CacheInterface&MockObject
-     */
-    private $cache;
+    private MockObject&CacheInterface $cache;
 
     private EventDispatcher $eventDispatcher;
 

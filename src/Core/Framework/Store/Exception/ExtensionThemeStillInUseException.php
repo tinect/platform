@@ -2,16 +2,18 @@
 
 namespace Shopware\Core\Framework\Store\Exception;
 
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @package merchant-services
- */
+#[Package('merchant-services')]
 class ExtensionThemeStillInUseException extends ShopwareHttpException
 {
-    public function __construct(string $id, array $parameters = [], ?\Throwable $e = null)
-    {
+    public function __construct(
+        string $id,
+        array $parameters = [],
+        ?\Throwable $e = null
+    ) {
         $parameters['id'] = $id;
 
         parent::__construct(

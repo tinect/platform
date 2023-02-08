@@ -11,6 +11,7 @@ use Shopware\Core\Migration\V6_4\Migration1649858046UpdateConfigurableFormatAndV
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\Migration\V6_4\Migration1649858046UpdateConfigurableFormatAndValidationForAddressCountry
  */
 class Migration1649858046UpdateConfigurableFormatAndValidationForAddressCountryTest extends TestCase
@@ -19,10 +20,7 @@ class Migration1649858046UpdateConfigurableFormatAndValidationForAddressCountryT
 
     private Connection $connection;
 
-    /**
-     * @var Migration1649858046UpdateConfigurableFormatAndValidationForAddressCountry
-     */
-    private $migration;
+    private Migration1649858046UpdateConfigurableFormatAndValidationForAddressCountry $migration;
 
     protected function setUp(): void
     {
@@ -107,9 +105,7 @@ class Migration1649858046UpdateConfigurableFormatAndValidationForAddressCountryT
     {
         return \count(array_filter(
             $this->connection->getSchemaManager()->listTableColumns($table),
-            static function (Column $column) use ($columnName): bool {
-                return $column->getName() === $columnName;
-            }
+            static fn (Column $column): bool => $column->getName() === $columnName
         )) > 0;
     }
 }

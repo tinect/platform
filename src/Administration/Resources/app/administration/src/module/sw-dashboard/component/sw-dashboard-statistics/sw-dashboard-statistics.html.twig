@@ -147,34 +147,23 @@
             </sw-card>
         </template>
 
+        <sw-extension-component-section
+            position-identifier="sw-chart-card__before"
+        />
+
         <template v-if="hasOrderInMonth">
-
-            {# @deprecated tag:v6.5.0 - Will be removed. #}
-            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
-            {% block sw_dashboard_statistics_headline %}
-            {# @deprecated tag:v6.5.0 - Will be removed. - Use block `sw_dashboard_statistics_count_title` and `sw_dashboard_statistics_sum_title` instead #}
-            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
-            {% block sw_dashboard_index_statistics_headline_title %}
-            {% endblock %}
-            {# @deprecated tag:v6.5.0 - Will be removed. - Use block `sw_dashboard_statistics_count_range_select` and `sw_dashboard_statistics_sum_range_select` instead #}
-            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
-            {% block sw_dashboard_statistics_headline_date %}
-            {% endblock %}
-            {% endblock %}
-
             <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
             {% block sw_dashboard_statistics_count %}
-            {# @deprecated tag:v6.5.0 - Will be removed. - Use the parent block `sw_dashboard_statistics_count` instead #}
-            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
-            {% block sw_dashboard_statistics_count_chart %}
             <sw-chart-card
                 class="sw-dashboard-statistics__statistics-count"
+                :available-ranges="availableRanges"
                 :card-subtitle="getCardSubtitle(ordersDateRange)"
                 :series="orderCountSeries"
                 :options="chartOptionsOrderCount"
-                :fill-empty-values="getTimeUnitInterval(ordersDateRange)"
+                :fill-empty-values="ordersDateRange.aggregate"
                 type="line"
                 sort
+                position-identifier="sw-chart-card__statistics-count"
                 @sw-chart-card-range-update="onOrdersRangeUpdate"
             >
                 <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
@@ -192,21 +181,19 @@
                 {% endblock %}
             </sw-chart-card>
             {% endblock %}
-            {% endblock %}
 
             <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
             {% block sw_dashboard_statistics_sum %}
-            {# @deprecated tag:v6.5.0 - Will be removed. - Use the parent block `sw_dashboard_statistics_sum` instead #}
-            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
-            {% block sw_dashboard_statistics_sum_chart %}
             <sw-chart-card
                 class="sw-dashboard-statistics__statistics-sum"
+                :available-ranges="availableRanges"
                 :card-subtitle="getCardSubtitle(turnoverDateRange)"
                 :series="orderSumSeries"
                 :options="chartOptionsOrderSum"
-                :fill-empty-values="getTimeUnitInterval(turnoverDateRange)"
+                :fill-empty-values="turnoverDateRange.aggregate"
                 type="line"
                 sort
+                position-identifier="sw-chart-card__statistics-sum"
                 @sw-chart-card-range-update="onTurnoverRangeUpdate"
             >
                 <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
@@ -228,8 +215,11 @@
                 {% endblock %}
             </sw-chart-card>
             {% endblock %}
-            {% endblock %}
         </template>
+
+        <sw-extension-component-section
+            position-identifier="sw-chart-card__after"
+        />
     </template>
 </div>
 {% endblock %}

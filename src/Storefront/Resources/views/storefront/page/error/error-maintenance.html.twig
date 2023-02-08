@@ -19,7 +19,8 @@
                 <noscript class="noscript-main">
                     {% sw_include '@Storefront/storefront/utilities/alert.html.twig' with {
                         type: 'info',
-                        content: 'general.noscriptNotice'|trans|sw_sanitize
+                        content: 'general.noscriptNotice'|trans|sw_sanitize,
+                        iconCache: false
                     } %}
                 </noscript>
             {% endblock %}
@@ -119,16 +120,6 @@
                     window.breakpoints = {{ breakpoint|json_encode()|raw }};
                 </script>
             {% endblock %}
-
-            {% block error_maintenance_script_csrf %}
-                <script>
-                    window.csrf = {
-                        'enabled': '{{ shopware.csrfEnabled }}',
-                        'mode': '{{ shopware.csrfMode }}'
-                    }
-                </script>
-            {% endblock %}
-
             {% block error_maintenance_script_reload %}
                 <script>
                     setTimeout(function () {

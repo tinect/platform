@@ -9,6 +9,7 @@ use Shopware\Core\Migration\V6_4\Migration1651118773UpdateZipCodeOfTableCustomer
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\Migration\V6_4\Migration1651118773UpdateZipCodeOfTableCustomerAddressToNullable
  */
 class Migration1651118773UpdateZipCodeOfTableCustomerAddressToNullableTest extends TestCase
@@ -27,7 +28,7 @@ class Migration1651118773UpdateZipCodeOfTableCustomerAddressToNullableTest exten
         $migration->update($this->connection);
 
         /** @var array<string> */
-        $dbUrlArr = parse_url($_SERVER['DATABASE_URL']);
+        $dbUrlArr = parse_url((string) $_SERVER['DATABASE_URL']);
         $databaseName = substr($dbUrlArr['path'], 1);
         $sql = "SELECT IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS
             WHERE TABLE_SCHEMA = '{$databaseName}' and TABLE_NAME = 'customer_address' and COLUMN_NAME = 'zipcode'";

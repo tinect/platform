@@ -9,6 +9,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\Log\Package;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -23,17 +24,14 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: 'app:uninstall',
     description: 'Uninstalls an app',
 )]
+#[Package('core')]
 class UninstallAppCommand extends Command
 {
-    private AbstractAppLifecycle $appLifecycle;
-
-    private EntityRepository $appRepository;
-
-    public function __construct(AbstractAppLifecycle $appLifecycle, EntityRepository $appRepository)
-    {
+    public function __construct(
+        private readonly AbstractAppLifecycle $appLifecycle,
+        private readonly EntityRepository $appRepository
+    ) {
         parent::__construct();
-        $this->appLifecycle = $appLifecycle;
-        $this->appRepository = $appRepository;
     }
 
     public function execute(InputInterface $input, OutputInterface $output): int
@@ -74,8 +72,7 @@ class UninstallAppCommand extends Command
 
     protected function configure(): void
     {
-        $this->setDescription('Uninstalls the app')
-            ->addArgument('name', InputArgument::REQUIRED, 'The name of the app');
+        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the app');
         $this->addOption('keep-user-data', null, InputOption::VALUE_NONE, 'Keep user data of the app');
     }
 

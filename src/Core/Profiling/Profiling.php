@@ -4,7 +4,9 @@ namespace Shopware\Core\Profiling;
 
 use Composer\InstalledVersions;
 use Shopware\Core\Framework\Bundle;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Kernel;
+use Shopware\Core\Profiling\Compiler\RemoveDevServices;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
@@ -15,10 +17,9 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 /**
- * @package core
- *
  * @internal
  */
+#[Package('core')]
 class Profiling extends Bundle
 {
     public function getTemplatePriority(): int
@@ -40,6 +41,12 @@ class Profiling extends Bundle
 
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/DependencyInjection/'));
         $loader->load('services.xml');
+
+        if ($environment === 'dev') {
+            $loader->load('services_dev.xml');
+        }
+
+        $container->addCompilerPass(new RemoveDevServices());
     }
 
     public function boot(): void

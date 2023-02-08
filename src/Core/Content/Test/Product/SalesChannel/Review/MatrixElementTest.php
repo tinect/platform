@@ -10,10 +10,7 @@ use Shopware\Core\Content\Product\SalesChannel\Review\MatrixElement;
  */
 class MatrixElementTest extends TestCase
 {
-    /**
-     * @var MatrixElement
-     */
-    private $element;
+    private MatrixElement $element;
 
     public function setUp(): void
     {
@@ -21,7 +18,6 @@ class MatrixElementTest extends TestCase
     }
 
     /**
-     * @test
      * @group reviews
      */
     public function testConstructor(): void
@@ -40,7 +36,6 @@ class MatrixElementTest extends TestCase
     /**
      * test point getter and setter
      *
-     * @test
      * @group reviews
      */
     public function testPointsGetterSetter(): void
@@ -54,7 +49,6 @@ class MatrixElementTest extends TestCase
     /**
      * test count getter and setter
      *
-     * @test
      * @group reviews
      */
     public function testCountGetterSetter(): void
@@ -68,7 +62,6 @@ class MatrixElementTest extends TestCase
     /**
      * test percent getter and setter
      *
-     * @test
      * @group reviews
      */
     public function testPercentGetterSetter(): void

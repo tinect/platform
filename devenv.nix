@@ -1,17 +1,17 @@
-{ pkgs, config, ... }:
+{ pkgs, lib, config, ... }:
 
 {
-  enterShell = ''
-    rm -f .devenv/bin
-    ln -sf ${pkgs.buildEnv { name = "devenv"; paths = config.packages; ignoreCollisions = true; }}/bin .devenv/bin
-  '';
+  packages = [
+    pkgs.gnupatch
+    pkgs.nodePackages_latest.yalc
+  ];
 
   languages.javascript.enable = true;
-  languages.javascript.package = pkgs.nodejs-18_x;
+  languages.javascript.package = lib.mkDefault pkgs.nodejs-18_x;
 
   languages.php.enable = true;
-  languages.php.package = pkgs.php.buildEnv {
-    extensions = { all, enabled }: with all; enabled ++ [ redis blackfire ];
+  languages.php.package = lib.mkDefault (pkgs.php.buildEnv {
+    extensions = { all, enabled }: with all; enabled ++ [ amqp redis blackfire grpc ];
     extraConfig = ''
       memory_limit = 2G
       pdo_mysql.default_socket=''${MYSQL_UNIX_PORT}
@@ -31,7 +31,7 @@
       zend.detect_unicode=0
       realpath_cache_ttl=3600
     '';
-  };
+  });
 
   languages.php.fpm.pools.web = {
     settings = {
@@ -44,7 +44,7 @@
     };
   };
 
-  services.caddy.enable = true;
+  services.caddy.enable = lib.mkDefault true;
   services.caddy.virtualHosts."http://localhost:8000" = {
     extraConfig = ''
       root * public
@@ -53,27 +53,40 @@
     '';
   };
 
-  services.mysql.enable = true;
-  services.mysql.initialDatabases = [{ name = "shopware"; }];
+  services.mysql.enable = lib.mkDefault true;
+  services.mysql.initialDatabases = [
+    { name = "shopware"; }
+  ];
   services.mysql.ensureUsers = [
     {
       name = "shopware";
       password = "shopware";
-      ensurePermissions = { "shopware.*" = "ALL PRIVILEGES"; };
+      ensurePermissions = {
+        "shopware.*" = "ALL PRIVILEGES";
+        "shopware_test.*" = "ALL PRIVILEGES";
+      };
     }
   ];
+  services.mysql.settings = {
+    mysqld = {
+      log_bin_trust_function_creators = 1;
+    };
+  };
 
-  services.redis.enable = true;
-  services.adminer.enable = true;
+  services.redis.enable = lib.mkDefault true;
+  services.adminer.enable = lib.mkDefault true;
+  services.adminer.listen = lib.mkDefault "127.0.0.1:9080";
+  services.mailhog.enable = lib.mkDefault true;
 
-  #elasticsearch.enable = true;
-  #services.rabbitmq.enable = true;
-  #services.rabbitmq.managementPlugin.enable = true;
+  # services.elasticsearch.enable = true;
+  # services.rabbitmq.enable = true;
+  # services.rabbitmq.managementPlugin.enable = true;
 
   # Environment variables
 
-  env.APP_URL = "http://localhost:8000";
-  env.APP_SECRET = "devsecret";
-  env.CYPRESS_baseUrl = "http://localhost:8000";
-  env.DATABASE_URL = "mysql://root@localhost:3306/shopware";
+  env.APP_URL = lib.mkDefault "http://localhost:8000";
+  env.APP_SECRET = lib.mkDefault "devsecret";
+  env.CYPRESS_baseUrl = lib.mkDefault "http://localhost:8000";
+  env.DATABASE_URL = lib.mkDefault "mysql://root@localhost:3306/shopware";
+  env.MAILER_DSN = lib.mkDefault "smtp://localhost:1025";
 }

@@ -54,6 +54,7 @@ export default {
         ...mapState('swOrderDetail', [
             'order',
             'versionContext',
+            'orderAddressIds',
         ]),
 
         delivery() {
@@ -85,8 +86,10 @@ export default {
                 return null;
             }
 
-            return this.stateStyleDataProviderService.getStyle('order_transaction.state',
-                this.transaction.stateMachineState.technicalName).selectBackgroundStyle;
+            return this.stateStyleDataProviderService.getStyle(
+                'order_transaction.state',
+                this.transaction.stateMachineState.technicalName,
+            ).selectBackgroundStyle;
         },
 
         orderOptionPlaceholder() {
@@ -103,8 +106,10 @@ export default {
                 return null;
             }
 
-            return this.stateStyleDataProviderService.getStyle('order.state',
-                this.order.stateMachineState.technicalName).selectBackgroundStyle;
+            return this.stateStyleDataProviderService.getStyle(
+                'order.state',
+                this.order.stateMachineState.technicalName,
+            ).selectBackgroundStyle;
         },
 
         deliveryOptionPlaceholder() {
@@ -121,8 +126,10 @@ export default {
                 return null;
             }
 
-            return this.stateStyleDataProviderService.getStyle('order_delivery.state',
-                this.delivery.stateMachineState.technicalName).selectBackgroundStyle;
+            return this.stateStyleDataProviderService.getStyle(
+                'order_delivery.state',
+                this.delivery.stateMachineState.technicalName,
+            ).selectBackgroundStyle;
         },
 
         customFieldSetRepository() {
@@ -187,6 +194,20 @@ export default {
             return this.order.addresses.find((address) => {
                 return address.id === this.order.billingAddressId;
             });
+        },
+
+        shippingAddress() {
+            return this.delivery.shippingOrderAddress;
+        },
+
+        selectedBillingAddressId() {
+            const currentAddress = this.orderAddressIds.find(item => item.type === 'billing');
+            return currentAddress?.customerAddressId || this.billingAddress.id;
+        },
+
+        selectedShippingAddressId() {
+            const currentAddress = this.orderAddressIds.find(item => item.type === 'shipping');
+            return currentAddress?.customerAddressId || this.shippingAddress.id;
         },
     },
 

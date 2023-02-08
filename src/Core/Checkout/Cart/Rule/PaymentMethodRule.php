@@ -3,37 +3,28 @@
 namespace Shopware\Core\Checkout\Cart\Rule;
 
 use Shopware\Core\Checkout\Payment\PaymentMethodDefinition;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Rule\Rule;
 use Shopware\Core\Framework\Rule\RuleComparison;
 use Shopware\Core\Framework\Rule\RuleConfig;
 use Shopware\Core\Framework\Rule\RuleConstraints;
 use Shopware\Core\Framework\Rule\RuleScope;
 
-/**
- * @package business-ops
- */
+#[Package('business-ops')]
 class PaymentMethodRule extends Rule
 {
-    private const NAME = 'paymentMethod';
+    final public const RULE_NAME = 'paymentMethod';
 
     /**
-     * @var array<string>
-     */
-    protected array $paymentMethodIds;
-
-    protected string $operator;
-
-    /**
-     * @param array<string> $paymentMethodIds
+     * @param list<string> $paymentMethodIds
      *
      * @internal
      */
-    public function __construct(string $operator = RULE::OPERATOR_EQ, array $paymentMethodIds = [])
-    {
+    public function __construct(
+        protected string $operator = RULE::OPERATOR_EQ,
+        protected array $paymentMethodIds = []
+    ) {
         parent::__construct();
-
-        $this->operator = $operator;
-        $this->paymentMethodIds = $paymentMethodIds;
     }
 
     public function match(RuleScope $scope): bool
@@ -47,11 +38,6 @@ class PaymentMethodRule extends Rule
             'paymentMethodIds' => RuleConstraints::uuids(),
             'operator' => RuleConstraints::uuidOperators(false),
         ];
-    }
-
-    public function getName(): string
-    {
-        return self::NAME;
     }
 
     public function getConfig(): RuleConfig

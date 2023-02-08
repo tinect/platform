@@ -8,18 +8,22 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\CustomFields;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Field;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\JsonField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StorageAware;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\System\CustomField\CustomFieldService;
 
 /**
  * @internal
  */
+#[Package('core')]
 class CustomFieldsAccessorBuilder extends JsonFieldAccessorBuilder
 {
     /**
      * @internal
      */
-    public function __construct(private CustomFieldService $customFieldService, Connection $connection)
-    {
+    public function __construct(
+        private readonly CustomFieldService $customFieldService,
+        Connection $connection
+    ) {
         parent::__construct($connection);
     }
 

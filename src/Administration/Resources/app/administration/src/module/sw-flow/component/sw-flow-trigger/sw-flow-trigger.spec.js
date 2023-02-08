@@ -90,6 +90,10 @@ async function createWrapper(propsData) {
             $tc(translationKey) {
                 return mockTranslations[translationKey] ? mockTranslations[translationKey] : translationKey;
             },
+
+            $te(translationKey) {
+                return !!mockTranslations[translationKey];
+            },
         },
         stubs: {
             'sw-contextual-field': await Shopware.Component.build('sw-contextual-field'),
@@ -521,8 +525,10 @@ describe('src/module/sw-flow/component/sw-flow-trigger', () => {
     });
 
     it('should show confirmation modal when clicking tree item', async () => {
-        Shopware.State.commit('swFlowState/setSequences',
-            getSequencesCollection(sequencesFixture));
+        Shopware.State.commit(
+            'swFlowState/setSequences',
+            getSequencesCollection(sequencesFixture)
+        );
         const wrapper = await createWrapper();
 
         const searchField = wrapper.find('.sw-flow-trigger__input-field');
@@ -546,8 +552,10 @@ describe('src/module/sw-flow/component/sw-flow-trigger', () => {
     });
 
     it('should show confirmation modal when pressing Enter on search item', async () => {
-        Shopware.State.commit('swFlowState/setSequences',
-            getSequencesCollection(sequencesFixture));
+        Shopware.State.commit(
+            'swFlowState/setSequences',
+            getSequencesCollection(sequencesFixture)
+        );
 
         const wrapper = await createWrapper();
         await wrapper.vm.$nextTick();
@@ -599,5 +607,12 @@ describe('src/module/sw-flow/component/sw-flow-trigger', () => {
 
         const emittedEvent = wrapper.emitted()['option-select'];
         expect(emittedEvent).toBeFalsy();
+    });
+
+    it('should not translate if the snippet is not exists', async () => {
+        const wrapper = await createWrapper();
+
+        expect(wrapper.vm.getEventNameTranslated('send')).toEqual('Send');
+        expect(wrapper.vm.getEventNameTranslated('test_event_name')).toEqual('test event name');
     });
 });

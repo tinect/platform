@@ -10,6 +10,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Write\EntityWriterInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Write\WriteContext;
 use Shopware\Core\Framework\Demodata\DemodataContext;
 use Shopware\Core\Framework\Demodata\DemodataGeneratorInterface;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Language\LanguageEntity;
 use Shopware\Core\System\User\UserDefinition;
@@ -17,15 +18,16 @@ use Shopware\Core\System\User\UserDefinition;
 /**
  * @internal
  */
+#[Package('core')]
 class UserGenerator implements DemodataGeneratorInterface
 {
     /**
      * @internal
      */
     public function __construct(
-        private EntityWriterInterface $writer,
-        private UserDefinition $userDefinition,
-        private EntityRepository $languageRepository
+        private readonly EntityWriterInterface $writer,
+        private readonly UserDefinition $userDefinition,
+        private readonly EntityRepository $languageRepository
     ) {
     }
 

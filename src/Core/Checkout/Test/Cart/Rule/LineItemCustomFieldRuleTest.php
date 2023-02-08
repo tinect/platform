@@ -10,14 +10,15 @@ use Shopware\Core\Checkout\Cart\Rule\LineItemCustomFieldRule;
 use Shopware\Core\Checkout\Cart\Rule\LineItemScope;
 use Shopware\Core\Checkout\Test\Cart\Rule\Helper\CartRuleHelperTrait;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 /**
- * @package business-ops
- *
  * @internal
+ *
  * @group rules
  */
+#[Package('business-ops')]
 class LineItemCustomFieldRuleTest extends TestCase
 {
     use CartRuleHelperTrait;
@@ -191,7 +192,7 @@ class LineItemCustomFieldRuleTest extends TestCase
      */
     private function createLineItemWithCustomFields(array $customFields = []): LineItem
     {
-        return ($this->createLineItem())->setPayloadValue('customFields', $customFields);
+        return $this->createLineItem()->setPayloadValue('customFields', $customFields);
     }
 
     /**

@@ -18,19 +18,14 @@ use Shopware\Core\Framework\Uuid\Uuid;
  * @package business-ops
  *
  * @internal
+ *
  * @covers \Shopware\Core\Content\Flow\Dispatching\Action\GenerateDocumentAction
  */
 class GenerateDocumentActionTest extends TestCase
 {
-    /**
-     * @var MockObject
-     */
-    private $documentGenerator;
+    private MockObject&DocumentGenerator $documentGenerator;
 
-    /**
-     * @var MockObject|StorableFlow
-     */
-    private $flow;
+    private MockObject&StorableFlow $flow;
 
     private GenerateDocumentAction $action;
 

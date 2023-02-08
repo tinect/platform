@@ -3,6 +3,7 @@ import './sw-first-run-wizard-modal.scss';
 
 /**
  * @package merchant-services
+ * @deprecated tag:v6.6.0 - Will be private
  */
 // eslint-disable-next-line sw-deprecation-rules/private-feature-declarations
 export default {
@@ -14,6 +15,8 @@ export default {
         return {
             title: 'No title defined',
             buttonConfig: [],
+            showLoader: false,
+            wasNewExtensionActivated: false,
             stepVariant: 'info',
             currentStep: {
                 name: '',
@@ -154,6 +157,10 @@ export default {
 
             return currentSteps;
         },
+
+        isClosable() {
+            return !Shopware.Context.app.firstRunWizard;
+        },
     },
 
     watch: {
@@ -209,6 +216,27 @@ export default {
                 .then(() => {
                     document.location.href = document.location.origin + document.location.pathname;
                 });
+        },
+
+        onExtensionActivated() {
+            this.wasNewExtensionActivated = true;
+        },
+
+        async closeModal() {
+            if (!this.isClosable) {
+                return;
+            }
+
+            this.showLoader = true;
+
+            await this.$nextTick();
+
+            await this.$router.push({ name: 'sw.settings.index.system' });
+
+            // reload page when new extension was activated and modal is closed
+            if (this.wasNewExtensionActivated) {
+                window.location.reload();
+            }
         },
     },
 };

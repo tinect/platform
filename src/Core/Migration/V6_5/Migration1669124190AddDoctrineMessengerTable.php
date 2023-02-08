@@ -3,11 +3,13 @@
 namespace Shopware\Core\Migration\V6_5;
 
 use Doctrine\DBAL\Connection;
+use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Migration\MigrationStep;
 
 /**
  * @internal
  */
+#[Package('core')]
 class Migration1669124190AddDoctrineMessengerTable extends MigrationStep
 {
     public function getCreationTimestamp(): int
@@ -38,5 +40,6 @@ class Migration1669124190AddDoctrineMessengerTable extends MigrationStep
 
     public function updateDestructive(Connection $connection): void
     {
+        $connection->executeStatement('DROP TABLE IF EXISTS `dead_message`');
     }
 }

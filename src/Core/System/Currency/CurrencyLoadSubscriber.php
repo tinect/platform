@@ -4,25 +4,29 @@ namespace Shopware\Core\System\Currency;
 
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityLoadedEvent;
+use Shopware\Core\Framework\Log\Package;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * @package core
- *
- * @deprecated tag:v6.5.0 - reason:becomes-internal - EventSubscribers will become internal in v6.5.0
+ * @internal
  */
+#[Package('core')]
 class CurrencyLoadSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {
-        return [CurrencyEvents::CURRENCY_LOADED_EVENT => 'setDefault'];
+        return [
+            CurrencyEvents::CURRENCY_LOADED_EVENT => 'setDefault',
+            'currency.partial_loaded' => 'setDefault',
+        ];
     }
 
     public function setDefault(EntityLoadedEvent $event): void
     {
-        /** @var CurrencyEntity $entity */
         foreach ($event->getEntities() as $entity) {
-            $entity->setIsSystemDefault($entity->getId() === Defaults::CURRENCY);
+            $entity->assign([
+                'isSystemDefault' => ($entity->get('id') === Defaults::CURRENCY),
+            ]);
         }
     }
 }

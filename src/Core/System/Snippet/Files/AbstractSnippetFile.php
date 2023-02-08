@@ -2,10 +2,10 @@
 
 namespace Shopware\Core\System\Snippet\Files;
 
-/**
- * @package system-settings
- */
-abstract class AbstractSnippetFile implements SnippetFileInterface
+use Shopware\Core\Framework\Log\Package;
+
+#[Package('system-settings')]
+abstract class AbstractSnippetFile
 {
     /**
      * Returns the displayed name.

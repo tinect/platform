@@ -11,14 +11,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\Log\Package;
 use Symfony\Contracts\Service\ResetInterface;
 
+#[Package('core')]
 class PromotionIndividualCodeSerializer extends EntitySerializer implements ResetInterface
 {
-    private EntityRepository $promoCodeRepository;
-
-    private EntityRepository $promoRepository;
-
     /**
      * @var array<string, string|null>
      */
@@ -33,11 +31,9 @@ class PromotionIndividualCodeSerializer extends EntitySerializer implements Rese
      * @internal
      */
     public function __construct(
-        EntityRepository $promoCodeRepository,
-        EntityRepository $promoRepository
+        private readonly EntityRepository $promoCodeRepository,
+        private readonly EntityRepository $promoRepository
     ) {
-        $this->promoCodeRepository = $promoCodeRepository;
-        $this->promoRepository = $promoRepository;
     }
 
     public function supports(string $entity): bool

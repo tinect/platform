@@ -23,29 +23,18 @@ use Shopware\Core\Framework\Uuid\Uuid;
 
 /**
  * @internal
+ *
  * @covers \Shopware\Core\Content\Mail\Service\MailAttachmentsBuilder
  */
 class MailAttachmentsBuilderTest extends TestCase
 {
-    /**
-     * @var MockObject|MediaService
-     */
-    private $mediaService;
+    private MockObject&MediaService $mediaService;
 
-    /**
-     * @var MockObject|EntityRepository
-     */
-    private $mediaRepository;
+    private MockObject&EntityRepository $mediaRepository;
 
-    /**
-     * @var MockObject|DocumentGenerator
-     */
-    private $documentGenerator;
+    private MockObject&DocumentGenerator $documentGenerator;
 
-    /**
-     * @var MockObject|Connection
-     */
-    private $connection;
+    private Connection&MockObject $connection;
 
     private MailAttachmentsBuilder $attachmentsBuilder;
 
