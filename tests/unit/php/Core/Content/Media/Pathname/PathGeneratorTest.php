@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Shopware\Core\Content\Test\Media\Pathname;
+namespace Shopware\Tests\Unit\Core\Content\Media\Pathname;
 
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Content\Media\Aggregate\MediaThumbnail\MediaThumbnailEntity;
@@ -11,6 +11,8 @@ use Shopware\Core\Framework\Uuid\Uuid;
 
 /**
  * @internal
+ *
+ * @covers \Shopware\Core\Content\Media\File\FileSaver
  */
 class PathGeneratorTest extends TestCase
 {
