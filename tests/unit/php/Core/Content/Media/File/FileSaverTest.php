@@ -13,6 +13,7 @@ use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Content\Media\Message\GenerateThumbnailsMessage;
 use Shopware\Core\Content\Media\Metadata\MetadataLoader;
 use Shopware\Core\Content\Media\Pathname\PathGenerator;
+use Shopware\Core\Content\Media\Pathname\PathnameStrategy\FilenamePathnameStrategy;
 use Shopware\Core\Content\Media\Thumbnail\ThumbnailService;
 use Shopware\Core\Content\Media\TypeDetector\TypeDetector;
 use Shopware\Core\Framework\Api\Context\AdminApiSource;
@@ -40,7 +41,7 @@ class FileSaverTest extends TestCase
     {
         $this->mediaRepository = $this->createMock(EntityRepository::class);
         $filesystemPublic = $this->createMock(FilesystemOperator::class);
-        $pathGenerator = $this->createMock(PathGenerator::class);
+        $this->pathGenerator = new PathGenerator(new FilenamePathnameStrategy());
         $thumbnailService = $this->createMock(ThumbnailService::class);
         $this->messageBus = new CollectingMessageBus();
         $metadataLoader = $this->createMock(MetadataLoader::class);
@@ -52,7 +53,7 @@ class FileSaverTest extends TestCase
             $this->mediaRepository,
             $filesystemPublic,
             $filesystemPrivate,
-            $pathGenerator,
+            $this->pathGenerator,
             $thumbnailService,
             $metadataLoader,
             $typeDetector,
@@ -138,6 +139,7 @@ class FileSaverTest extends TestCase
         $currentMedia = new MediaEntity();
         $currentMedia->setId(Uuid::randomHex());
         $currentMedia->setPrivate($isPrivate);
+        $currentMedia->setPath($this->pathGenerator->generatePath($mediaA));
 
         $mediaSearchResult = $this->createMock(EntitySearchResult::class);
         $mediaSearchResult->method('get')->willReturn($currentMedia);
