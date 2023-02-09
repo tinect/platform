@@ -87,6 +87,16 @@ class MediaIndexer extends EntityIndexer
         $this->eventDispatcher->dispatch(new MediaIndexerEvent($ids, $context, $message->getSkip()));
     }
 
+    public function getTotal(): int
+    {
+        return $this->iteratorFactory->createIterator($this->repository->getDefinition())->fetchCount();
+    }
+
+    public function getDecorated(): EntityIndexer
+    {
+        throw new DecorationPatternException(static::class);
+    }
+
     private function updateThumbnailsPath(Context $context, array $ids): void
     {
         $mediaThumbnailIdsWithMissingPaths = $this->connection->fetchFirstColumn(
@@ -178,15 +188,5 @@ class MediaIndexer extends EntityIndexer
                 'id' => Uuid::fromHexToBytes($media->getId()),
             ]);
         }
-    }
-
-    public function getTotal(): int
-    {
-        return $this->iteratorFactory->createIterator($this->repository->getDefinition())->fetchCount();
-    }
-
-    public function getDecorated(): EntityIndexer
-    {
-        throw new DecorationPatternException(static::class);
     }
 }
