@@ -83,7 +83,6 @@ class MailServiceTest extends TestCase
             $this->salesChannelRepository,
             $this->createMock(SystemConfigService::class),
             $this->eventDispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
             $this->logger,
         );
     }
