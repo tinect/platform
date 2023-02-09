@@ -9,7 +9,6 @@ use Shopware\Core\Content\Mail\Service\AbstractMailSender;
 use Shopware\Core\Content\Mail\Service\MailFactory;
 use Shopware\Core\Content\Mail\Service\MailService;
 use Shopware\Core\Content\MailTemplate\Service\Event\MailBeforeValidateEvent;
-use Shopware\Core\Content\Media\Pathname\UrlGeneratorInterface;
 use Shopware\Core\Framework\Adapter\Twig\StringTemplateRenderer;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
