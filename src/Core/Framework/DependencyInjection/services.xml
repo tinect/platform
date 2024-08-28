@@ -646,9 +646,9 @@ base-uri 'self';
             <tag name="kernel.event_listener"/>
         </service>
 
-        <service id="Shopware\Core\Framework\Adapter\Cache\RedisConnectionFactory">
-            <argument>%shopware.cache.redis_prefix%</argument>
-        </service>
+        <service id="Shopware\Core\Framework\Adapter\Cache\RedisConnectionFactory"/>
+
+        <service id="Shopware\Core\Framework\Adapter\Redis\RedisConnectionFactory"/>
 
         <service id="Shopware\Core\Framework\Routing\Facade\RequestFacadeFactory" public="true">
             <argument type="service" id="request_stack"/>

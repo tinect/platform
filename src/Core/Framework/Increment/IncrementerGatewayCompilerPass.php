@@ -2,7 +2,7 @@
 
 namespace Shopware\Core\Framework\Increment;
 
-use Shopware\Core\Framework\Adapter\Cache\RedisConnectionFactory;
+use Shopware\Core\Framework\Adapter\Redis\RedisConnectionFactory;
 use Shopware\Core\Framework\Log\Package;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
