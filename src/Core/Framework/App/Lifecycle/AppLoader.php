@@ -56,7 +56,7 @@ class AppLoader
      */
     private function loadFromAppDir(): array
     {
-        if (!file_exists($this->appDir)) {
+        if (!is_dir($this->appDir)) {
             return [];
         }
 

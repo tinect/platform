@@ -77,7 +77,7 @@ class AclValidPermissionsHelper
      */
     private function getEntitiesFromSchema(string $path): ?array
     {
-        if (!file_exists($path)) {
+        if (!is_file($path)) {
             return null;
         }
 

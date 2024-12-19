@@ -59,7 +59,7 @@ class SnippetFinder implements SnippetFinderInterface
 
         foreach ($activePlugins as $plugin) {
             $pluginPath = $plugin->getPath() . '/Resources/app/administration/src';
-            if (!file_exists($pluginPath)) {
+            if (!is_dir($pluginPath)) {
                 continue;
             }
 
@@ -92,7 +92,7 @@ class SnippetFinder implements SnippetFinderInterface
 
             $bundlePath = $bundle->getPath() . '/Resources/app/administration/src';
 
-            if (!file_exists($bundlePath)) {
+            if (!is_dir($bundlePath)) {
                 continue;
             }
 

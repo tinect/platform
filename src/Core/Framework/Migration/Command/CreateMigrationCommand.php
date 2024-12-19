@@ -130,7 +130,7 @@ class CreateMigrationCommand extends Command
         $pluginBundle = array_values($pluginBundles)[0];
 
         $directory = $pluginBundle->getMigrationPath();
-        if (!file_exists($directory) && !mkdir($directory) && !is_dir($directory)) {
+        if (!is_dir($directory) && !mkdir($directory) && !is_dir($directory)) {
             throw new \RuntimeException(\sprintf('Migration directory "%s" could not be created', $directory));
         }
 

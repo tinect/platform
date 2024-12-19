@@ -62,7 +62,7 @@ class SystemInstallCommand extends Command
         $_ENV['BLUE_GREEN_DEPLOYMENT'] = $isBlueGreen;
         putenv('BLUE_GREEN_DEPLOYMENT=' . $isBlueGreen);
 
-        if (!$input->getOption('force') && file_exists($this->projectDir . '/install.lock')) {
+        if (!$input->getOption('force') && is_file($this->projectDir . '/install.lock')) {
             $output->comment('install.lock already exists. Delete it or pass --force to do it anyway.');
 
             return self::FAILURE;
@@ -166,8 +166,8 @@ class SystemInstallCommand extends Command
 
         $result = $this->runCommands($commands, $output);
 
-        if (!file_exists($this->projectDir . '/public/.htaccess')
-            && file_exists($this->projectDir . '/public/.htaccess.dist')
+        if (!is_file($this->projectDir . '/public/.htaccess')
+            && is_file($this->projectDir . '/public/.htaccess.dist')
         ) {
             copy($this->projectDir . '/public/.htaccess.dist', $this->projectDir . '/public/.htaccess');
         }

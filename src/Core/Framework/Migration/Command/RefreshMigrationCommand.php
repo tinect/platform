@@ -25,14 +25,14 @@ class RefreshMigrationCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $path = $input->getArgument('path');
+        if (!is_file($path)) {
+            throw new \RuntimeException('The provided migration file does not exist.');
+        }
+
         $filename = basename((string) $path);
         $className = pathinfo($filename, \PATHINFO_FILENAME);
 
         $output->writeln('Updating timestamp of migration: ' . $filename);
-
-        if (!file_exists($path)) {
-            throw new \RuntimeException('The provided migration file does not exist.');
-        }
 
         $timestamp = $this->getCurrentTimestamp($filename);
         $newTimestamp = (string) time();

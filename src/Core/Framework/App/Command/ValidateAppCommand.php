@@ -102,7 +102,7 @@ class ValidateAppCommand extends Command
      */
     private function getManifestsFromDir(string $dir): array
     {
-        if (!file_exists($dir)) {
+        if (!is_dir($dir)) {
             throw new ManifestNotFoundException($dir);
         }
 

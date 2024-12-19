@@ -9,7 +9,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 /** @var string $rootFile */
 $rootFile = $_SERVER['SCRIPT_FILENAME'];
 $configEnv = dirname($rootFile) . '/.env.installer';
-if (file_exists($configEnv)) {
+if (is_file($configEnv)) {
     $dotenv = new Dotenv();
     $dotenv->usePutenv(false)->load($configEnv);
 }

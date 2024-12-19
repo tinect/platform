@@ -57,7 +57,7 @@ class CreateSchemaCommand extends Command
 
         $io->success('Created schema in ' . $this->dir);
 
-        if (!file_exists($this->dir)) {
+        if (!is_dir($this->dir)) {
             mkdir($this->dir);
         }
 

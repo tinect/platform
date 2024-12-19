@@ -39,7 +39,7 @@ class PluginCompatibility
             \dirname((string) realpath($this->projectComposerJsonFile))
         );
 
-        if (!file_exists($installedJsonLocation)) {
+        if (!is_file($installedJsonLocation)) {
             return;
         }
 

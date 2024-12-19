@@ -8,14 +8,14 @@ $_SERVER['SCRIPT_FILENAME'] = __FILE__;
 
 require_once __DIR__ . '/../vendor/autoload_runtime.php';
 
-if (!file_exists(__DIR__ . '/../.env')) {
+if (!is_file(__DIR__ . '/../.env')) {
     $_SERVER['APP_RUNTIME_OPTIONS']['disable_dotenv'] = true;
 }
 
 return function (array $context) {
     $classLoader = require __DIR__ . '/../vendor/autoload.php';
 
-    if (!file_exists(dirname(__DIR__) . '/install.lock')) {
+    if (!is_file(dirname(__DIR__) . '/install.lock')) {
         $baseURL = str_replace(basename(__FILE__), '', $_SERVER['SCRIPT_NAME']);
         $baseURL = rtrim($baseURL, '/');
 
@@ -41,7 +41,7 @@ return function (array $context) {
         Request::setTrustedHosts(explode(',', $trustedHosts));
     }
 
-    if (!file_exists(dirname(__DIR__) . '/install.lock')) {
+    if (!is_file(dirname(__DIR__) . '/install.lock')) {
         return new InstallerKernel($appEnv, $debug);
     }
 

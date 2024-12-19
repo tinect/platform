@@ -245,7 +245,7 @@ class DumpClassSchemaCommand extends Command
 
     private function getFilePath(string $className): string
     {
-        if (!file_exists($this->schemaPath)) {
+        if (!is_dir($this->schemaPath)) {
             if (!mkdir($concurrentDirectory = $this->schemaPath, 0777, true) && !is_dir($concurrentDirectory)) {
                 throw new \RuntimeException(\sprintf('Directory "%s" was not created', $concurrentDirectory));
             }

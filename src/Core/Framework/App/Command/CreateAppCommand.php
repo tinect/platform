@@ -296,7 +296,7 @@ class CreateAppCommand extends Command
      */
     private function createApp(string $appDirectory, array $details, bool $createThemeConfig): void
     {
-        if (file_exists($appDirectory)) {
+        if (is_dir($appDirectory)) {
             throw new \RuntimeException(\sprintf('App directory %s already exists', $details['name']));
         }
 

@@ -27,7 +27,7 @@ class ThemeFileImporter implements ThemeFileImporterInterface
     {
         Feature::triggerDeprecationOrThrow('v6.7.0.0', Feature::deprecatedClassMessage(self::class, 'v6.7.0.0'));
 
-        return file_exists($filePath) && !is_dir($filePath);
+        return is_file($filePath) && !is_dir($filePath);
     }
 
     public function getRealPath(string $filePath): string

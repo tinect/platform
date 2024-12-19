@@ -29,16 +29,16 @@ class TwigLoaderConfigCompilerPass implements CompilerPassInterface
             $viewDirectory = $bundle['path'] . '/Resources/views';
             $resourcesDirectory = $bundle['path'] . '/Resources';
 
-            if (file_exists($viewDirectory)) {
+            if (is_dir($viewDirectory)) {
                 $fileSystemLoader->addMethodCall('addPath', [$viewDirectory]);
                 $fileSystemLoader->addMethodCall('addPath', [$viewDirectory, $name]);
             }
 
-            if (file_exists($viewDirectory . '/../app/storefront/dist')) {
+            if (is_dir($viewDirectory . '/../app/storefront/dist')) {
                 $fileSystemLoader->addMethodCall('addPath', [$viewDirectory . '/../app/storefront/dist', $name]);
             }
 
-            if (file_exists($resourcesDirectory)) {
+            if (is_dir($resourcesDirectory)) {
                 $fileSystemLoader->addMethodCall('addPath', [$resourcesDirectory, $name]);
             }
         }
@@ -71,16 +71,16 @@ class TwigLoaderConfigCompilerPass implements CompilerPassInterface
             $viewDirectory = \sprintf('%s/%s/Resources/views', $projectDir, $app['path']);
             $resourcesDirectory = \sprintf('%s/%s/Resources', $projectDir, $app['path']);
 
-            if (file_exists($viewDirectory)) {
+            if (is_dir($viewDirectory)) {
                 $fileSystemLoader->addMethodCall('addPath', [$viewDirectory]);
                 $fileSystemLoader->addMethodCall('addPath', [$viewDirectory, $app['name']]);
             }
 
-            if (file_exists($viewDirectory . '/../app/storefront/dist')) {
+            if (is_dir($viewDirectory . '/../app/storefront/dist')) {
                 $fileSystemLoader->addMethodCall('addPath', [$viewDirectory . '/../app/storefront/dist', $app['name']]);
             }
 
-            if (file_exists($resourcesDirectory)) {
+            if (is_dir($resourcesDirectory)) {
                 $fileSystemLoader->addMethodCall('addPath', [$resourcesDirectory, $app['name']]);
             }
         }

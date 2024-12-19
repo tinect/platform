@@ -48,7 +48,7 @@ class RecoveryManager
             throw InstallerException::cannotFindShopwareInstallation();
         }
 
-        if (file_exists($composerLookup)) {
+        if (is_file($composerLookup)) {
             /** @var array{packages: array{name: string, version: string}[]} $composerJson */
             $composerJson = json_decode((string) file_get_contents($composerLookup), true, \JSON_THROW_ON_ERROR);
 
@@ -66,7 +66,7 @@ class RecoveryManager
     {
         $lockFile = $shopwarePath . '/composer.lock';
 
-        if (!file_exists($lockFile)) {
+        if (!is_file($lockFile)) {
             throw InstallerException::cannotFindComposerLock();
         }
 
@@ -84,6 +84,6 @@ class RecoveryManager
 
     public function isFlexProject(string $shopwarePath): bool
     {
-        return file_exists($shopwarePath . '/symfony.lock');
+        return is_file($shopwarePath . '/symfony.lock');
     }
 }

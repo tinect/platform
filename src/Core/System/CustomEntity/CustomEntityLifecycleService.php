@@ -43,7 +43,7 @@ class CustomEntityLifecycleService
             $pluginPath,
         );
 
-        if (\file_exists(Path::join($pathToCustomEntityFile, CustomEntityXmlSchema::FILENAME))) {
+        if (\is_file(Path::join($pathToCustomEntityFile, CustomEntityXmlSchema::FILENAME))) {
             Feature::triggerDeprecationOrThrow('v6.7.0.0', 'Custom entity for plugins are deprecated for performance reasons, use attribute entities instead');
         }
 
@@ -90,7 +90,7 @@ class CustomEntityLifecycleService
     private function getXmlSchema(string $pathToCustomEntityFile): ?CustomEntityXmlSchema
     {
         $filePath = Path::join($pathToCustomEntityFile, CustomEntityXmlSchema::FILENAME);
-        if (!file_exists($filePath)) {
+        if (!is_file($filePath)) {
             return null;
         }
 
@@ -104,7 +104,7 @@ class CustomEntityLifecycleService
     {
         $configPath = Path::join($pathToCustomEntityFile, 'config', AdminUiXmlSchema::FILENAME);
 
-        if (!file_exists($configPath)) {
+        if (!is_file($configPath)) {
             return null;
         }
 

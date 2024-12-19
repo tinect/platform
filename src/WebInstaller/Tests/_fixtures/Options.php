@@ -57,7 +57,7 @@ class Options
         }
         $this->writtenFiles[$file] = true;
 
-        if (!file_exists($file)) {
+        if (!is_file($file)) {
             return true;
         }
 

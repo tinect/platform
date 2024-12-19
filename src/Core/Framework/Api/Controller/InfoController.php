@@ -329,7 +329,7 @@ class InfoController extends AbstractController
         $path = 'administration/css/' . str_replace('_', '-', $bundle->getContainerPrefix()) . '.css';
         $bundlePath = $bundle->getPath();
 
-        if (!file_exists($bundlePath . '/Resources/public/' . $path) && !file_exists($bundlePath . '/Resources/.administration-css')) {
+        if (!is_file($bundlePath . '/Resources/public/' . $path) && !is_file($bundlePath . '/Resources/.administration-css')) {
             return [];
         }
 
@@ -344,7 +344,7 @@ class InfoController extends AbstractController
         $path = 'administration/js/' . str_replace('_', '-', $bundle->getContainerPrefix()) . '.js';
         $bundlePath = $bundle->getPath();
 
-        if (!file_exists($bundlePath . '/Resources/public/' . $path) && !file_exists($bundlePath . '/Resources/.administration-js')) {
+        if (!is_file($bundlePath . '/Resources/public/' . $path) && !is_file($bundlePath . '/Resources/.administration-js')) {
             return [];
         }
 
@@ -364,7 +364,7 @@ class InfoController extends AbstractController
         $defaultEntryFile = 'administration/index.html';
         $bundlePath = $bundle->getPath();
 
-        if (!file_exists($bundlePath . '/Resources/public/' . $defaultEntryFile)) {
+        if (!is_file($bundlePath . '/Resources/public/' . $defaultEntryFile)) {
             return null;
         }
 

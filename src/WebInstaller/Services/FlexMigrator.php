@@ -175,7 +175,7 @@ EOT;
     {
         $envPath = $projectDir . '/.env';
 
-        if (!file_exists($envPath)) {
+        if (!is_file($envPath)) {
             file_put_contents($envPath, self::ENV_DEFAULT);
 
             return;
