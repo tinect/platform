@@ -71,13 +71,13 @@ class InstallerKernel extends HttpKernel
     {
         $r = new \ReflectionObject($this);
 
-        /** @var string $dir */
-        $dir = $r->getFileName();
-        if (!is_dir($dir)) {
+        /** @var string $filePath */
+        $filePath = $r->getFileName();
+        if (!is_file($filePath)) {
             throw new \LogicException(\sprintf('Cannot auto-detect project dir for kernel of class "%s".', $r->name));
         }
 
-        $dir = $rootDir = \dirname($dir);
+        $dir = $rootDir = \dirname($filePath);
         while (!is_dir($dir . '/vendor')) {
             if ($dir === \dirname($dir)) {
                 return $rootDir;
