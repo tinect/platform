@@ -99,25 +99,25 @@ class SystemGenerateJwtSecretCommand extends Command
 
         $force = $input->getOption('force');
 
-        if (!\is_string($privateKeyPath)) {
+        if (!\is_string($privateKeyPath) || \is_dir($privateKeyPath)) {
             $io->error('Private key path is invalid');
 
             return self::FAILURE;
         }
 
-        if (!\is_string($publicKeyPath)) {
+        if (!\is_string($publicKeyPath) || \is_dir($publicKeyPath)) {
             $io->error('Public key path is invalid');
 
             return self::FAILURE;
         }
 
-        if (!$force && is_file($privateKeyPath)) {
+        if (!$force && \is_file($privateKeyPath)) {
             $io->error(\sprintf('Cannot create private key %s, it already exists.', $privateKeyPath));
 
             return self::FAILURE;
         }
 
-        if (!$force && is_file($publicKeyPath)) {
+        if (!$force && \is_file($publicKeyPath)) {
             $io->error(\sprintf('Cannot create public key %s, it already exists.', $publicKeyPath));
 
             return self::FAILURE;

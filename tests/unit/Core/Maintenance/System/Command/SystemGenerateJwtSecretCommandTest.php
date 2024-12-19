@@ -81,7 +81,7 @@ class SystemGenerateJwtSecretCommandTest extends TestCase
 
         $tester->execute(['--private-key-path' => __DIR__]);
         static::assertSame(Command::FAILURE, $tester->getStatusCode());
-        static::assertStringContainsString('Cannot create private key', $tester->getDisplay());
+        static::assertStringContainsString('Private key path is invalid', $tester->getDisplay());
     }
 
     public function testPublicKeyExists(): void
@@ -94,7 +94,7 @@ class SystemGenerateJwtSecretCommandTest extends TestCase
 
         $tester->execute(['--public-key-path' => __DIR__]);
         static::assertSame(Command::FAILURE, $tester->getStatusCode());
-        static::assertStringContainsString('Cannot create public key', $tester->getDisplay());
+        static::assertStringContainsString('Public key path is invalid', $tester->getDisplay());
     }
 
     public function testGenerationForce(): void
