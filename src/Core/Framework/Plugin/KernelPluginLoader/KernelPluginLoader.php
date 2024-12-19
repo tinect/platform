@@ -277,7 +277,7 @@ abstract class KernelPluginLoader extends Bundle
             $className = $pluginData['baseClass'];
 
             $pluginClassFilePath = $this->classLoader->findFile($className);
-            if (!class_exists($className) || !$pluginClassFilePath || !file_exists($pluginClassFilePath)) {
+            if (!\class_exists($className) || !$pluginClassFilePath || !\is_file($pluginClassFilePath)) {
                 continue;
             }
 
