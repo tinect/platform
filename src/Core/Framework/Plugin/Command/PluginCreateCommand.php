@@ -75,7 +75,7 @@ class PluginCreateCommand extends Command
 
             $directory = \sprintf('%s/custom/%splugins/%s', $this->projectDir, $staticPrefix, $pluginName);
 
-            if ($this->filesystem->exists($directory)) {
+            if (\is_dir($directory)) {
                 $io->error(\sprintf('Plugin directory %s already exists', $directory));
 
                 return self::FAILURE;
@@ -109,7 +109,7 @@ class PluginCreateCommand extends Command
         } catch (\Throwable $exception) {
             $io->error($exception->getMessage());
 
-            if (isset($directory) && $this->filesystem->exists($directory)) {
+            if (isset($directory) && \is_dir($directory)) {
                 $this->filesystem->remove($directory);
             }
 

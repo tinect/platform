@@ -44,7 +44,7 @@ readonly class RemoteZip implements Source
     {
         $temporaryDirectory = $this->temporaryDirectoryFactory->path();
 
-        if ($app instanceof AppEntity && $this->io->exists(Path::join($temporaryDirectory, $app->getName()))) {
+        if ($app instanceof AppEntity && \is_dir(Path::join($temporaryDirectory, $app->getName()))) {
             // app is already on the filesystem
             return new Filesystem(Path::join($temporaryDirectory, $app->getName()));
         }
