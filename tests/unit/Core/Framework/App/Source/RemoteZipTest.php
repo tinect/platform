@@ -95,10 +95,6 @@ class RemoteZipTest extends TestCase
         $downloader->expects($this->never())->method('download');
         $extractor->expects($this->never())->method('extract');
 
-        $fs->expects($this->once())
-            ->method('exists')
-            ->with($dirFactory->path() . '/TestApp')
-            ->willReturn(true);
         $source = new RemoteZip(
             $dirFactory,
             $downloader,
@@ -172,10 +168,6 @@ class RemoteZipTest extends TestCase
                 $dirFactory->path() . '/TestApp.zip',
                 $dirFactory->path() . '/TestApp'
             );
-
-        $fs->method('exists')
-            ->with($dirFactory->path() . '/TestApp')
-            ->willReturn(false);
 
         $source = new RemoteZip(
             $dirFactory,

@@ -164,7 +164,6 @@ class ServiceSourceResolverTest extends TestCase
 
         $appExtractor = $this->createMock(AppExtractor::class);
         $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->expects($this->once())->method('exists')->with('/some/tmp/path/MyCoolService')->willReturn(true);
 
         $appInfo = new AppInfo('MyCoolService', '6.7.0.0', 'abcd', '6.7.0.0-abcd', 'https://mycoolservice.com/service/lifecycle/app-zip/6.7.0.0');
 

@@ -157,7 +157,6 @@ class PluginCreateCommandTest extends TestCase
     private function getCommandTester(array $generators = [], bool $directoryExists = false): CommandTester
     {
         $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->method('exists')->willReturn($directoryExists);
 
         $command = new PluginCreateCommand(
             'shopware',
