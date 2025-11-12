@@ -2,15 +2,18 @@
 
 namespace Shopware\Tests\Integration\Elasticsearch\Product;
 
-use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Term\Filter\AbstractTokenFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Term\Filter\TokenFilter;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Elasticsearch\Product\StopwordTokenFilter;
 
 /**
  * @internal
+ *
+ * @deprecated tag:v6.8.0 - Will be removed without replacement
  */
 class StopwordTokenFilterTest extends TestCase
 {
@@ -18,12 +21,12 @@ class StopwordTokenFilterTest extends TestCase
 
     private Context $context;
 
-    private Connection $connection;
+    private AbstractTokenFilter $tokenFilter;
 
     protected function setUp(): void
     {
         $this->context = Context::createDefaultContext();
-        $this->connection = static::getContainer()->get(Connection::class);
+        $this->tokenFilter = static::getContainer()->get(TokenFilter::class);
     }
 
     /**
@@ -33,7 +36,7 @@ class StopwordTokenFilterTest extends TestCase
     #[DataProvider('cases')]
     public function testExcludedFilterFilter(array $tokens, array $expected): void
     {
-        $service = new StopwordTokenFilter($this->connection);
+        $service = new StopwordTokenFilter($this->tokenFilter);
         $keywords = $service->filter($tokens, $this->context);
 
         sort($expected);

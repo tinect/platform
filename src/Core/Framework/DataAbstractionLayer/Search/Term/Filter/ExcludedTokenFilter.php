@@ -5,22 +5,22 @@ namespace Shopware\Core\Framework\DataAbstractionLayer\Search\Term\Filter;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\SearchConfigLoader;
 use Shopware\Core\Framework\Log\Package;
-use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 
 #[Package('framework')]
-class TokenFilter extends AbstractTokenFilter
+class ExcludedTokenFilter extends AbstractTokenFilter
 {
     /**
      * @internal
      */
     public function __construct(
+        private readonly AbstractTokenFilter $tokenFilter,
         private readonly SearchConfigLoader $configLoader,
     ) {
     }
 
     public function getDecorated(): AbstractTokenFilter
     {
-        throw new DecorationPatternException(self::class);
+        return $this->tokenFilter;
     }
 
     /**
@@ -28,38 +28,37 @@ class TokenFilter extends AbstractTokenFilter
      */
     public function filter(array $tokens, Context $context): array
     {
+        $tokens = $this->tokenFilter->filter($tokens, $context);
+
         if (empty($tokens)) {
             return $tokens;
         }
 
         $config = $this->configLoader->load($context);
 
-        $minSearchLength = $config[0]['min_search_length'] ?? AbstractTokenFilter::DEFAULT_MIN_SEARCH_TERM_LENGTH;
-
-        return $this->searchTermLengthFilter($tokens, $minSearchLength);
-    }
-
-    public function reset(): void
-    {
-        // do nothing
+        return $this->excludedTermsFilter(
+            $tokens,
+            array_flip($config[0]['excluded_terms'] ?? [])
+        );
     }
 
     /**
      * @param list<string> $tokens
+     * @param array<string> $excludedTerms
      *
      * @return list<string>
      */
-    private function searchTermLengthFilter(array $tokens, int $minSearchTermLength): array
+    private function excludedTermsFilter(array $tokens, array $excludedTerms): array
     {
+        if (empty($excludedTerms) || empty($tokens)) {
+            return $tokens;
+        }
+
         $filtered = [];
-        foreach ($tokens as $tag) {
-            $tag = trim((string) $tag);
-
-            if (empty($tag) || mb_strlen($tag) < $minSearchTermLength) {
-                continue;
+        foreach ($tokens as $token) {
+            if (!isset($excludedTerms[$token])) {
+                $filtered[] = $token;
             }
-
-            $filtered[] = $tag;
         }
 
         return $filtered;

@@ -2,32 +2,30 @@
 
 namespace Shopware\Elasticsearch\Product;
 
-use Doctrine\DBAL\Connection;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Term\Filter\AbstractTokenFilter;
+use Shopware\Core\Framework\Feature;
 use Shopware\Core\Framework\Log\Package;
-use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
-use Shopware\Core\Framework\Uuid\Uuid;
 
+/**
+ * @deprecated tag:v6.8.0 - Will be removed without replacement, use TokenFilter and decoration instead
+ */
 #[Package('framework')]
 class StopwordTokenFilter extends AbstractTokenFilter
 {
     /**
-     * @var array<string, int>
-     */
-    private array $config = [];
-
-    /**
      * @internal
      */
     public function __construct(
-        private readonly Connection $connection
+        private readonly AbstractTokenFilter $tokenFilter,
     ) {
     }
 
     public function getDecorated(): AbstractTokenFilter
     {
-        throw new DecorationPatternException(self::class);
+        Feature::triggerDeprecationOrThrow('v6.8.0.0', Feature::deprecatedMethodMessage(self::class, 'getDecorated', 'v6.8.0.0'));
+
+        return $this->tokenFilter;
     }
 
     /**
@@ -35,62 +33,8 @@ class StopwordTokenFilter extends AbstractTokenFilter
      */
     public function filter(array $tokens, Context $context): array
     {
-        if (empty($tokens)) {
-            return $tokens;
-        }
+        Feature::triggerDeprecationOrThrow('v6.8.0.0', Feature::deprecatedMethodMessage(self::class, 'getDecorated', 'v6.8.0.0'));
 
-        $minSearchLength = $this->getMinSearchLength($context->getLanguageId());
-
-        if ($minSearchLength === null) {
-            return $tokens;
-        }
-
-        return $this->searchTermLengthFilter($tokens, $minSearchLength);
-    }
-
-    public function reset(): void
-    {
-        $this->config = [];
-    }
-
-    /**
-     * @param list<string> $tokens
-     *
-     * @return list<string>
-     */
-    private function searchTermLengthFilter(array $tokens, int $minSearchTermLength): array
-    {
-        $filtered = [];
-        foreach ($tokens as $tag) {
-            $tag = trim($tag);
-
-            if (empty($tag) || mb_strlen($tag) < $minSearchTermLength) {
-                continue;
-            }
-
-            $filtered[] = $tag;
-        }
-
-        return $filtered;
-    }
-
-    private function getMinSearchLength(string $languageId): ?int
-    {
-        if (isset($this->config[$languageId])) {
-            return $this->config[$languageId];
-        }
-
-        $config = $this->connection->fetchAssociative('
-            SELECT `min_search_length`
-            FROM product_search_config
-            WHERE language_id = :languageId
-            LIMIT 1
-        ', ['languageId' => Uuid::fromHexToBytes($languageId)]);
-
-        if (empty($config)) {
-            return null;
-        }
-
-        return $this->config[$languageId] = (int) ($config['min_search_length'] ?? self::DEFAULT_MIN_SEARCH_TERM_LENGTH);
+        return $this->getDecorated()->filter($tokens, $context);
     }
 }

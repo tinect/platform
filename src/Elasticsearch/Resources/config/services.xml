@@ -237,8 +237,9 @@
             <tag name="shopware.es.definition"/>
         </service>
 
-        <service id="Shopware\Elasticsearch\Product\StopwordTokenFilter">
-            <argument type="service" id="Doctrine\DBAL\Connection"/>
+        <service id="Shopware\Elasticsearch\Product\StopwordTokenFilter"
+                 decorates="Shopware\Core\Framework\DataAbstractionLayer\Search\Term\Filter\TokenFilter">
+            <argument type="service" id="Shopware\Elasticsearch\Product\StopwordTokenFilter.inner"/>
         </service>
 
         <service id="Shopware\Core\Framework\DataAbstractionLayer\Search\SearchConfigLoader">
@@ -247,7 +248,7 @@
 
         <service id="Shopware\Elasticsearch\Product\AbstractProductSearchQueryBuilder" class="Shopware\Elasticsearch\Product\ProductSearchQueryBuilder">
             <argument type="service" id="Shopware\Core\Content\Product\ProductDefinition"/>
-            <argument type="service" id="Shopware\Elasticsearch\Product\StopwordTokenFilter"/>
+            <argument type="service" id="Shopware\Core\Framework\DataAbstractionLayer\Search\Term\Filter\TokenFilter"/>
             <argument type="service" id="Shopware\Core\Framework\DataAbstractionLayer\Search\Term\Tokenizer"/>
             <argument type="service" id="Shopware\Core\Framework\DataAbstractionLayer\Search\SearchConfigLoader"/>
             <argument type="service" id="Shopware\Elasticsearch\TokenQueryBuilder"/>
